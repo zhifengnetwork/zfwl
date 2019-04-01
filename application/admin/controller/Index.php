@@ -5,6 +5,6 @@ class Index
 {
     public function index()
     {
-        phpinfo();
+        phpinfo();die;
     }
 }
