@@ -15,15 +15,15 @@ return [
     // +----------------------------------------------------------------------
 
     // 应用调试模式
-    'app_debug'              => false,
+    'app_debug'              => true,
     // 应用Trace
-    'app_trace'              => false,
+    'app_trace'              => true,
     // 应用模式状态
     'app_status'             => '',
     // 是否支持多模块
     'app_multi_module'       => true,
     // 入口自动绑定模块
-    'auto_bind_module'       => false,
+    'auto_bind_module'       => true,
     // 注册的根命名空间
     'root_namespace'         => [],
     // 扩展函数文件
@@ -54,7 +54,7 @@ return [
     // +----------------------------------------------------------------------
 
     // 默认模块名
-    'default_module'         => 'index',
+    'default_module'         => 'admin',
     // 禁止访问模块
     'deny_module_list'       => ['common'],
     // 默认控制器名
@@ -83,7 +83,7 @@ return [
     // URL伪静态后缀
     'url_html_suffix'        => 'html',
     // URL普通方式参数 用于自动生成
-    'url_common_param'       => false,
+    'url_common_param'       => true,
     // URL参数方式 0 按名称成对解析 1 按顺序解析
     'url_param_type'         => 0,
     // 是否开启路由
@@ -92,8 +92,6 @@ return [
     'route_complete_match'   => false,
     // 路由配置文件（支持配置多个）
     'route_config_file'      => ['route'],
-    // 是否开启路由解析缓存
-    'route_check_cache'      => false,
     // 是否强制使用路由
     'url_route_must'         => false,
     // 域名部署
@@ -143,7 +141,16 @@ return [
     ],
 
     // 视图输出字符串内容替换
-    'view_replace_str'       => [],
+    'view_replace_str'       => [
+
+        '__INSPINIA__' => '/static/inspinia',
+        '__IMG__'      => '/static/images',
+    	'__STATIC__'   => '/static',
+        '__LIB__'      => '/static/lib',
+        '__MOBILE__'   => '/static/mobile',
+
+        '__PLIST__'    =>  '/plist',
+    ],
     // 默认跳转页面对应的模板文件
     'dispatch_success_tmpl'  => THINK_PATH . 'tpl' . DS . 'dispatch_jump.tpl',
     'dispatch_error_tmpl'    => THINK_PATH . 'tpl' . DS . 'dispatch_jump.tpl',
@@ -187,6 +194,24 @@ return [
     // | 缓存设置
     // +----------------------------------------------------------------------
 
+    // reids 缓存
+    // 'cache'                  => [
+    //     // 驱动方式
+    //     'type'     => 'redis',
+    //     // 缓存保存目录
+    //     'path'     => CACHE_PATH,
+    //     // 缓存前缀
+    //     'prefix'   => 'zjtest',
+    //     // 缓存有效期 0表示永久缓存
+    //     'expire'   => 0,
+
+    //     'port'     => 6100,
+    //     'password' => 'sVbV#M8YAbe8',
+    //     'select'   => 1,
+    //     'host'     => '127.0.0.1',
+    // ],
+
+    // 文件缓存 (本地使用这个)
     'cache'                  => [
         // 驱动方式
         'type'   => 'File',
@@ -240,4 +265,35 @@ return [
         'var_page'  => 'page',
         'list_rows' => 15,
     ],
+
+    //'api_auth_key'=> '0681baabe2c46df563819ddd4f3b1002',
+
+    // 队列任务
+    'queue_job'              => [
+        'gameRecord'       => 'gameRecordQueue', // 游戏记录
+        'agentTax'         => 'agentTaxQueue', // 代理统计
+        'gameStatistics'   => 'gameStatisticsQueue', // 游戏统计
+        'reportStatistics' => 'reportStatisticsQueue', // 日常登入统计
+    ],
+
+    // 中间件服务端口
+    'middle_service'         => [
+        'host' => '127.0.0.1',
+        'port' => 28100,
+    ],
+
+    // 控制服务端口
+    'ctrl_service'           => [
+        'host' => '127.0.0.1',
+        'port' => 27100,
+    ],
+
+    // 服务端口信息
+    'room_no_service'        => [
+        'host' => '127.0.0.1',
+        'port' => 3388,
+    ],
+
+    // 提现充值渠道名称
+    //'channel_names' => ['人工充值', '支付宝', '微信', 'vip充值', '银行'],
 ];

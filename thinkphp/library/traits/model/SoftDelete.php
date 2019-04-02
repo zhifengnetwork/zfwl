@@ -2,7 +2,6 @@
 
 namespace traits\model;
 
-use think\Collection;
 use think\db\Query;
 use think\Model;
 
@@ -112,7 +111,7 @@ trait SoftDelete
         }
 
         // 包含软删除数据
-        $query = (new static())->db(false);
+        $query = self::withTrashed();
         if (is_array($data) && key($data) !== 0) {
             $query->where($data);
             $data = null;

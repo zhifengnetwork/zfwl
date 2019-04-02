@@ -361,9 +361,14 @@ abstract class Connection
             // 调试开始
             $this->debug(true);
 
+            // 释放前次的查询结果
+            if (!empty($this->PDOStatement)) {
+                $this->free();
+            }
             // 预处理
-            $this->PDOStatement = $this->linkID->prepare($sql);
-
+            if (empty($this->PDOStatement)) {
+                $this->PDOStatement = $this->linkID->prepare($sql);
+            }
             // 是否为存储过程调用
             $procedure = in_array(strtolower(substr(trim($sql), 0, 4)), ['call', 'exec']);
             // 参数绑定
@@ -424,9 +429,14 @@ abstract class Connection
             // 调试开始
             $this->debug(true);
 
+            //释放前次的查询结果
+            if (!empty($this->PDOStatement) && $this->PDOStatement->queryString != $sql) {
+                $this->free();
+            }
             // 预处理
-            $this->PDOStatement = $this->linkID->prepare($sql);
-
+            if (empty($this->PDOStatement)) {
+                $this->PDOStatement = $this->linkID->prepare($sql);
+            }
             // 是否为存储过程调用
             $procedure = in_array(strtolower(substr(trim($sql), 0, 4)), ['call', 'exec']);
             // 参数绑定
@@ -649,15 +659,18 @@ abstract class Connection
                 );
             }
 
+        } catch (\PDOException $e) {
+            if ($this->isBreak($e)) {
+                return $this->close()->startTrans();
+            }
+            throw $e;
         } catch (\Exception $e) {
             if ($this->isBreak($e)) {
-                --$this->transTimes;
                 return $this->close()->startTrans();
             }
             throw $e;
         } catch (\Error $e) {
             if ($this->isBreak($e)) {
-                --$this->transTimes;
                 return $this->close()->startTrans();
             }
             throw $e;
@@ -791,8 +804,6 @@ abstract class Connection
         $this->linkWrite = null;
         $this->linkRead  = null;
         $this->links     = [];
-        // 释放查询
-        $this->free();
         return $this;
     }
 

@@ -1,10 +1,19 @@
 <?php
 namespace app\admin\controller;
 
-class Index
+use think\Db;
+
+/**
+ * 首页
+ */
+class Index extends Common
 {
     public function index()
     {
-        phpinfo();die;
+        
+     
+        $this->assign('meta_title', '首页');
+        return $this->fetch();
     }
+
 }

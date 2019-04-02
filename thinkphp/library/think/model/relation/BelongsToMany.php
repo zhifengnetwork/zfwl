@@ -29,8 +29,6 @@ class BelongsToMany extends Relation
     protected $pivotName;
     // 中间表模型对象
     protected $pivot;
-    // 中间表数据名称
-    protected $pivotDataName = 'pivot';
 
     /**
      * 构造函数
@@ -69,18 +67,6 @@ class BelongsToMany extends Relation
     public function pivot($pivot)
     {
         $this->pivotName = $pivot;
-        return $this;
-    }
-
-    /**
-     * 设置中间表数据名称
-     * @access public
-     * @param  string $name
-     * @return $this
-     */
-    public function pivotDataName($name)
-    {
-        $this->pivotDataName = $name;
         return $this;
     }
 
@@ -132,7 +118,7 @@ class BelongsToMany extends Relation
                     }
                 }
             }
-            $model->setRelation($this->pivotDataName, $this->newPivot($pivot, true));
+            $model->setRelation('pivot', $this->newPivot($pivot, true));
         }
     }
 
@@ -360,18 +346,10 @@ class BelongsToMany extends Relation
      * 获取关联统计子查询
      * @access public
      * @param \Closure $closure 闭包
-     * @param string   $name    统计数据别名
      * @return string
      */
-    public function getRelationCountQuery($closure, &$name = null)
+    public function getRelationCountQuery($closure)
     {
-        if ($closure) {
-            $return = call_user_func_array($closure, [ & $this->query]);
-            if ($return && is_string($return)) {
-                $name = $return;
-            }
-        }
-
         return $this->belongsToManyQuery($this->foreignKey, $this->localKey, [
             'pivot.' . $this->localKey => [
                 'exp',
@@ -406,7 +384,7 @@ class BelongsToMany extends Relation
                     }
                 }
             }
-            $set->setRelation($this->pivotDataName, $this->newPivot($pivot, true));
+            $set->setRelation('pivot', $this->newPivot($pivot, true));
             $data[$pivot[$this->localKey]][] = $set;
         }
         return $data;
@@ -519,29 +497,6 @@ class BelongsToMany extends Relation
         } else {
             throw new Exception('miss relation data');
         }
-    }
-
-    /**
-     * 判断是否存在关联数据
-     * @access public
-     * @param  mixed $data  数据 可以使用关联模型对象 或者 关联对象的主键
-     * @return Pivot
-     * @throws Exception
-     */
-    public function attached($data)
-    {
-        if ($data instanceof Model) {
-            $relationFk = $data->getPk();
-            $id         = $data->$relationFk;
-        } else {
-            $id = $data;
-        }
-
-        $pk = $this->parent->getPk();
-
-        $pivot = $this->pivot->where($this->localKey, $this->parent->$pk)->where($this->foreignKey, $id)->find();
-
-        return $pivot ?: false;
     }
 
     /**

@@ -176,7 +176,7 @@ class Log
             }
         }
 
-        if ($result = self::$driver->save($log, true)) {
+        if ($result = self::$driver->save($log)) {
             self::$log = [];
         }
 
@@ -211,7 +211,7 @@ class Log
         is_null(self::$driver) && self::init(Config::get('log'));
 
         // 写入日志
-        if ($result = self::$driver->save($log, false)) {
+        if ($result = self::$driver->save($log)) {
             self::$log = [];
         }
 
