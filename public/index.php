@@ -11,11 +11,11 @@
 
 // [ 应用入口文件 ]
 define('HTTP_HOST', $_SERVER['HTTP_HOST']);
-if (preg_match("/(.*)\.(.*)\.fangxiname\.com/i", HTTP_HOST, $matches)) {
+if (preg_match("/(.*)\.(.*)\.zhifengwangluo\.com/i", HTTP_HOST, $matches)) {
     $partner = $matches[1];
     $key     = $matches[2];
     $modules = [
-        'goc'   => 'admin',
+        'zfwl'   => 'admin',
         'home'  => 'home',
         'pay'   => 'pay',
         'api'   => 'api',
@@ -26,8 +26,6 @@ if (preg_match("/(.*)\.(.*)\.fangxiname\.com/i", HTTP_HOST, $matches)) {
     $module = isset($modules[$key]) ? $modules[$key] : 'home';
     define('MG_PARTNER', $partner);
     define('BIND_MODULE', $module);
-    echo 111;
-    exit;
 } else {
     $terrace = [
         '127.0.0.1:10060' => 'kf',
