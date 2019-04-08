@@ -286,4 +286,112 @@ class Goods extends Common
 
     }
 
+    /*
+     * 商品规格管理
+     */
+    public function sku_index(){
+
+        $where = [];
+        $pageParam = ['query' => []];
+
+        $sku_name = input('sku_name');
+        if( $sku_name ){
+            $where["sku_name"] = ['like', "%{$sku_name}%"];
+            $pageParam['query']['sku_name'] = ['like', "%{$sku_name}%"];
+        }
+
+        $list  = Db::table('goods_sku')->order('sku_id DESC')->where($where)->paginate(10,false,$pageParam);
+
+        return $this->fetch('goods/sku_index',[
+            'list'          =>  $list,
+            'sku_name'      =>  $sku_name,
+            
+            'meta_title'    =>  '商品规格管理',
+        ]);
+    }
+
+    /*
+     * 添加商品规格
+     */
+    public function goods_sku_add(){
+
+        if( Request::instance()->isPost() ){
+            $data = input('post.');
+            
+            if( !$data['sku_name'] || !$data['sku_value'] ){
+                $this->error('请填写完整！');
+            }
+
+            $data['create_time'] = time();
+            $data['update_time'] = time();
+
+            if ( Db::table('goods_sku')->insert($data) ) {
+                $this->success('添加成功', url('goods/goods_sku_add'));
+            } else {
+                $this->error('添加失败');
+            }
+
+        }
+
+        return $this->fetch('goods/goods_sku_add',[
+            'meta_title'    =>  '添加商品规格',
+        ]);
+    }
+
+    /*
+     * 修改商品规格
+     */
+    public function goods_sku_edit(){
+        $sku_id = input('sku_id');
+        
+        if(!$sku_id){
+            $this->error('参数错误！');
+        }
+
+        if( Request::instance()->isPost() ){
+            $data = input('post.');
+            
+            if( !$data['sku_name'] || !$data['sku_value'] ){
+                $this->error('请填写完整！');
+            }
+
+            $data['update_time'] = time();
+
+            if ( Db::table('goods_sku')->update($data) ) {
+                $this->success('修改成功', url('goods/goods_sku_edit'));
+            } else {
+                $this->error('修改失败');
+            }
+
+        }
+
+        $info = Db::table('goods_sku')->find($sku_id);
+        
+        return $this->fetch('goods/goods_sku_edit',[
+            'info'          =>  $info,
+            'meta_title'    =>  '修改商品规格',
+        ]);
+    }
+
+    /*
+     * ajax 删除商品规格
+     */
+    public function goods_sku_del(){
+        $sku_id = input('sku_id');
+        if(!$sku_id){
+            jason(100,'参数错误');
+        }
+        $info = Db::table('goods_sku')->find($sku_id);
+        if(!$info){
+            jason(100,'参数错误');
+        }
+
+        if( Db::table('goods')->where('sku_id',$sku_id)->delete() ){
+            jason(200,'删除商品规格成功！');
+        }else{
+            jason(100,'删除商品规格失败！');
+        }
+
+    }
+
 }
