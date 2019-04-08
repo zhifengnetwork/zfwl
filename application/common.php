@@ -1,6 +1,16 @@
 <?php
 use think\Db;
 
+function pre($data){
+    echo '<pre>';
+    print_r($data);
+}
+
+function pred($data){
+    echo '<pre>';
+    print_r($data);die;
+}
+
 /**
  * 创建盐
  * @author tangtanglove <dai_hang_love@126.com>
