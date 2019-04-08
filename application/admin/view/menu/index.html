@@ -42,7 +42,7 @@
                                     {if condition="isset($v['_child'])"}
                                     {volist name="v['_child']" id="v1"}
                                         <tr>
-                                            <td style="">------------ {$v1.title}</td>
+                                            <td >------------ {$v1.title}</td>
                                             <td>{$v1.url}</td>
                                             <td>{eq name="v1['status']" value="1"}正常{else /}删除{/eq}</td>
                                             <td>{eq name="v['hide']" value="1"}显示{else /}隐藏{/eq}</td>
@@ -60,43 +60,4 @@
             </div>
         </div>
     </div>
-{/block}
-{block name='script'}
-<script>
-$(function() {
-    $('#clean_database').click(function(){
-         layer.confirm('此操作将会清空所有用户数据', {
-          btn: ['确认','取消'] //按钮
-          ,anim: 4 //动画类型
-        }, function(){
-            layer.confirm('并且没有日志记录，一旦清空无法复原', {
-              btn: ['确认','取消'] //按钮
-              ,anim: 3 //动画类型
-            }, function(){
-               layer.confirm('默认保留配置表数据和后台系统数据', {
-                  btn: ['确认','取消'] //按钮
-                  ,anim: 2 //动画类型
-                }, function(){
-                    layer.confirm('你确认要清空数据？', {
-                      btn: ['确认','取消'] //按钮
-                      ,anim: 1 //动画类型
-                    }, function(index1){
-                        layer.close(index1);
-                        layer.prompt({title: '请输入二级密码', formType: 1}, function(pass, index){
-                            $.post("{:url('database/cleanDatabase')}", {password:pass}, function(res){
-                                layer.close(index);
-                                if (res.code) {
-                                    layer.msg(res.msg,{icon:6});
-                                } else {
-                                    layer.msg(res.msg,{icon:5});
-                                }
-                            });
-                        });
-                    });
-                });
-            });
-        });
-    });
-});
-</script>
 {/block}

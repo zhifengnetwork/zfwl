@@ -141,12 +141,12 @@ return [
 
     // 视图输出字符串内容替换
     'view_replace_str'       => [
-        '__INSPINIA__' => '/public/static/inspinia',
-        '__IMG__'      => '/public/static/images',
-    	'__STATIC__'   => '/public/static',
-        '__LIB__'      => '/public/static/lib',
-        '__MOBILE__'   => '/public/static/mobile',
-        '__PLIST__'    =>  '/public/plist',
+        '__INSPINIA__' => '/static/inspinia',
+        '__IMG__'      => '/static/images',
+    	'__STATIC__'   => '/static',
+        '__LIB__'      => '/static/lib',
+        '__MOBILE__'   => '/static/mobile',
+        '__PLIST__'    =>  '/plist',
     ],
     // 默认跳转页面对应的模板文件
     'dispatch_success_tmpl'  => THINK_PATH . 'tpl' . DS . 'dispatch_jump.tpl',
@@ -263,34 +263,7 @@ return [
         'list_rows' => 15,
     ],
 
-    //'api_auth_key'=> '0681baabe2c46df563819ddd4f3b1002',
-
     // 队列任务
     'queue_job'              => [
-        'gameRecord'       => 'gameRecordQueue', // 游戏记录
-        'agentTax'         => 'agentTaxQueue', // 代理统计
-        'gameStatistics'   => 'gameStatisticsQueue', // 游戏统计
-        'reportStatistics' => 'reportStatisticsQueue', // 日常登入统计
     ],
-
-    // 中间件服务端口
-    'middle_service'         => [
-        'host' => '127.0.0.1',
-        'port' => 28100,
-    ],
-
-    // 控制服务端口
-    'ctrl_service'           => [
-        'host' => '127.0.0.1',
-        'port' => 27100,
-    ],
-
-    // 服务端口信息
-    'room_no_service'        => [
-        'host' => '127.0.0.1',
-        'port' => 3388,
-    ],
-
-    // 提现充值渠道名称
-    //'channel_names' => ['人工充值', '支付宝', '微信', 'vip充值', '银行'],
 ];

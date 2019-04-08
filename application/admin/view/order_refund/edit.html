@@ -1,0 +1,156 @@
+{extend name="common:base" /}
+{block name="style"}
+<style type="text/css">
+.table>thead>tr>th {
+    text-align: center;
+}
+</style>
+{/block}
+{block name="content"}
+<div class="ibox">
+    <div class="ibox-content">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="m-b-md" style=" position:relative;">
+                    <h3>基础内容</h3>
+                    <div style=" position:absolute; right:0; top:-10px;">
+                        <a class="btn btn-sm btn-info" id="add_virtual_num" data-toggle="modal" data-target="#edit" style="margin-left: 20px;">
+                            打印订单 <i class="fa fa-edit"></i>
+                        </a>
+                    </div>
+                </div>
+                <table class="table  table-bordered" align="right">
+                    <tbody>
+                        <tr>
+                            <td class="col-lg-1 active text-right">商品名称</td>
+                            <td class="col-lg-2"></td>
+                            <td class="col-lg-1 active text-right">收货地址</td>
+                            <td class="col-lg-2"> </td>
+                        </tr>
+                        <tr>
+                            <td class="col-lg-1 active text-right">订单号</td>
+                            <td class="col-lg-2"></td>
+                            <td class="col-lg-1 active text-right">收货人</td>
+                            <td class="col-lg-2"></td>
+                        </tr>
+                        <tr>
+                            <td class="col-lg-1 active text-right">订单金额</td>
+                            <td class="col-lg-2">
+                               
+                            </td>
+                            <td class="col-lg-1 active text-right">手机号码</td>
+                            <td class="col-lg-2"></td>
+                        </tr>
+                        <tr>
+                            <td class="col-lg-1 active text-right">状态</td>
+                            <td class="col-lg-2"></td>
+                            <td class="col-lg-1 active text-right">下单时间</td>
+                            <td class="col-lg-2"></td>
+                        </tr>
+                        <tr>
+                            <td class="col-lg-1 active text-right">支付方式</td>
+                            <td class="col-lg-2"></td>
+                            <td class="col-lg-1 active text-right">支付时间</td>
+                            <td class="col-lg-2"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="m-b-md">
+                    <h3>商品信息</h3>
+                </div>
+                <table class="table  table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>商品编号</th>
+                            <th>商品名称</th>
+                            <th>规格属性</th>
+                            <th>数量</th>
+                            <th>单品价格</th>
+                            <th>单品小计</th>
+                        </tr>
+                        <thead>
+                        <tbody>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="m-b-md">
+                    <h3>费用信息</h3>
+                </div>
+                <table class="table  table-bordered text-center">
+                    <!-- <thead>
+                        <tr>
+                            <th>商品编号</th>
+                            <th>商品名称</th>
+                            <th>规格属性</th>
+                            <th>数量</th>
+                            <th>单品价格</th>
+                            <th>单品小计</th>
+                        </tr>
+                        <thead> -->
+                        <tbody>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="m-b-md">
+                    <h3>退款处理</h3>
+                </div>
+                <table class="table  table-bordered text-center">
+                    <!-- <thead>
+                        <tr>
+                            <th>商品编号</th>
+                            <th>商品名称</th>
+                            <th>规格属性</th>
+                            <th>数量</th>
+                            <th>单品价格</th>
+                            <th>单品小计</th>
+                        </tr>
+                        <thead> -->
+                        <tbody>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                </table>
+            </div>
+        </div>
+
+
+
+    </div>
+</div>
+
+{/block}

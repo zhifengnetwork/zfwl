@@ -98,7 +98,7 @@ return [
         'id'    => 40000,
         'title' => '订单管理',
         'sort'  => 2,
-        'url'   => 'user/index',
+        'url'   => 'order/index',
         'hide'  => 1,
         'icon'  => 'fa-user',
         'child' => [
@@ -106,21 +106,42 @@ return [
                 'id'    => 40100,
                 'title' => '全部订单',
                 'sort'  => 1,
-                'url'   => 'machine/index',
+                'url'   => 'order/index',
                 'hide'  => 1,
+                'child' => [
+                    [
+                        'id'    => 40101,
+                        'title' => '订单详情',
+                        'sort'  => 1,
+                        'url'   => 'order/edit',
+                        'hide'  => 1,
+                    ],
+                   
+                ],
+
             ],
             [
                 'id'    => 40200,
                 'title' => '退货退款',
                 'sort'  => 1,
-                'url'   => 'machine/index',
+                'url'   => 'order_refund/index',
                 'hide'  => 1,
+                'child' => [
+                    [
+                        'id'    => 40201,
+                        'title' => '退款详情',
+                        'sort'  => 1,
+                        'url'   => 'order_refund/edit',
+                        'hide'  => 1,
+                    ],
+                   
+                ],
             ],
             [
                 'id'    => 40300,
                 'title' => '评价列表',
                 'sort'  => 1,
-                'url'   => 'machine/index',
+                'url'   => 'comment/index',
                 'hide'  => 1,
             ],
             [
@@ -150,8 +171,24 @@ return [
                 'id'    => 50100,
                 'title' => '首页轮播图',
                 'sort'  => 1,
-                'url'   => 'config/get_config',
+                'url'   => 'advertisement/index',
                 'hide'  => 1,
+                'child' => [
+                    [
+                        'id'    => 50101,
+                        'title' => '首页轮播图',
+                        'sort'  => 1,
+                        'url'   => 'advertisement/index',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 50201,
+                        'title' => '轮播图编辑',
+                        'sort'  => 1,
+                        'url'   => 'advertisement/edit',
+                        'hide'  => 0,
+                    ],
+                ],
             ],
             [
                 'id'    => 50200,

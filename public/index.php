@@ -16,12 +16,12 @@ if (preg_match("/(.*)\.(.*)\.zhifengwangluo\.com/i", HTTP_HOST, $matches)) {
     $key     = $matches[2];
     $modules = [
         'zfwl'   => 'admin',
-        'home'  => 'home',
-        'pay'   => 'pay',
-        'api'   => 'api',
-        'sapi'  => 'sapi',
-        'agent' => 'agent',
-        'kf'    => 'kf',
+        'home'   => 'home',
+        'pay'    => 'pay',
+        'api'    => 'api',
+        'sapi'   => 'sapi',
+        'agent'  => 'agent',
+        'kf'     => 'kf',
     ];
     $module = isset($modules[$key]) ? $modules[$key] : 'home';
     define('MG_PARTNER', $partner);
