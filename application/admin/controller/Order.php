@@ -2,11 +2,15 @@
 namespace app\admin\controller;
 
 use app\common\model\Order as OrderModel;
+use app\common\model\OrderGoods as OrdeGoodsModel;
 use Overtrue\Wechat\Payment\Business;
 use Overtrue\Wechat\Payment\QueryRefund;
 use Overtrue\Wechat\Payment\Refund;
 use \think\Db;
 use think\Exception;
+
+//物流api
+use app\home\controller\Api;
 
 class Order extends Common
 {
@@ -15,23 +19,25 @@ class Order extends Common
      */
     public function index()
     {
-        $params_key       = ['type', 'status',  'kw', 'order_id','good_name'];
+        $params_key       = ['shipping_status', 'pay_status',  'kw', 'order_id','good_name'];
 
         //携带参数
         $where            = $this->get_where($params_key, $param_arr);
         
         $list             = OrderModel::alias('uo')->field('*')
             ->where($where)
-            ->order('id DESC')
+            ->order('order_id DESC')
             ->paginate(2, false, ['query' => $where]);
         // 导出设置
         $param_arr['tpl_type'] = 'export';
         // 模板变量赋值
         $this->assign('list', $list);
         //订单状态
-        $this->assign('status_list', OrderModel::$status_list);
+        $this->assign('status_list', config('ORDER_STATUS'));
         //支付方式
-        $this->assign('type_list', OrderModel::$type_list);
+        $this->assign('type_list',config('PAY_TYPE'));
+        //支付状态
+        $this->assign('pay_status',config('PAY_STATUS'));
         
         $this->assign('param_arr', $param_arr);
 
@@ -45,10 +51,26 @@ class Order extends Common
      */
     public function edit(){
         $order_id   = input('order_id','');
-        $orderGoodsMdel = new OrderGoods();
+        $orderGoodsMdel = new OrdeGoodsModel();
         $orderModel     = new OrderModel();
         $order_info     =  $orderModel->where(['order_id'=>$order_id])->find();
         $orderGoods     =  $orderGoodsMdel::all(['order_id'=>$order_id,'is_send'=>['lt',2]]);
+        
+         //订单状态
+         $this->assign('order_status', config('ORDER_STATUS'));
+         //支付方式
+         $this->assign('type_list',config('PAY_TYPE'));
+        //物流
+        // $Api = new Api;
+        // $data = M('delivery_doc')->where('order_id', $order_id)->find();
+        // $shipping_code = $data['shipping_code'];
+        // $invoice_no = $data['invoice_no'];
+        // $result = $Api->queryExpress($shipping_code, $invoice_no);
+        // if ($result['status'] == 0) {
+        //     $result['result'] = $result['result']['list'];
+        // }
+        // $this->assign('invoice_no', $invoice_no);
+        // $this->assign('result', $result);
         $this->assign('orderGoods', $orderGoods);
         $this->assign('order_info', $order_info);
         $this->assign('meta_title', '订单详情');
@@ -179,130 +201,6 @@ class Order extends Common
         $this->assign('params_arr', $params_arr);
         
         return $where;
-    }
-
-    public function selecthtml()
-    {
-        $c_id = input('c_id/d', 0);
-        $a_id = input('a_id/d', 0);
-        $p_id = input('p_id/d', 0);
-        $m_id = input('m_id/d', 0);
-        $type = input('type/d', 0);
-        $def  = input('def');
-
-        if ($type == 1) {
-            return get_place_html($a_id, $p_id, $def);
-        } elseif ($type == 2) {
-            return get_machine_html($p_id, $m_id);
-        } elseif ($type == 3){
-            return get_service_html($a_id,0);
-        }else{
-            return '';
-        }
-    }
-
-    /**
-     *  退款功能
-     * @return array
-     *
-     */
-    public function refund()
-    {
-        //现在只有管理员可以退款
-        $hasRefundAuth = $this->_hasRefundAuth();
-        if (!$hasRefundAuth) {
-            $this->error("没有操作的权限，请联系管理员。");
-        }
-
-        //请求数据处理
-        $orderId = input('order_id/d', 0);
-        if (!$orderId) {
-            $this->error("参数错误");
-        }
-
-        if (TERRACE_ID == '1007') {
-            $isProd = false;
-        } else {
-            $isProd = true;
-        }
-
-        $orderSerice = new OrderService();
-        $refundRes   = $orderSerice->refund($orderId, $this->mginfo['mgid'], $isProd);
-        $code        = $refundRes[0];
-        $msg         = $refundRes[1];
-
-        //统一添加退款日志
-        pft_log('order_refund', json_encode([$this->mginfo, $orderId, $refundRes]));
-
-        //添加微信退款通知
-        if ($isProd) {
-            $warnMsg = "退款通知：{$this->mginfo['name']}【{$this->mginfo['username']}】将订单【{$orderId}】进行退款，退款结果：{$msg}【{$code}】。";
-            NoticeService::warningMsg(date('Y-m-d H:i:s'), $warnMsg);
-        }
-
-        switch ($code) {
-            case 0:
-                //退款失败
-                $this->error($msg);
-                break;
-            case 1:
-                //退款成功
-                StatisService::addStatisAsynchTask($orderId, StatisService::REFUND_ACTION);
-                $this->success($msg);
-                break;
-            case 2:
-                //退款超时
-                $this->error("退款超时，请重新请求");
-                break;
-            case 3:
-                //退款失败
-                $this->error($msg);
-                break;
-        }
-    }
-
-    /**
-     *  查询退款功能
-     *  @return array
-     *
-     */
-    public function queryRefund()
-    {
-        $request['out_trade_no'] = input('order_id', '');
-        if ($request['out_trade_no'] == '') {
-            $this->error('查询订单号不能为空');
-            exit;
-        }
-        try {
-            include_once VENDOR_PATH . 'wechat-2/autoload.php';
-            // 获取实例化参数
-            $wxConfigArr   = Config::get('wx_config');
-            $appId         = $wxConfigArr['appid'];
-            $appSecret     = $wxConfigArr['appsecret'];
-            $mchId         = $wxConfigArr['mch_id'];
-            $mchKey        = $wxConfigArr['mch_key'];
-            $apiclientCert = $wxConfigArr['apiclient_cert'];
-            $apiclientKey  = $wxConfigArr['apiclient_key'];
-
-            $business = new Business($appId, $appSecret, $mchId, $mchKey);
-            $business->setClientCert($apiclientCert);
-            $business->setClientKey($apiclientKey);
-
-            $queryRefund                = new QueryRefund($business);
-            $queryRefund->out_refund_no = $request['out_trade_no'];
-            $queryRefundRes             = $queryRefund->getResponse();
-            $msg                        = '';
-        } catch (\Exception $e) {
-            $msg            = $e->getMessage();
-            $queryRefundRes = '';
-        }
-
-        if ($msg) {
-            $this->error($msg);
-        } elseif ($queryRefundRes) {
-            // todo
-        }
-        exit;
     }
 
       /**

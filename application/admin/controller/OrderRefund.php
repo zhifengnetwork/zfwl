@@ -1,7 +1,9 @@
 <?php
 namespace app\admin\controller;
 
+use app\common\model\OrderRefund as OrderRefundModel;
 use app\common\model\Order as OrderModel;
+use app\common\model\OrderGoods as OrdeGoodsModel;
 use Overtrue\Wechat\Payment\Business;
 use Overtrue\Wechat\Payment\QueryRefund;
 use Overtrue\Wechat\Payment\Refund;
@@ -15,23 +17,21 @@ class OrderRefund extends Common
      */
     public function index()
     {
-        $params_key       = ['type', 'status',  'kw', 'order_id','good_name'];
+      
+        $params_key       = ['shipping_status', 'pay_status',  'kw', 'order_id','good_name'];
 
         //携带参数
         $where            = $this->get_where($params_key, $param_arr);
         
-        $list             = OrderModel::alias('uo')->field('*')
-            ->where($where)
-            ->order('id DESC')
-            ->paginate(20, false, ['query' => $where]);
+        $list   = OrderRefundModel::alias('r')->field('*')
+                ->join("order uo",'uo.order_id=r.order_id','LEFT')
+                ->where($where)
+                ->order('r.id DESC')
+                ->paginate(2, false, ['query' => $where]);
         // 导出设置
         $param_arr['tpl_type'] = 'export';
         // 模板变量赋值
         $this->assign('list', $list);
-        //订单状态
-        $this->assign('status_list', OrderModel::$status_list);
-        //支付方式
-        $this->assign('type_list', OrderModel::$type_list);
         
         $this->assign('param_arr', $param_arr);
 
@@ -44,6 +44,29 @@ class OrderRefund extends Common
      * 退款详情
      */
     public function edit(){
+        $order_id   = input('order_id','');
+        $orderGoodsMdel = new OrdeGoodsModel();
+        $orderModel     = new OrderModel();
+        $order_info     =  $orderModel->where(['order_id'=>$order_id])->find();
+        $orderGoods     =  $orderGoodsMdel::all(['order_id'=>$order_id,'is_send'=>['lt',2]]);
+        
+         //订单状态
+         $this->assign('order_status', config('ORDER_STATUS'));
+         //支付方式
+         $this->assign('type_list',config('PAY_TYPE'));
+        //物流
+        // $Api = new Api;
+        // $data = M('delivery_doc')->where('order_id', $order_id)->find();
+        // $shipping_code = $data['shipping_code'];
+        // $invoice_no = $data['invoice_no'];
+        // $result = $Api->queryExpress($shipping_code, $invoice_no);
+        // if ($result['status'] == 0) {
+        //     $result['result'] = $result['result']['list'];
+        // }
+        // $this->assign('invoice_no', $invoice_no);
+        // $this->assign('result', $result);
+        $this->assign('orderGoods', $orderGoods);
+        $this->assign('order_info', $order_info);
         $this->assign('meta_title', '退款详情');
         return $this->fetch();
     }
@@ -175,25 +198,7 @@ class OrderRefund extends Common
         return $where;
     }
 
-    public function selecthtml()
-    {
-        $c_id = input('c_id/d', 0);
-        $a_id = input('a_id/d', 0);
-        $p_id = input('p_id/d', 0);
-        $m_id = input('m_id/d', 0);
-        $type = input('type/d', 0);
-        $def  = input('def');
 
-        if ($type == 1) {
-            return get_place_html($a_id, $p_id, $def);
-        } elseif ($type == 2) {
-            return get_machine_html($p_id, $m_id);
-        } elseif ($type == 3){
-            return get_service_html($a_id,0);
-        }else{
-            return '';
-        }
-    }
 
     /**
      *  退款功能
@@ -202,57 +207,62 @@ class OrderRefund extends Common
      */
     public function refund()
     {
-        //现在只有管理员可以退款
-        $hasRefundAuth = $this->_hasRefundAuth();
-        if (!$hasRefundAuth) {
-            $this->error("没有操作的权限，请联系管理员。");
-        }
-
         //请求数据处理
-        $orderId = input('order_id/d', 0);
+        $orderId       = input('order_id/d', 0);
+
+        $refund_type   = input('refund_type/d', -1);
+        $refund_status = input('refund_status/d',-1);
+        $handle_remark = input('handle_remark','');
+        
         if (!$orderId) {
             $this->error("参数错误");
         }
 
-        if (TERRACE_ID == '1007') {
-            $isProd = false;
-        } else {
-            $isProd = true;
+        if($refund_type < 0){
+            $this->error("参数错误");
         }
 
-        $orderSerice = new OrderService();
-        $refundRes   = $orderSerice->refund($orderId, $this->mginfo['mgid'], $isProd);
-        $code        = $refundRes[0];
-        $msg         = $refundRes[1];
-
-        //统一添加退款日志
-        pft_log('order_refund', json_encode([$this->mginfo, $orderId, $refundRes]));
-
-        //添加微信退款通知
-        if ($isProd) {
-            $warnMsg = "退款通知：{$this->mginfo['name']}【{$this->mginfo['username']}】将订单【{$orderId}】进行退款，退款结果：{$msg}【{$code}】。";
-            NoticeService::warningMsg(date('Y-m-d H:i:s'), $warnMsg);
+        if($refund_status < 0){
+            $this->error("参数错误");
         }
+        //todo 退款操作
 
-        switch ($code) {
-            case 0:
-                //退款失败
-                $this->error($msg);
-                break;
-            case 1:
-                //退款成功
-                StatisService::addStatisAsynchTask($orderId, StatisService::REFUND_ACTION);
-                $this->success($msg);
-                break;
-            case 2:
-                //退款超时
-                $this->error("退款超时，请重新请求");
-                break;
-            case 3:
-                //退款失败
-                $this->error($msg);
-                break;
-        }
+
+        
+
+        // $orderSerice = new OrderService();
+        // $refundRes   = $orderSerice->refund($orderId, $this->mginfo['mgid'], $isProd);
+        // $code        = $refundRes[0];
+        // $msg         = $refundRes[1];
+
+        // //统一添加退款日志
+        // //pft_log('order_refund', json_encode([$this->mginfo, $orderId, $refundRes]));
+
+        // //添加微信退款通知
+        // if ($isProd) {
+        //     $warnMsg = "退款通知：{$this->mginfo['name']}【{$this->mginfo['username']}】将订单【{$orderId}】进行退款，退款结果：{$msg}【{$code}】。";
+        //     NoticeService::warningMsg(date('Y-m-d H:i:s'), $warnMsg);
+        // }
+
+        // switch ($code) {
+        //     case 0:
+        //         //退款失败
+        //         $this->error($msg);
+        //         break;
+        //     case 1:
+        //         //退款成功
+        //         StatisService::addStatisAsynchTask($orderId, StatisService::REFUND_ACTION);
+        //         $this->success($msg);
+        //         break;
+        //     case 2:
+        //         //退款超时
+        //         $this->error("退款超时，请重新请求");
+        //         break;
+        //     case 3:
+        //         //退款失败
+        //         $this->error($msg);
+        //         break;
+        // }
     }
 
     /**
