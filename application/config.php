@@ -141,13 +141,13 @@ return [
 
     // 视图输出字符串内容替换
     'view_replace_str'       => [
-        '__INSPINIA__' => '/static/inspinia',
-        '__IMG__'      => '/static/images',
-    	'__STATIC__'   => '/static',
-        '__LIB__'      => '/static/lib',
-        '__MOBILE__'   => '/static/mobile',
-        '__IMAGES__'   => '/upload/images',
-        '__PLIST__'    =>  '/plist',
+        '__INSPINIA__' => '/pubilc/static/inspinia',
+        '__IMG__'      => '/pubilc/static/images',
+    	'__STATIC__'   => '/pubilc/static',
+        '__LIB__'      => '/pubilc/static/lib',
+        '__MOBILE__'   => '/pubilc/static/mobile',
+        '__IMAGES__'   => '/pubilc/upload/images',
+        '__PLIST__'    =>  '/pubilc/plist',
     ],
     // 默认跳转页面对应的模板文件
     'dispatch_success_tmpl'  => THINK_PATH . 'tpl' . DS . 'dispatch_jump.tpl',
