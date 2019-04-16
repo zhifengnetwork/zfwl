@@ -146,7 +146,7 @@ return [
     	'__STATIC__'   => '/public/static',
         '__LIB__'      => '/public/static/lib',
         '__MOBILE__'   => '/public/static/mobile',
-        '__IMAGES__'   => '/upload/images',
+        '__IMAGES__'   => '/public/upload/images',
         '__PLIST__'    =>  '/public/plist',
     ],
     // 默认跳转页面对应的模板文件

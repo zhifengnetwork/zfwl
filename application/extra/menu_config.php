@@ -186,7 +186,7 @@ return [
                 'id'    => 50200,
                 'title' => '配送方式',
                 'sort'  => 2,
-                'url'   => 'config/edit',
+                'url'   => 'delivery/index',
                 'hide'  => 1,
             ],
             [

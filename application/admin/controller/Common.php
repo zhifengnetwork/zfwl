@@ -1,6 +1,5 @@
 <?php
 namespace app\admin\controller;
-use app\common\model\UserAgentLog;
 use app\common\model\Config;
 use think\Controller;
 use think\Db;
