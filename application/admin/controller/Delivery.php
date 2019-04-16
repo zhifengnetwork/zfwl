@@ -11,17 +11,6 @@ class Delivery extends Common
 
     public function index(){
 
-        $one   = 0;
-        $two   = 0;
-        $three = 0;
-        $arr = [];
-
-        for($i = 0 ; $i<=1 ; $i ++){
-            var_dump($i);
-           
-           
-        };
-        exit;
         $list    = DeliveryModel::field('*')
                     ->where([])
                     ->order('id DESC')
