@@ -15,13 +15,13 @@ if (preg_match("/(.*)\.(.*)\.zhifengwangluo\.com/i", HTTP_HOST, $matches)) {
     $partner = $matches[1];
     $key     = $matches[2];
     $modules = [
-        'zfwl'   => 'admin',
-        'home'   => 'home',
-        'pay'    => 'pay',
-        'api'    => 'api',
-        'sapi'   => 'sapi',
-        'agent'  => 'agent',
-        'kf'     => 'kf',
+        'admin'   => 'admin',
+        'home'    => 'home',
+        'pay'     => 'pay',
+        'api'     => 'api',
+        'sapi'    => 'sapi',
+        'agent'   => 'agent',
+        'kf'      => 'kf',
     ];
     $module = isset($modules[$key]) ? $modules[$key] : 'home';
     define('MG_PARTNER', $partner);
@@ -34,6 +34,7 @@ if (preg_match("/(.*)\.(.*)\.zhifengwangluo\.com/i", HTTP_HOST, $matches)) {
         '127.0.0.1:10057' => 'sapi',
         '127.0.0.1:10056' => 'api',
         '127.0.0.1:12588' => 'admin',
+        '127.0.0.1:12580' => 'admin',
     ];
     define('MG_PARTNER', 'dev');
     if (!empty($terrace[HTTP_HOST])) {

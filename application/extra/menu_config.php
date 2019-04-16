@@ -8,9 +8,6 @@ return [
         'url'   => 'index/index',
         'hide'  => 1,
         'icon'  => 'fa-th-large',
-        'child' => [
-
-        ],
     ],
 
     //商品分类
@@ -42,7 +39,7 @@ return [
 
 
        //商品模块
-       'good_model'      => [
+       'goods'      => [
         'id'    => 30000,
         'title' => '商品模块',
         'sort'  => 2,
