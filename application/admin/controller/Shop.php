@@ -11,8 +11,13 @@ namespace app\admin\controller;
 
 class Shop extends Common
 {
+    public function _initialize () {
+        parent::_initialize();
+        $info = session('admin_user_auth');
+        $this->admin_id = $info['mgid'];
+    }
     public function index () {
-        dump(session('admin_user_auth'));die;
+
     }
 
     public function getKeysList () {
@@ -21,6 +26,18 @@ class Shop extends Common
     }
 
     public function editShop () {
-
+        if (request()->isPost()){
+            $data = request()->param('data');
+            if (!empty($data)){
+                $res = model('DiyEweiShop')->edit($data,$this->admin_id);
+                if ($res){
+                    return json(['code'=>1,'msg'=>'保存成功']);
+                }else{
+                    return json(['code'=>0,'msg'=>'保存失败']);
+                }
+            }else{
+                return json(['code'=>0,'msg'=>'首页不能为空，请您添加组件']);
+            }
+        }
     }
 }
