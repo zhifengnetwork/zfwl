@@ -17,7 +17,7 @@ class DiyEweiShop extends Model
 
     public function edit ($data,$admin_id) {
         $where = [];
-        $where == ['status'=>1,'admin_id'=>$admin_id];
+        $where == ['status'=>1];
         $find = $this->where($where)->find();
         try{
             if (!empty($find)){
@@ -45,9 +45,9 @@ class DiyEweiShop extends Model
         }
     }
 
-    public function getShopData ($admin_id) {
+    public function getShopData () {
         $where = [];
-        $where = ['status'=>1,'admin_id'=>$admin_id];
+        $where = ['status'=>1];
         $getData = $this->where($where)->find();
         if (!empty($getData)){
             if (!empty($getData['data'])){
