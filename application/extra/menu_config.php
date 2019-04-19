@@ -67,7 +67,7 @@ return [
                 'id'    => 30200,
                 'title' => '商品规格管理',
                 'sort'  => 1,
-                'url'   => 'goods/sku_index',
+                'url'   => 'goods/goods_type_list',
                 'hide'  => 1,
                 'child' => [
                     [

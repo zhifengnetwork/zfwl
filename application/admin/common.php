@@ -1,7 +1,7 @@
 <?php
 use think\Db;
 
-function jason($code,$msg="",$data=array()){
+function jason($data=array(),$msg="ok",$code=1){
     $result=array(  
       'code'=>$code,  
       'msg'=>$msg, 

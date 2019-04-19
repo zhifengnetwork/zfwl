@@ -122,7 +122,7 @@
         if(window.confirm('确认删除该商品吗？')){
             $.post("{:url('Goods/del')}",{'goods_id':goods_id},function(data){
                 alert(data.msg);
-                if(data.code==200){
+                if(data.code){
                     $(obj).parents('tr').remove();
                 }
             },'json');
@@ -142,7 +142,7 @@
 
         if(window.confirm(ts)){
             $.post("{:url('Goods/is_show')}",{'goods_id':goods_id,'is_show':is_show},function(data){
-                if(data.code==200){
+                if(data.code){
                     $(obj).attr('is_show',is_show);
                     if( is_show ){
                         $(obj).parents('tr').find('td').eq(2).html('已上架');
@@ -178,7 +178,7 @@
         goods_id = goods_id.substring(0, goods_id.length - 1);  
         
         $.post("{:url('Goods/is_show_all')}",{'goods_id':goods_id,'is_show':is_show},function(data){
-            if(data.code==200){
+            if(data.code){
                 if( is_show ){
                     alert('批量上架成功！');
                 }else{
@@ -207,7 +207,7 @@
 
         if(window.confirm('确认批量删除商品吗？')){
             $.post("{:url('Goods/del_all')}",{'goods_id':goods_id},function(data){
-                if(data.code==200){
+                if(data.code){
                     alert('批量删除成功！');
                     location.reload();
                 }else{

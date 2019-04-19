@@ -217,17 +217,17 @@ class Goods extends Common
     public function del(){
         $goods_id = input('goods_id');
         if(!$goods_id){
-            jason(100,'参数错误');
+            jason([],'参数错误',0);
         }
         $info = Db::table('goods')->find($goods_id);
         if(!$info){
-            jason(100,'参数错误');
+            jason([],'参数错误',0);
         }
 
         if( Db::table('goods')->where('goods_id',$goods_id)->update(['is_del'=>1]) ){
-            jason(200,'删除商品成功！');
+            jason([],'删除商品成功！');
         }else{
-            jason(100,'删除商品失败！');
+            jason([],'删除商品失败！',0);
         }
 
     }
@@ -239,17 +239,17 @@ class Goods extends Common
         $goods_id = input('goods_id');
         $is_show  = input('is_show');
         if(!$goods_id){
-            jason(100,'参数错误');
+            jason([],'参数错误',0);
         }
         $info = Db::table('goods')->find($goods_id);
         if(!$info){
-            jason(100,'参数错误');
+            jason([],'参数错误',0);
         }
 
         if( Db::table('goods')->where('goods_id',$goods_id)->update(['is_show'=>$is_show]) ){
             jason(200);
         }
-        jason(100,'失败');
+        jason([],'失败',0);
 
     }
 
@@ -260,13 +260,13 @@ class Goods extends Common
         $goods_id = input('goods_id');
         $is_show  = input('is_show');
         if(!$goods_id){
-            jason(100,'参数错误');
+            jason([],'参数错误',0);
         }
 
         if( Db::table('goods')->where('goods_id','in',$goods_id)->update(['is_show'=>$is_show]) ){
-            jason(200);
+            jason([]);
         }
-        jason(100,'失败');
+        jason([],'失败',0);
 
     }
     
@@ -276,120 +276,102 @@ class Goods extends Common
     public function del_all(){
         $goods_id = input('goods_id');
         if(!$goods_id){
-            jason(100,'参数错误');
+            jason([],'参数错误',0);
         }
 
         if( Db::table('goods')->where('goods_id','in',$goods_id)->update(['is_del'=>1]) ){
-            jason(200);
+            jason([]);
         }
-        jason(100,'失败');
+        jason([],'失败',0);
 
     }
 
-    /*
-     * 商品规格管理
-     */
-    public function sku_index(){
+    public function goods_type_list(){
 
         $where = [];
         $pageParam = ['query' => []];
 
-        $sku_name = input('sku_name');
-        if( $sku_name ){
-            $where["sku_name"] = ['like', "%{$sku_name}%"];
-            $pageParam['query']['sku_name'] = ['like', "%{$sku_name}%"];
+        $type_name = input('type_name');
+        if( $type_name ){
+            $where["type_name"] = ['like', "%{$type_name}%"];
+            $pageParam['query']['type_name'] = ['like', "%{$type_name}%"];
         }
 
-        $list  = Db::table('goods_sku')->order('sku_id DESC')->where($where)->paginate(10,false,$pageParam);
+        $list  = Db::table('goods_type')->order('type_id DESC')->where($where)->paginate(10,false,$pageParam);
 
-        return $this->fetch('goods/sku_index',[
+        return $this->fetch('',[
             'list'          =>  $list,
-            'sku_name'      =>  $sku_name,
-            
+            'type_name'      =>  $type_name,
             'meta_title'    =>  '商品规格管理',
         ]);
     }
 
-    /*
-     * 添加商品规格
-     */
-    public function goods_sku_add(){
+    public function goods_type_add(){
 
         if( Request::instance()->isPost() ){
             $data = input('post.');
             
-            if( !$data['sku_name'] || !$data['sku_value'] ){
-                $this->error('请填写完整！');
+            if( !$data['type_name'] ){
+                $this->error('请填写商品类型名称！');
             }
 
-            $data['create_time'] = time();
-            $data['update_time'] = time();
-
-            if ( Db::table('goods_sku')->insert($data) ) {
-                $this->success('添加成功', url('goods/goods_sku_add'));
+            if ( Db::table('goods_type')->insert($data) ) {
+                $this->success('添加成功', url('goods/goods_type_list'));
             } else {
                 $this->error('添加失败');
             }
-
         }
 
-        return $this->fetch('goods/goods_sku_add',[
-            'meta_title'    =>  '添加商品规格',
+        return $this->fetch('',[
+            'meta_title'    =>  '添加商品类型',
         ]);
     }
 
-    /*
-     * 修改商品规格
-     */
     public function goods_sku_edit(){
-        $sku_id = input('sku_id');
+        $type_id = input('type_id');
         
-        if(!$sku_id){
+        if(!$type_id){
             $this->error('参数错误！');
         }
 
         if( Request::instance()->isPost() ){
             $data = input('post.');
             
-            if( !$data['sku_name'] || !$data['sku_value'] ){
-                $this->error('请填写完整！');
+            if( !$data['type_name'] ){
+                $this->error('请填写商品类型名称！');
             }
 
-            $data['update_time'] = time();
-
-            if ( Db::table('goods_sku')->update($data) ) {
-                $this->success('修改成功', url('goods/goods_sku_edit'));
+            if ( Db::table('goods_type')->update($data) ) {
+                $this->success('修改成功', url('goods/goods_type_list'));
             } else {
                 $this->error('修改失败');
             }
 
         }
 
-        $info = Db::table('goods_sku')->find($sku_id);
+        $info = Db::table('goods_type')->find($type_id);
         
-        return $this->fetch('goods/goods_sku_edit',[
+        return $this->fetch('',[
             'info'          =>  $info,
-            'meta_title'    =>  '修改商品规格',
+            'meta_title'    =>  '修改商品类型',
         ]);
     }
 
-    /*
-     * ajax 删除商品规格
-     */
-    public function goods_sku_del(){
-        $sku_id = input('sku_id');
-        if(!$sku_id){
-            jason(100,'参数错误');
+    
+    public function goods_type_del(){
+        $type_id = input('type_id');
+        if(!$type_id){
+            jason([],'参数错误',0);
         }
-        $info = Db::table('goods_sku')->find($sku_id);
+        $info = Db::table('goods_sku')->find($type_id);
         if(!$info){
-            jason(100,'参数错误');
+            jason([],'参数错误',0);
         }
 
-        if( Db::table('goods')->where('sku_id',$sku_id)->delete() ){
-            jason(200,'删除商品规格成功！');
+        if( Db::table('goods')->where('type_id',$type_id)->delete() ){
+            jason([],'删除商品规格成功！');
         }else{
-            jason(100,'删除商品规格失败！');
+            jason([],'删除商品规格失败！',0);
         }
 
     }

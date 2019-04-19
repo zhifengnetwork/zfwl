@@ -135,21 +135,21 @@ class Category extends Common
     public function del(){
         $cat_id = input('cat_id');
         if(!$cat_id){
-            jason(100,'参数错误');
+            jason([],'参数错误',0);
         }
         $info = Db::table('category')->find($cat_id);
         if(!$info){
-            jason(100,'参数错误');
+            jason([],'参数错误',0);
         }
         if( Db::table('category')->where('pid',$cat_id)->find() ){
-            jason(100,'该分类含有下级分类，不能删除');
+            jason([],'该分类含有下级分类，不能删除',0);
         }
 
         if( Db::table('category')->where('cat_id',$cat_id)->delete() ){
             if( $info['img'] ){
                 @unlink( ROOT_PATH .Config('c_pub.img') . $info['img'] );
             }
-            jason(200,'删除分类成功！');
+            jason([],'删除分类成功！');
         }
 
     }
