@@ -41,4 +41,19 @@ class Shop extends Common
             }
         }
     }
+
+    public function getShopData () {
+        $where = [];
+        $where = ['status'=>1,'admin_id'=>$this->admin_id];
+        $getData = model('DiyEweiShop')->where($where)->find();
+        if (!empty($getData)){
+            if (!empty($getData['data'])){
+                $data = json_decode($getData['data']);
+                $res = towArraySort($data,'key_num');
+                dump($res);
+            }
+        }else{
+            return json(['code'=>0,'msg'=>'没有数据，请添加']);
+        }
+    }
 }
