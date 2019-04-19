@@ -131,6 +131,11 @@ return [
         // 标签库标签结束标记
         'taglib_end'   => '}',
     ],
+
+    'c_pub'       => [
+        'img'    =>   '/public/upload/images/',
+    ],
+
     // 视图输出字符串内容替换
     'view_replace_str'       => [
         '__INSPINIA__' => '/static/inspinia',
@@ -138,7 +143,7 @@ return [
     	'__STATIC__'   => '/static',
         '__LIB__'      => '/static/lib',
         '__MOBILE__'   => '/static/mobile',
-        '__IMAGES__'   => '/upload/images',
+        '__IMAGES__'   => '/public/upload/images',
         '__PLIST__'    =>  '/plist',
     ],
     // 默认跳转页面对应的模板文件

@@ -4,6 +4,7 @@ namespace app\admin\controller;
 use think\Db;
 use think\Loader;
 use think\Request;
+use think\Config;
 
 /*
  * 分类管理
@@ -45,11 +46,11 @@ class Category extends Common
                     //生成文件夹
                     $names = "category" ;
                     $name = "category/" .date('Ymd',time()) ;
-                    if (!file_exists(ROOT_PATH .'upload/images/'.$names)){ 
-                        mkdir(ROOT_PATH .'upload/images/'.$names,0777,true);
+                    if (!file_exists(ROOT_PATH .Config('c_pub.img').$names)){ 
+                        mkdir(ROOT_PATH .Config('c_pub.img').$names,0777,true);
                     }
                     //保存图片到本地
-                    file_put_contents(ROOT_PATH .'upload/images/'.$name.$saveName,$img);
+                    file_put_contents(ROOT_PATH .Config('c_pub.img').$name.$saveName,$img);
     
                     $data['img'] = $name.$saveName;
             }
@@ -102,16 +103,16 @@ class Category extends Common
                 //生成文件夹
                 $names = "category" ;
                 $name = "category/" .date('Ymd',time()) ;
-                if (!file_exists(ROOT_PATH .'upload/images/'.$names)){ 
-                    mkdir(ROOT_PATH .'upload/images/'.$names,0777,true);
+                if (!file_exists(ROOT_PATH .Config('c_pub.img').$names)){ 
+                    mkdir(ROOT_PATH .Config('c_pub.img').$names,0777,true);
                 } 
                 //保存图片到本地
-                file_put_contents(ROOT_PATH .'upload/images/'.$name.$saveName,$img);
+                file_put_contents(ROOT_PATH .Config('c_pub.img').$name.$saveName,$img);
 
                 $data['img'] = $name.$saveName;
 
                 if($info['img']){
-                    @unlink( ROOT_PATH .'upload/images/' . $info['img'] );
+                    @unlink( ROOT_PATH .Config('c_pub.img') . $info['img'] );
                 }
             }
 
@@ -146,7 +147,7 @@ class Category extends Common
 
         if( Db::table('category')->where('cat_id',$cat_id)->delete() ){
             if( $info['img'] ){
-                @unlink( ROOT_PATH .'upload/images/' . $info['img'] );
+                @unlink( ROOT_PATH .Config('c_pub.img') . $info['img'] );
             }
             jason(200,'删除分类成功！');
         }
@@ -170,16 +171,16 @@ class Category extends Common
                 //生成文件夹
                 $names = "category_set" ;
                 $name = "category_set/" .date('Ymd',time()) ;
-                if (!file_exists(ROOT_PATH .'upload/images/'.$names)){ 
-                    mkdir(ROOT_PATH .'upload/images/'.$names,0777,true);
+                if (!file_exists(ROOT_PATH .Config('c_pub.img').$names)){ 
+                    mkdir(ROOT_PATH .Config('c_pub.img').$names,0777,true);
                 } 
                 //保存图片到本地
-                file_put_contents(ROOT_PATH .'upload/images/'.$name.$saveName,$img);
+                file_put_contents(ROOT_PATH .Config('c_pub.img').$name.$saveName,$img);
 
                 $data['img'] = $name.$saveName;
 
                 if($info['img']){
-                    @unlink( ROOT_PATH .'upload/images/' . $info['img'] );
+                    @unlink( ROOT_PATH .Config('c_pub.img') . $info['img'] );
                 }
             }
 
