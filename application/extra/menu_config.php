@@ -327,7 +327,13 @@ return [
                 'url'   => 'site/index',
                 'hide'  => 1,
                 'child' => [
-                    
+                    [
+                        'id'    => 210501,
+                        'title' => '网站设置',
+                        'sort'  => 2,
+                        'url'   => 'site/index',
+                        'hide'  => 1,
+                    ],
                 ],
             ],
         ],

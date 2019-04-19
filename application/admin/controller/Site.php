@@ -9,8 +9,9 @@ class Site extends Common
     {
         
      
-        $this->assign('meta_title', '首页');
-        return $this->fetch();
+        return $this->fetch('',[
+            'meta_title'    =>  '网站设置',
+        ]);
     }
 
 }
