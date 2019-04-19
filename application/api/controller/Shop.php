@@ -12,11 +12,6 @@ namespace app\api\controller;
 class Shop extends Common
 {
     public function index () {
-//        dump(123);die;
-    }
-
-    public function getKeysList () {
-        $list = model('DiyKeys')->where('status',1)->select();
-        return json($list);
+        dump(session('admin_user_auth'));die;
     }
 }
