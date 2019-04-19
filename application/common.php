@@ -485,9 +485,15 @@ function excel_export($file_name,$title,$data){
 
 //二维数组排序
 function towArraySort ($data,$key,$order = SORT_ASC) {
+
+    try{
+        //        dump($data);
+        $last_names = array_column($data,$key);
+        array_multisort($last_names,$order,$data);
 //        dump($data);
-    $last_names = array_column($data,$key);
-    array_multisort($last_names,$order,$data);
-//        dump($data);
-    return $data;
+        return $data;
+    }catch (\Exception $e){
+        return false;
+    }
+
 }

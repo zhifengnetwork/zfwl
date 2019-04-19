@@ -43,7 +43,26 @@ class DiyEweiShop extends Model
         }catch (\Exception $e){
             return false;
         }
+    }
 
-
+    public function getShopData ($admin_id) {
+        $where = [];
+        $where = ['status'=>1,'admin_id'=>$admin_id];
+        $getData = $this->where($where)->find();
+        if (!empty($getData)){
+            if (!empty($getData['data'])){
+                $data = json_decode($getData['data']);
+                $res = towArraySort($data,'key_num');
+                if ($res){
+                    return $res;
+                }else {
+                    return false;
+                }
+            }else{
+                return false;
+            }
+        }else{
+            return false;
+        }
     }
 }
