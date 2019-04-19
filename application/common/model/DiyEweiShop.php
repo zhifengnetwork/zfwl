@@ -16,8 +16,8 @@ class DiyEweiShop extends Model
     protected $table = 'diy_ewei_shop';
 
     public function edit ($data,$admin_id) {
-        $where['status'] == 1;
-        $where['admin_id'] == $admin_id;
+        $where = [];
+        $where == ['status'=>1,'admin_id'=>$admin_id];
         $find = $this->where($where)->find();
         try{
             if (!empty($find)){
