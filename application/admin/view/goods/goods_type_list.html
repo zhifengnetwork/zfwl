@@ -76,8 +76,8 @@
 {block name='script'}
 <script>
     function goods_type_del(obj,type_id){
-        if(window.confirm('确认删除该商品规格吗？')){
-            $.post("{:url('Goods/goods_typedel')}",{'type_id':type_id},function(data){
+        if(window.confirm('确认删除该商品类型吗？')){
+            $.post("{:url('Goods/goods_type_del')}",{'type_id':type_id},function(data){
                 alert(data.msg);
                 if(data.code){
                     $(obj).parents('tr').remove();

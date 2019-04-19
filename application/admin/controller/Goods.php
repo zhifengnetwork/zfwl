@@ -327,7 +327,7 @@ class Goods extends Common
         ]);
     }
 
-    public function goods_sku_edit(){
+    public function goods_type_edit(){
         $type_id = input('type_id');
         
         if(!$type_id){
@@ -363,12 +363,12 @@ class Goods extends Common
         if(!$type_id){
             jason([],'参数错误',0);
         }
-        $info = Db::table('goods_sku')->find($type_id);
+        $info = Db::table('goods_type')->find($type_id);
         if(!$info){
             jason([],'参数错误',0);
         }
 
-        if( Db::table('goods')->where('type_id',$type_id)->delete() ){
+        if( Db::table('goods_type')->where('type_id',$type_id)->delete() ){
             jason([],'删除商品规格成功！');
         }else{
             jason([],'删除商品规格失败！',0);
