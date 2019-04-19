@@ -47,7 +47,7 @@ class Category extends Common
                     $name = "category/" .date('Ymd',time()) ;
                     if (!file_exists(ROOT_PATH .'upload/images/'.$names)){ 
                         mkdir(ROOT_PATH .'upload/images/'.$names,0777,true);
-                    } 
+                    }
                     //保存图片到本地
                     file_put_contents(ROOT_PATH .'upload/images/'.$name.$saveName,$img);
     
