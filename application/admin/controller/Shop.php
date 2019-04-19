@@ -35,6 +35,7 @@ class Shop extends Common
                 }else{
                     return json(['code'=>0,'msg'=>'保存失败']);
                 }
+
             }else{
                 return json(['code'=>0,'msg'=>'首页不能为空，请您添加组件']);
             }
