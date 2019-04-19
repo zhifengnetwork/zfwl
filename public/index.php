@@ -16,6 +16,7 @@ if (preg_match("/(.*)\.(.*)\.c3w\.cc/i", HTTP_HOST, $matches)) {
     $key     = $matches[2];
     $modules = [
         'zhifengwangluo'   => 'admin',
+        'zfwl'   => 'admin',
         'home'    => 'home',
         'pay'     => 'pay',
         'api'     => 'api',
