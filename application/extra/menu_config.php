@@ -321,7 +321,7 @@ return [
                 ],
             ],
             [
-                'id'    => 210400,
+                'id'    => 210500,
                 'title' => '网站设置',
                 'sort'  => 4,
                 'url'   => 'site/index',
