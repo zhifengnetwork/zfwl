@@ -82,7 +82,7 @@
     function del(obj){
         if(window.confirm('确认删除该分类吗？')){
             var cat_id = $(obj).attr('cat_id');
-            $.post("{:url('category/del_cat')}",{'cat_id':cat_id},function(data){
+            $.post("{:url('category/del')}",{'cat_id':cat_id},function(data){
                 alert(data.msg);
                 if(data.code==200){
                     $(obj).parents('tr').remove();
