@@ -6,10 +6,25 @@ namespace app\api\controller;
 use app\common\util\jwt\JWT;
 use think\Db;
 use think\Controller;
+use app\common\model\Config;
+use think\Request;
+use think\Session;
 
 
 class ApiBase extends Controller
 {
+    protected $uid;
+    protected $user_name;
+
+    public function _initialize () {
+        config((new Config)->getConfig());
+        if (session('admin_user_auth')) {
+            $this->uid = session('admin_user_auth.uid');
+            $this->user_name = session('admin_user_auth.user_name');
+        } else {
+            exit(json_encode(['code'=>0,'msg'=>'您未登录，请登录！']));
+        }
+    }
 
     public function ajaxReturn($data){
         header('Access-Control-Allow-Origin:*');
