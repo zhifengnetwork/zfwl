@@ -16,16 +16,14 @@ if (preg_match("/(.*)\.(.*)\.c3w\.cc/i", HTTP_HOST, $matches)) {
     $key     = $matches[2];
     $modules = [
         'zhifengwangluo'   => 'admin',
-        'zfwl'   => 'admin',
-        'home'    => 'home',
-        'pay'     => 'pay',
-        'api'     => 'api',
-        'sapi'    => 'sapi',
-        'agent'   => 'agent',
-        'kf'      => 'kf',
+        'home'             => 'home',
+        'pay'              => 'pay',
+        'api'              => 'api',
+        'sapi'             => 'sapi',
+        'agent'            => 'agent',
+        'kf'               => 'kf',
     ];
     $module = isset($modules[$key]) ? $modules[$key] : 'home';
-    define('MG_PARTNER', $partner);
     define('BIND_MODULE', $module);
 } else {
     $terrace = [
@@ -37,7 +35,6 @@ if (preg_match("/(.*)\.(.*)\.c3w\.cc/i", HTTP_HOST, $matches)) {
         '127.0.0.1:12588' => 'admin',
         '127.0.0.1:12580' => 'admin',
     ];
-    define('MG_PARTNER', 'dev');
     if (!empty($terrace[HTTP_HOST])) {
         $module = $terrace[HTTP_HOST];
         define('BIND_MODULE', $module);

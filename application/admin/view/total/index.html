@@ -1,0 +1,230 @@
+{extend name="common:base" /}
+{block name="style"}
+<style type="text/css">
+.table>thead>tr>th {
+    text-align: center;
+}
+
+.fant {
+    font-weight: 600;
+}
+</style>
+{/block}
+{block name="content"}
+<div class="ibox">
+    <div class="ibox-content">
+        {volist name="data_total" id="vo" key="k"}
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="m-b-md">
+                    <h3>{:config('data_type.'. ($k-1))}</h3>
+                </div>
+                <table class="table  table-bordered table-hover">
+                    <tbody>
+                        <tr>
+                            <td class="active text-center col-lg-2 fant">总充值</td>
+                            <td class="col-lg-2">{:number_format($vo.recharge?:0,2)}</td>
+                            <td class="active text-center col-lg-2 fant">总兑换</td>
+                            <td class="col-lg-2">{:number_format($vo.exchange?:0,2)}</td>
+                            <td class="active text-center col-lg-2 fant">总税收</td>
+                            <td class="col-lg-2">{:number_format($vo.pump_gold + $vo.withdraw_pump + $vo.exchange_pump,2)}</td>
+                        </tr>
+                        <tr>
+                            <td class="active text-center col-lg-2 fant">总盈亏</td>
+                            <td class="col-lg-2" {$vo.robot_profit|color_show}>{:number_format($vo.robot_profit + $vo.pump_gold + $vo.withdraw_pump + $vo.exchange_pump,2)}</td>
+                            <td class="active text-center col-lg-2 fant">总ARPPU</td>
+                            <td class="col-lg-2">{:round($vo.ARPPU, 2)}</td>
+                            <td class="active text-center col-lg-2 fant">总ARPU</td>
+                            <td class="col-lg-2">{:round($vo.ARPU, 2)}</td>
+                        </tr>
+                        <tr>
+                            <td class="active text-center col-lg-2 fant">总游戏税收</td>
+                            <td class="col-lg-2">{:number_format($vo.pump_gold?:0,2)}</td>
+                            <td class="active text-center col-lg-2 fant">总兑换税收</td>
+                            <td class="col-lg-2">{:number_format($vo.exchange_pump?:0,2)}</td>
+                            <td class="active text-center col-lg-2 fant">总提现税收</td>
+                            <td class="col-lg-2">{:number_format($vo.withdraw_pump?:0,2)}</td>
+                        </tr>
+                        <tr>
+                            <td class="active text-center col-lg-2 fant">总绑定账号</td>
+                            <td class="col-lg-2">{:number_format($vo.bing_tel_player?:0,2)}</td>
+                            <td class="active text-center col-lg-2 fant">总注册玩家</td>
+                            <td class="col-lg-2">{:number_format($vo.player?:0)}</td>
+                            <td class="active text-center col-lg-2 fant">总金币</td>
+                            <td class="col-lg-2">{:number_format($vo.gold?:0,2)}</td>
+                        </tr>
+                        {volist name="$games" id="v" mod="3"}
+                        {eq name="mod" value="0"}<tr>{/eq}
+                            <td class="active text-center col-lg-2 fant">{$v}盈亏</td>
+                            <td class="col-lg-2" {:color_show($vo['game'][$key]??0)}>{:number_format($vo['game'][$key]??0,2)}</td>
+                            {/volist}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {/volist}
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="m-b-md">
+                    <h3>历史统计</h3>
+                </div>
+                <table class="table table-bordered table-hover">
+                    <tbody>
+                        <tr>
+                            <td class="active text-center col-lg-2 fant">总充值</td>
+                            <td class="col-lg-2">{:number_format($total.recharge,2)}</td>
+                            <td class="active text-center col-lg-2 fant">总兑换</td>
+                            <td class="col-lg-2">{:number_format($total.exchange,2)}</td>
+                            <td class="active text-center col-lg-2 fant">总税收</td>
+                            <td class="col-lg-2">{:number_format($total.pump_gold + $total.withdraw_pump + $total.exchange_pump,2)}</td>
+                        </tr>
+                        <tr>
+                            <td class="active text-center col-lg-2 fant">总盈亏</td>
+                            <td class="col-lg-2" {$total.robot_profit|color_show}>{:number_format($total.robot_profit + $total.pump_gold + $total.withdraw_pump + $total.exchange_pump,2)}</td>
+                            <td class="active text-center col-lg-2 fant">总ARPPU</td>
+                            <td class="col-lg-2">{:round($total.ARPPU,2)}</td>
+                            <td class="active text-center col-lg-2 fant">总ARPU</td>
+                            <td class="col-lg-2">{:round($total.ARPU,2)}</td>
+                        </tr>
+                        <tr>
+                            <td class="active text-center col-lg-2 fant">总付费率</td>
+                            <td class="col-lg-2">{:round($total.PUR,2)}</td>
+                            <td class="active text-center col-lg-2 fant">总兑换税收</td>
+                            <td class="col-lg-2">{:number_format($total.exchange_pump,2)}</td>
+                            <td class="active text-center col-lg-2 fant">总游戏税收</td>
+                            <td class="col-lg-2">{:number_format($total.pump_gold,2)}</td>
+                        </tr>
+                        <tr>
+                            <td class="active text-center col-lg-2 fant">总绑定账号</td>
+                            <td class="col-lg-2">{:number_format($total.bing_tel_player,2)}</td>
+                            <td class="active text-center col-lg-2 fant">总注册玩家</td>
+                            <td class="col-lg-2">{:number_format($total.player)}</td>
+                            <td class="active text-center col-lg-2 fant">总金币</td>
+                            <td class="col-lg-2">{:number_format($total.gold,2)}</td>
+                        </tr>
+                        {volist name="$games" id="vo" mod="3"}
+                        {eq name="mod" value="0"}<tr>{/eq}
+                            <td class="active text-center col-lg-2 fant">{$vo}盈亏</td>
+                            <td class="col-lg-2" {:color_show($total['game'][$key]??0)}>{:number_format($total['game'][$key]??0,2)}</td>
+                            {/volist}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="m-b-md">
+                    <h3>按日期统计</h3>
+                </div>
+                <form class="form-inline" name="search-form" method="get" action="">
+                    <div class="ibox-content">
+                        <div class="form-group" id="datepicker">
+                            <label class="font-noraml"></label>
+                            <div class="input-group date">
+                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                <input type="text" autocomplete="off" class="form-control" style="width:150px;" placeholder="起始时间" name="startDate" value="{$startDate}">
+                            </div>
+                            至
+                            <div class="input-group date">
+                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                <input type="text" autocomplete="off" class="form-control" style="width:150px;" placeholder="截止时间" name="endDate" value="{$endDate}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-lg-10">
+                                <button class="btn btn-primary pull-right" type="submit">
+                                    搜索
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <table class="table  table-bordered table-hover">
+                    <tbody>
+                        <tr>
+                            <td class="active text-center col-lg-2 fant">总充值</td>
+                            <td class="col-lg-2">{:number_format($setotal.recharge?:0,2)}</td>
+                            <td class="active text-center col-lg-2 fant">总兑换</td>
+                            <td class="col-lg-2">{:number_format($setotal.exchange?:0,2)}</td>
+                            <td class="active text-center col-lg-2 fant">总税收</td>
+                            <td class="col-lg-2">{:number_format($setotal.pump_gold + $setotal.withdraw_pump + $setotal.exchange_pump,2)}</td>
+                        </tr>
+                        <tr>
+                            <td class="active text-center col-lg-2 fant">总盈亏</td>
+                            <td class="col-lg-2" {$setotal.robot_profit|color_show}>{:number_format($setotal.robot_profit + $setotal.pump_gold + $setotal.withdraw_pump + $setotal.exchange_pump,2)}</td>
+                            <td class="active text-center col-lg-2 fant">总ARPPU</td>
+                            <td class="col-lg-2">{:round($setotal.ARPPU, 2)}</td>
+                            <td class="active text-center col-lg-2 fant">总ARPU</td>
+                            <td class="col-lg-2">{:round($setotal.ARPU, 2)}</td>
+                        </tr>
+                        <tr>
+                            <td class="active text-center col-lg-2 fant"> 总游戏税收</td>
+                            <td class="col-lg-2">{:number_format($setotal.pump_gold?:0,2)}</td>
+                            <td class="active text-center col-lg-2 fant">总兑换税收</td>
+                            <td class="col-lg-2">{:number_format($setotal.exchange_pump?:0,2)}</td>
+                            <td class="active text-center col-lg-2 fant">总提现税收</td>
+                            <td class="col-lg-2">{:number_format($setotal.withdraw_pump?:0,2)}</td>
+                        </tr>
+                        <tr>
+                            <td class="active text-center col-lg-2 fant">总绑定账号</td>
+                            <td class="col-lg-2">{:number_format($setotal.bing_tel_player?:0,2)}</td>
+                            <td class="active text-center col-lg-2 fant">总注册玩家</td>
+                            <td class="col-lg-2">{:number_format($setotal.player?:0)}</td>
+                            <td class="active text-center col-lg-2 fant">总金币</td>
+                            <td class="col-lg-2">{:number_format($setotal.gold?:0,2)}</td>
+                        </tr>
+                        {volist name="$games" id="vo" mod="3"}
+                        {eq name="mod" value="0"}<tr>{/eq}
+                            <td class="active text-center col-lg-2 fant">{$vo}盈亏</td>
+                            <td class="col-lg-2" {:color_show($setotal['game'][$key]??0)}>{:number_format($setotal['game'][$key]??0,2)}</td>
+                            {/volist}
+                    </tbody>
+                </table>
+                <div class="ibox-content">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover text-center">
+                            <thead>
+                                <tr>
+                                    <th>日期</th>
+                                    <th>营收</th>
+                                    <th>充值</th>
+                                    <th>兑换</th>
+                                    <th>提现</th>
+                                    <th>总金币</th>
+                                    <th>注册玩家</th>
+                                    <th>登录玩家</th>
+                                    <th>总税收</th>
+                                    <th>游戏输赢</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {notempty name="list"}
+                                {volist name="list" id="vo"}
+                                <tr>
+                                    <td>{$vo.start_time|date="Y-m-d",###}</td>
+                                    <td>{:number_format($vo.profit,2)}</td>
+                                    <td>{:number_format($vo.recharge,2)}</td>
+                                    <td>{:number_format($vo.exchange,2)}</td>
+                                    <td>{:number_format($vo.withdraw,2)}</td>
+                                    <td>{:number_format($vo.gold,2)}</td>
+                                    <td>{:number_format($vo.register)}</td>
+                                    <td>{:number_format($vo.login,2)}</td>
+                                    <td>{:number_format($vo.pump,2)}</td>
+                                    <td>{:number_format($vo.robot_profit,2)}</td>
+                                    <td>
+                                        <a class="btn btn-default" href="{:url('total/edit',['id'=>$vo.id])}"><i class="fa fa-list"></i>详情</a>
+                                    </td>
+                                </tr>
+                                {/volist}
+                                {/notempty}
+                            </tbody>
+                        </table>
+                        {$page}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}

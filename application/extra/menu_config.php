@@ -143,6 +143,38 @@ return [
         ],
     ],
 
+      //数据分析
+      'baobiao'      => [
+        'id'    => 60000,
+        'title' => '数据管理',
+        'sort'  => 2,
+        'url'   => 'total/index',
+        'hide'  => 1,
+        'icon'  => 'fa-th-large',
+        'child' => [
+            [
+                'id'    => 60100,
+                'title' => '业务数据',
+                'sort'  => 1,
+                'url'   => 'total/business',
+                'hide'  => 1,
+                'child' => [
+                ],
+
+            ],
+            [
+                'id'    => 60200,
+                'title' => '财务数据',
+                'sort'  => 1,
+                'url'   => 'total/finance',
+                'hide'  => 1,
+                'child' => [
+                ],
+            ],
+           
+         ],
+     ],
+
 
 
     

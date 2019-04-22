@@ -137,7 +137,7 @@ class CartLogic extends Model
             }
             $isBuyWhere = [
                 'og.goods_id'=>$this->goods['goods_id'],
-                'o.user_id'=>$this->user_id,
+                'o.user_id'  =>$this->user_id,
                 'o.deleted'=>0,
                 'o.order_status'=>['neq',3]
             ];
@@ -671,44 +671,44 @@ class CartLogic extends Model
         $goodsPromFactory = new GoodsPromFactory();
         foreach ($cartList as $cartKey => $cart) {
             //商品不存在或者已经下架
-            if (empty($cart['goods']) || $cart['goods']['is_on_sale'] != 1 || $cart['goods_num'] == 0) {
+            if (empty($cart['goods']) || $cart['goods']['is_del'] != 1 || $cart['stock'] == 0) {
                 $cart->delete();
                 unset($cartList[$cartKey]);
                 continue;
             }
             //活动商品的活动是否失效
-            if ($goodsPromFactory->checkPromType($cart['prom_type'])) {
-                if (!empty($cart['spec_key'])) {
-                    $specGoodsPrice = SpecGoodsPrice::get(['goods_id' => $cart['goods_id'], 'item_id' => $cart['item_id']], '', true);
-                    if ($specGoodsPrice['prom_id'] != $cart['prom_id']) {
-                        $cart->delete();
-                        unset($cartList[$cartKey]);
-                        continue;
-                    }
-                } else {
-                    if ($cart['goods']['prom_id'] != $cart['prom_id']) {
-                        $cart->delete();
-                        unset($cartList[$cartKey]);
-                        continue;
-                    }
-                    $specGoodsPrice = null;
-                }
-                $goodsPromLogic = $goodsPromFactory->makeModule($cart['goods'], $specGoodsPrice);
-                if ($goodsPromLogic && !$goodsPromLogic->isAble()) {
-                    $cart->delete();
-                    unset($cartList[$cartKey]);
-                    continue;
-                }
+            // if ($goodsPromFactory->checkPromType($cart['prom_type'])) {
+            //     if (!empty($cart['spec_key'])) {
+            //         $specGoodsPrice = SpecGoodsPrice::get(['goods_id' => $cart['goods_id'], 'item_id' => $cart['item_id']], '', true);
+            //         if ($specGoodsPrice['prom_id'] != $cart['prom_id']) {
+            //             $cart->delete();
+            //             unset($cartList[$cartKey]);
+            //             continue;
+            //         }
+            //     } else {
+            //         if ($cart['goods']['prom_id'] != $cart['prom_id']) {
+            //             $cart->delete();
+            //             unset($cartList[$cartKey]);
+            //             continue;
+            //         }
+            //         $specGoodsPrice = null;
+            //     }
+            //     $goodsPromLogic = $goodsPromFactory->makeModule($cart['goods'], $specGoodsPrice);
+            //     if ($goodsPromLogic && !$goodsPromLogic->isAble()) {
+            //         $cart->delete();
+            //         unset($cartList[$cartKey]);
+            //         continue;
+            //     }
 
-            }elseif ($cart['prom_type'] == 7){
-                //如果结束时间小于当前时间，该套餐已过期
-                if($cart['combination']['end_time'] < time() || $cart['combination']['is_on_sale']==0){
-                    //删除自己的过期套餐
-                    db('cart')->where(['user_id'=>$cart->user_id,'prom_id'=>$cart['combination']->combination_id])->delete();
-                    unset($cartList[$cartKey]);
-              }
+            // }elseif ($cart['prom_type'] == 7){
+            //     //如果结束时间小于当前时间，该套餐已过期
+            //     if($cart['combination']['end_time'] < time() || $cart['combination']['is_on_sale']==0){
+            //         //删除自己的过期套餐
+            //         db('cart')->where(['user_id'=>$cart->user_id,'prom_id'=>$cart['combination']->combination_id])->delete();
+            //         unset($cartList[$cartKey]);
+            //   }
 
-            }
+            // }
         }
         $this->getUserCartGoodsNum();//删除后，需要重新设置cookie值
         return $cartList;

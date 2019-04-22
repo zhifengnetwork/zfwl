@@ -15,13 +15,12 @@ class Index extends ApiBase
     */
     public function index()
     {
+        echo 1111;
+        exit;
         $user_id = $this->get_user_id();
         if(!$user_id){
             $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
         }
-
-
-
 
 
         $data = '首页数据';
