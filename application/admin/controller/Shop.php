@@ -70,7 +70,5 @@ class Shop extends Common
         }else{
             return json(['code'=>0,'msg'=>'没有数据哦','data'=>$list]);
         }
-
-
     }
 }
