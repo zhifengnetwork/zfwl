@@ -51,4 +51,14 @@ class Shop extends Common
             return json(['code'=>0,'msg'=>'没有数据，请添加','data'=>'']);
         }
     }
+
+    public function gooodsList () {
+        $keyword = request()->param('keyword');
+        $list = model('Goods')->getGoodsList($keyword);
+        if (!empty($list)){
+            return json(['code'=>1,'msg'=>'','data'=>$list]);
+        }else{
+            return json(['code'=>0,'msg'=>'还没有商品哦','data'=>$list]);
+        }
+    }
 }
