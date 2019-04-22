@@ -133,7 +133,7 @@ return [
     ],
 
     'c_pub'       => [
-        'img'    =>   '/upload/images/',
+        'img'    =>   '/public/upload/images/',
     ],
 
     // 视图输出字符串内容替换
