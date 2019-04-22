@@ -23,14 +23,20 @@ class Login extends \think\Controller
 
     public function login () {
         if (Request::instance()->isPost()) {
-            $username = input('post.username');
-            $password = input('post.password');
+            $username = input('username');
+            $password = input('password');
 
             // 实例化验证器
             $validate = Loader::validate('Login');
             // 验证数据
-            $data = ['username' => $username, 'password' => $password, 'captcha' => request()->input('captcha')];
+            $data = ['username' => $username, 'password' => $password];
             // 验证
+            $code = input('captcha');
+            $str = session('captcha_id');
+            $captcha = new \think\captcha\Captcha();
+            if (!$captcha->check($code,$str)){
+                return json(['code'=>0,'msg'=>'验证码错误']);
+            }
             if (!$validate->check($data)) {
                 return $this->error($validate->getError());
             }
@@ -52,8 +58,10 @@ class Login extends \think\Controller
      *  获取验证码
       */
     public function loginCaptcha () {
+        $str  = time().uniqid();
+        Session::set('captcha_id', $str);
         $captcha = new Captcha();
-        return $captcha->entry();
+        return $captcha->entry($str);
     }
 
     /*

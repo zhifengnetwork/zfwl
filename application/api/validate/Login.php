@@ -14,8 +14,7 @@ class Login extends Validate
 {
     protected $rule = [
         'username' => 'require',
-        'password' => 'require',
-        'captcha|验证码'=>'require|captcha'
+        'password' => 'require'
     ];
 
     protected $message = [];
