@@ -84,6 +84,19 @@ class Goods extends Common
             if(!$validate->scene('add')->check($data)){
                 $this->error( $validate->getError() );
             }
+            
+            //规格处理
+            $sku_keys = array_keys($data['attr_td']);
+            $sku = [];
+            foreach ($data['attr_td'][$sku_keys[0]] as $key => $value) {
+                $sku[$key]['sku_attr'] = '{';
+                foreach ($sku_keys as $k => $v) {
+                    $sku[$key]['sku_attr'] .= '"' . $v . '"' . ':' . $data['attr_td'][$v][$key] . ',';
+                }
+                $sku[$key]['sku_attr'] = rtrim($sku[$key]['sku_attr'],',') . '}';
+                $sku[$key]['market_price']    = $data['market_price'][$key];
+                $sku[$key]['stock']           = $data['stocks'][$key];
+            }
 
             if( isset( $data['goods_attr'] ) ){
                 if( in_array( 6 , $data['goods_attr']  ) ){
@@ -92,6 +105,7 @@ class Goods extends Common
                 }
                 $data['goods_attr'] = implode( ',' , $data['goods_attr'] );
             }
+            
             $data['add_time'] = strtotime( $data['add_time'] );
 
             if( isset($data['img']) ){
@@ -111,8 +125,13 @@ class Goods extends Common
                 $data['img'] = $name.$saveName;
 
             }
-
-            if ( Db::table('goods')->insert($data) ) {
+            $goods_id = Db::table('goods')->strict(false)->insertGetId($data);
+            if ( $goods_id ) {
+                //库存
+                foreach ($sku as $key => $value) {
+                    $sku[$key]['goods_id'] = $goods_id;
+                    Db::name('goods_sku')->insert($sku[$key]);
+                }
                 $this->success('添加成功', url('goods/add'));
             } else {
                 $this->error('添加失败');
@@ -120,6 +139,8 @@ class Goods extends Common
 
         }
 
+        //商品类型
+        $goods_type = Db::table('goods_type')->select();
         //商品属性
         $goods_attr = Db::table('goods_attr')->select();
         //商品一级分类
@@ -129,6 +150,7 @@ class Goods extends Common
 
         return $this->fetch('goods/add',[
             'meta_title'    =>  '添加商品',
+            'goods_type'    =>  $goods_type,
             'goods_attr'    =>  $goods_attr,
             'cat_id1'       =>  $cat_id1,
             'cat_id2'       =>  $cat_id2,
@@ -158,6 +180,39 @@ class Goods extends Common
                 $this->error( $validate->getError() );
             }
 
+            //规格处理
+            $sku_keys = array_keys($data['attr_td']);
+            $sku = [];
+            $new_sku = [];
+            foreach ($data['attr_td'][$sku_keys[0]] as $key => $value) {
+                if(isset($data['sku_id'][$key])){
+
+                    $sku[$key]['sku_attr'] = '{';
+                    foreach ($sku_keys as $k => $v) {
+                        $sku[$key]['sku_attr'] .= '"' . $v . '"' . ':' . $data['attr_td'][$v][$key] . ',';
+                    }
+                    $sku[$key]['sku_attr'] = rtrim($sku[$key]['sku_attr'],',') . '}';
+
+                    $sku[$key]['sku_id']          = $data['sku_id'][$key];
+                    $sku[$key]['market_price']    = $data['market_price'][$key];
+                    $sku[$key]['stock']           = $data['stocks'][$key];
+
+                    Db::table('goods_sku')->update($sku[$key]);
+                }else{
+                    $new_sku[$key]['sku_attr'] = '{';
+                    foreach ($sku_keys as $k => $v) {
+                        $new_sku[$key]['sku_attr'] .= '"' . $v . '"' . ':' . $data['attr_td'][$v][$key] . ',';
+                    }
+                    $new_sku[$key]['sku_attr'] = rtrim($new_sku[$key]['sku_attr'],',') . '}';
+
+                    $new_sku[$key]['goods_id']        = $data['goods_id'];
+                    $new_sku[$key]['market_price']    = $data['market_price'][$key];
+                    $new_sku[$key]['stock']           = $data['stocks'][$key];
+
+                    Db::table('goods_sku')->insert($new_sku[$key]);
+                }
+            }
+
             if( isset( $data['goods_attr'] ) ){
                 if( in_array( 6 , $data['goods_attr']  ) ){
                     $data['limited_start'] = strtotime( $data['limited_start'] );
@@ -165,6 +220,7 @@ class Goods extends Common
                 }
                 $data['goods_attr'] = implode( ',' , $data['goods_attr'] );
             }
+
             $data['add_time'] = strtotime( $data['add_time'] );
 
             if( isset($data['img']) ){
@@ -188,13 +244,30 @@ class Goods extends Common
                 }
             }
             
-            if ( Db::table('goods')->update($data) !== false ) {
+            if ( Db::table('goods')->strict(false)->update($data) !== false ) {
                 $this->success('修改成功', url('goods/index'));
             } else {
                 $this->error('修改失败');
             }
         }
 
+        //sku
+        $sku = Db::table('goods_sku')->where('goods_id','=',$info['goods_id'])->select();
+        if($sku){
+            foreach ($sku as $key => $value) {
+                $sku[$key]['sku_attr'] = json_decode( $value['sku_attr'] ,true );
+            }
+        }
+
+        $spec = Db::table('goods_spec')->where('type_id','=',$info['type_id'])->select();
+        if( $spec ){
+            foreach ($spec as $key => $value) {
+                $spec[$key]['spec_value'] = Db::table('goods_spec_val')->where('spec_id','=',$value['spec_id'])->select();
+            }
+        }
+        
+        //商品类型
+        $goods_type = Db::table('goods_type')->select();
         //商品属性
         $goods_attr = Db::table('goods_attr')->select();
         //商品一级分类
@@ -203,8 +276,11 @@ class Goods extends Common
         $cat_id2 = Db::table('category')->where('level',2)->select();
 
         return $this->fetch('goods/edit',[
-            'meta_title'  =>    '编辑商品',
-            'info'        =>    $info,
+            'meta_title'  =>  '编辑商品',
+            'info'        =>  $info,
+            'sku'         =>  $sku,
+            'spec'        =>  $spec,
+            'goods_type'  =>  $goods_type,
             'goods_attr'  =>  $goods_attr,
             'cat_id1'     =>  $cat_id1,
             'cat_id2'     =>  $cat_id2,
@@ -586,4 +662,34 @@ class Goods extends Common
         }
     }
 
+
+    /**
+     * ajax规格
+     */
+    public function spec(){
+        $type_id = input('type_id','1');
+
+        if(!$type_id){
+            return false;
+        }
+
+        $res = Db::table('goods_spec')->where('type_id','=',$type_id)->select();
+
+        foreach ($res as $key => $value) {
+            $res[$key]['spec_value'] = Db::table('goods_spec_val')->where('spec_id','=',$value['spec_id'])->select();
+        }
+
+        return json($res);
+    }
+
+    /**
+     * ajax删除sku
+     */
+    public function del_sku(){
+        if( request()->isAjax() ){
+            $sku_id = input('sku_id');
+            
+            return Db::talbe('goods_sku')->where('sku_id','=',$sku_id)->delete();
+        }
+    }
 }

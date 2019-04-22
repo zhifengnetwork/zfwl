@@ -80,6 +80,64 @@
                         </div>
 
                         <div class="form-group">
+                            <label class="col-sm-2 control-label"><span style="color:red;">*</span>商品类型</label>
+                            <div class="col-sm-9">
+                                <div style="line-height:34px;float:left;margin:0 10px 0 0;">
+                                    <select class="form-control" name="type_id">
+                                        <option value="" >请选择类型</option>
+                                        {volist name="goods_type" id="vo"}
+                                        <option {if condition="$info.type_id eq $vo.type_id"} selected="" {/if} value="{$vo.type_id}">{$vo.type_name}</option>
+                                        {/volist}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row cl">
+                            <label class="form-label col-sm-2 control-label"><span style="color:red;">*</span>{:lang(\'商品规格\')}:</label>
+                            <div class="formControls col-sm-9">
+                              <div class="addd"><input class="btn btn-secondary radius add" type="button" title="{:lang(\'添加一行\')}" value="{:lang(\'添加一行\')}&nbsp;&nbsp;"></div>
+                              <table class="table table-border table-bordered table-bg table-sort">
+                                <thead>
+                                  <tr class="text-c gg">
+                                    {volist name="spec" id="vo"}
+                                    <th width="">{:lang($vo.spec_name)}</th>
+                                    {/volist}
+                                    <th width="100">{:lang(\'市场售价\')}</th>
+                                    <th width="100">{:lang(\'库存\')}</th>
+                                    <th width="">{:lang(\'操作\')}</th>
+                                  </tr>
+                                </thead>
+                                <tbody id="tbd">
+                                
+                                  {volist name="sku" id="vog" key="sku_k"}
+                                  <input type="hidden" name="sku_id[]" value="{$vog.sku_id}">
+                                  <tr class="text-c vv">
+                                    {volist name="spec" id="sp" key="sp_k"}
+                                    <td class="bian">
+                                    <select name="attr_td[{$sp.spec_id}][]" style="width: 100px;" class="input-text validate">
+                                      <option value="">请选择</option>
+                                      {volist name="sp.spec_value" id="sp_val" key="sp_val_k"}
+                                      <option {if condition="isset( $vog['sku_attr'][$sp.spec_id] ) and $vog['sku_attr'][$sp.spec_id] eq $sp_val.val_id"} selected="" {/if} {$vog['sku_attr'][$sp.spec_id]}  {$sp_val.val_id} value="{$sp_val.val_id}">{$sp_val.val_name}</option>
+                                      {/volist}
+                                    </select>
+                                    </td>
+                                    {/volist}
+                      
+                                    <td><input type="text" class="input-text" value="{$vog.market_price}" name="market_price[]" /></td>
+                                    <td><input type="text" class="input-text read" value="{$vog.stock}" name="stocks[]" /></td>
+                                    <td>
+                                        <input class="btn btn-danger radius dels" sku_id="{$vog.sku_id}" style="display: inline-block;" type="button" value="{:lang(\'删除\')}">
+                                    </td>
+                                  </tr>
+                                 {/volist}
+                                </tbody>
+                              </table>
+                            </div>
+                            <div class="col-4"> </div>
+                          </div>
+
+                        <div class="form-group">
                             <label class="col-sm-2 control-label">商品简介</label>
                             <div class="col-sm-9">
                                 <textarea name="desc"  class="form-control" placeholder="说点什么...最少输入0个字符" datatype="*0-100" onkeyup="textarealength(this,100)">{$info.desc}</textarea>
@@ -473,5 +531,86 @@
         $("#upload_image").show();
         $(".upload_btn").show();
     });
+
+
+
+    //禁用同级点击
+  $(document).on("click", ".checkbox", function(e){ 
+    $(e.target).siblings().removeAttr('checked');
+    $(e.target).attr('checked','checked');
+  });
+
+  //添加
+  $('.addd').on('click',function(){
+    $('.vv').parents('tbody').append( $('.vv').eq(0).clone().find('.validate').removeAttr('disabled').find('option').removeAttr('selected').parents('tr').find('.dels').css('display','inline-block').attr('sku_id','').parents('tr').prop("outerHTML") );
+  });
+
+  //删除
+  $(document).on("click", ".dels", function(e){ 
+    if( $('.vv').length == 1 ){
+      alert('最少保留一条规格!');
+      return;
+    }
+    
+    if( $(e.target).attr('sku_id') ){
+      if (confirm('确认要删除吗?')==true) {
+        $.post("{:url('Goods/del_sku')}" ,{'sku_id':$(e.target).attr('sku_id')} ,function(data){
+          if(data){
+            $(e.target).parents('.vv').remove();
+            layer.msg('{:lang(\'已删除\')}!',{icon:1,time:1000});
+          }else{
+            layer.msg('{:lang(\'删除失败\')}!',{icon: 5,time:1000});
+          }
+        },'json');
+      }
+    }else{
+      $(e.target).parents('.vv').remove();
+    }
+
+  });
+
+
+function isRepeat(arr){
+  var  hash = {};
+  for(var i in arr) {
+    if(hash[arr[i]]) {
+      return true;
+    }
+    hash[arr[i]] = true;
+  }
+  return false;
+}
+
+//表单提交验证事件
+$("form").submit(function(e){
+  var validate = 0
+  $('.validate').each(function(k,v){
+    if( !$(v).val() ){
+      validate=1;
+      return false;
+    }
+  });
+  if(validate){
+    alert('商品规格必须填写完整!');
+    return false;
+  }
+
+  var arr = new Array();
+  $('.vv').each(function(key,value){
+    var arr2 = new Array()
+    $(value).find('select').find('option:selected').each(function(k,v){
+      arr2.push( $(v).val() );
+    });
+    arr.push( arr2 );
+  });
+
+  if( isRepeat(arr) ){
+    alert('商品规格有重复,请检查!');
+    return false;
+  }
+
+  $('.validate').removeAttr('disabled');
+
+});
 </script>
 {/block}
