@@ -143,7 +143,7 @@ return [
     	'__STATIC__'   => '/static',
         '__LIB__'      => '/static/lib',
         '__MOBILE__'   => '/static/mobile',
-        '__IMAGES__'   => '/public/upload/images',
+        '__IMAGES__'   => '/upload/images',
         '__PLIST__'    =>  '/plist',
     ],
     // 默认跳转页面对应的模板文件
