@@ -28,7 +28,7 @@ define('HTTP_HOST', $_SERVER['HTTP_HOST']);
 //     define('BIND_MODULE', $module);
 // } else {
     $terrace = [
-        'zfwl.zhifengwangluo.c3w.cc' => 'admin',
+        // 'zfwl.zhifengwangluo.c3w.cc' => 'admin',
         '127.0.0.1:10059' => 'agent',
         '127.0.0.1:10058' => 'home',
         '127.0.0.1:10057' => 'sapi',
