@@ -83,8 +83,9 @@ class Common extends Controller
         }
         $menu_tree = list_to_tree($list);
         Session::set('ALL_MENU_LIST', $menu_tree);
-
-        $left_menu = self::menu($menu_tree);
+         $left_menu = self::menu($menu_tree);
+        
+       
         return $left_menu;
     }
 
@@ -93,10 +94,11 @@ class Common extends Controller
      */
     private function menu($left_menu)
     {
+      
         static $url;
         //!$url && $url = strtolower(request()->controller() . '/' . request()->action());
         !$url && $url = request()->path();
-
+        
         foreach ($left_menu as $key => &$val) {
             if (!empty($val['_child'])) {
                 $val['_child'] = self::menu($val['_child']);

@@ -159,6 +159,7 @@ return [
                 'url'   => 'total/business',
                 'hide'  => 1,
                 'child' => [
+                    
                 ],
 
             ],
@@ -207,7 +208,7 @@ return [
                         'title' => '轮播图编辑',
                         'sort'  => 1,
                         'url'   => 'advertisement/edit',
-                        'hide'  => 0,
+                        'hide'  => 1,
                     ],
                 ],
             ],

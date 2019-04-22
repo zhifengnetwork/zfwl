@@ -28,32 +28,27 @@
         <div id="wrapper">
             <nav class="navbar-default navbar-static-side" role="navigation">
                 <div class="sidebar-collapse">
-                    <ul class="nav metismenu" id="side-menu">
-                        <li class="nav-header">
-                            <div class="dropdown profile-element">
-                                <span><img alt="image" class="img-circle" src="__INSPINIA__/img/profile_small.jpg" /></span>
-                            </div>
-                            <span class="block m-t-xs"> <strong class="font-bold" style="color: white">{$Think.session.admin_user_auth.username}</strong>
-                             </span>
-                            <div class="logo-element">GAME</div>
-                        </li>
+                <ul class="nav metismenu" id="side-menu">
+                    
+                    <li class="">
+                        <a href="/admin/user/index.html">
+                            <i class="fa fa-user"></i><span class="nav-label">商品分类</span> 
+                                                            <span class="fa arrow"></span>
+                                                        </a>
+                                                    <ul class="nav nav-second-level collapse" style="height: 0px;">
+                            <li class=""><a href="/admin/category/index.html">分类管理</a>
+                                <!--  -->
+                            </li>
+                            <li class=""><a href="/admin/category/category_set.html">分类层级设置</a>
+                                <!--  -->
+                            </li>
+                                                        </ul>
+                                                </li>
 
-                        {volist name="left_menu" id="vo"}
-                        <li class="{$vo.class}">
-                            <a href="{:url($vo['url'])}">
-                                <i class="fa {$vo.icon}"></i><span class="nav-label">{$vo.title}</span> 
-                                {notempty name="vo['_child']"}<span class="fa arrow"></span>{/notempty}
-                            </a>
-                            {notempty name="vo['_child']"}
-                            <ul class="nav nav-second-level">
-                                {volist name="vo['_child']" id="v"}<li class="{$v.class}"><a href="{:url($v['url'])}">{$v.title}</a></li>{/volist}
-                            </ul>
-                            {/notempty}
-                        </li>
-                        {/volist}
-                    </ul>
+                </ul>
                 </div>
             </nav>
+
 
             <div id="page-wrapper" class="gray-bg dashbard-1">
                 <div class="row border-bottom">
