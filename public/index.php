@@ -10,38 +10,37 @@
 // +----------------------------------------------------------------------
 // [ 应用入口文件 ]
 define('HTTP_HOST', $_SERVER['HTTP_HOST']);
-// http://zfwl.zhifengwangluo.c3w.cc/
 
-if (preg_match("/(.*)\.(.*)\.c3w\.cc/i", HTTP_HOST, $matches)) {
-    $partner = $matches[1];
-    $key     = $matches[2];
-    $modules = [
-        'zhifengwangluo'   => 'admin',
-        'home'             => 'home',
-        'pay'              => 'pay',
-        'api'              => 'api',
-        'sapi'             => 'sapi',
-        'agent'            => 'agent',
-        'kf'               => 'kf',
-    ];
-    $module = isset($modules[$key]) ? $modules[$key] : 'home';
-    define('BIND_MODULE', $module);
-} else {
+// http://zfwl.zhifengwangluo.c3w.cc/
+// if (preg_match("/(.*)\.(.*)\.c3w\.cc/i", HTTP_HOST, $matches)) {
+//     $partner = $matches[1];
+//     $key     = $matches[2];
+//     $modules = [
+//         'zhifengwangluo'   => 'admin',
+//         'home'             => 'home',
+//         'pay'              => 'pay',
+//         'api'              => 'api',
+//         'sapi'             => 'sapi',
+//         'agent'            => 'agent',
+//         'kf'               => 'kf',
+//     ];
+//     $module = isset($modules[$key]) ? $modules[$key] : 'home';
+//     define('BIND_MODULE', $module);
+// } else {
     $terrace = [
-        '127.0.0.1:10060/admin' => 'kf',
+        // 'zfwl.zhifengwangluo.c3w.cc' => 'admin',
         '127.0.0.1:10059' => 'agent',
         '127.0.0.1:10058' => 'home',
         '127.0.0.1:10057' => 'sapi',
-        '127.0.0.1:12580/api' => 'api',
+        '127.0.0.1:10056' => 'api',
         '127.0.0.1:12588' => 'admin',
-        '127.0.0.1:12580/admin' => 'admin',
+        // '127.0.0.1:12580' => 'admin',
     ];
-    define('MG_PARTNER', 'dev');
     if (!empty($terrace[HTTP_HOST])) {
         $module = $terrace[HTTP_HOST];
         define('BIND_MODULE', $module);
     }
-}
+// }
 
 // 定义应用目录
 define('APP_PATH', __DIR__ . '/../application/');
