@@ -53,21 +53,22 @@ class Cart extends ApiBase
                 $v['seller_name']="";
             }
         }*/
+ 
         foreach($data as $k=>$v){
-        unset($v['user_id']);
-        unset($v["session_id"]);
-        unset($v["goods_id"]);
-        unset($v["goods_name"]);
-        unset($v["market_price"]);
-        unset($v["member_goods_price"]);
-        unset($v["item_id"]);
-        unset($v["spec_key"]);
-        unset($v["bar_code"]);
-        unset($v["add_time"]);
-        unset($v["prom_type"]);
-        unset($v["prom_id"]);
-        unset($v["sku"]);
-        unset($v["combination_group_id"]);
+            unset($v['user_id']);
+            unset($v["session_id"]);
+            unset($v["goods_id"]);
+            unset($v["goods_name"]);
+            unset($v["market_price"]);
+            unset($v["member_goods_price"]);
+            unset($v["item_id"]);
+            unset($v["spec_key"]);
+            unset($v["bar_code"]);
+            unset($v["add_time"]);
+            unset($v["prom_type"]);
+            unset($v["prom_id"]);
+            unset($v["sku"]);
+            unset($v["combination_group_id"]);
         }
         
         $res[0] = array(

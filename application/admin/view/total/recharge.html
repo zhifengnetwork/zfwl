@@ -1,0 +1,866 @@
+{extend name="common:base" /}
+{block name="style"}
+<style type="text/css">
+.table > thead>tr> th{
+   text-align: center;
+}
+</style>
+{/block}
+{block name="content"}
+<div class="ibox">
+    <div class="ibox-content">
+        <div class="row">
+            <div class="col-lg-12" style="background-color:#f9f9f9;height:120px;">
+                <div class="m-b-md">
+                    <h3>交易统计</h3>
+                </div>
+                    <form class="form-inline" name="search-form" method="get" action="">
+                        <div class="ibox-content" style="background-color:#f9f9f9" >
+                            <div class="form-group pull-right">
+                                 <div class="col-lg-10">
+                                        <button class="btn btn-primary pull-right ajiaoyi" type="button">
+                                            搜索
+                                        </button>
+                                 </div>
+                            </div>
+                            <div class="form-group pull-right" id="datepicker">
+                                <label class="font-noraml"></label>
+                                <div class="input-group date">
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    <input type="text" autocomplete="off" class="form-control" style="width:150px;" placeholder="起始时间" name="jistartDate" value="{$Think.get.startDate}">
+                                </div>
+                                至
+                                <div class="input-group date">
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    <input type="text" autocomplete="off" class="form-control" style="width:150px;" placeholder="截止时间" name="jiendDate" value="{$Think.get.endDate}">
+                                </div>
+                            </div>
+                            <div class="form-group pull-right">
+                                <div class="col-lg-12">
+                                    <a href="javascript:void(0);" class="btn btn-info jiaoyi" time="yst">
+                                     昨天
+                                    </a> 
+                                </div>
+                            </div>
+                            <div class="form-group pull-right">
+                                    <div class="col-lg-12">
+                                        <a href="javascript:void(0);" class="btn jiaoyi" time="day7">
+                                          最近7天
+                                        </a> 
+                                    </div>
+                                </div>
+                                <div class="form-group pull-right">
+                                    <div class="col-lg-12">
+                                        <a href="javascript:void(0);" class="btn jiaoyi" time="day30">
+                                           最近30天
+                                        </a> 
+                                    </div>
+                                </div>
+                                <div class="form-group pull-right">
+                                    <div class="col-lg-10">
+                                        <a href="" class="btn">
+                                           <i class="fa fa-download"></i> 导出数据
+                                        </a>
+                                    </div>
+                                </div>
+                        </div> 
+                    </form>
+                </div>
+            </div>
+            <div class="col-lg-12" style="float:none;margin-left:auto;margin-right:auto;margin-top:30px;">
+                    <div class="row">
+                     <div style="height:200px;margin: auto;">
+                            <table class="table  table-bordered table-hover text-center">
+                                    <thead>
+                                        <tr style="height:50px;">
+                                            <th>登录人数</th>
+                                            <th>游戏人数</th>
+                                            <th>充值数</th>
+                                            <th>充值总金额</th>
+                                            <th>充值总金币</th>
+                                            <th>充值人数</th>
+                                            <th>平均充值</th>
+                                        </tr>
+                                    </thead> 
+                                    <tbody>
+                                        <tr style="height:50px;">
+                                            <td>{$statistic['login']}</td>
+                                            <td>{$statistic['login']}</td>
+                                            <td class="old_recharge_num">{$statistic['old_recharge_num'] + $statistic['new_recharge_num']}</td>
+                                            <td class="old_recharge_amount">{$statistic['old_recharge_amount'] + $statistic['new_recharge_amount']}</td>
+                                            <td class="old_recharge_gold">{$statistic['old_recharge_gold'] + $statistic['new_recharge_gold']}</td>
+                                            <td class="old_recharge_player">{$statistic['old_recharge_player'] + $statistic['new_recharge_player']}</td>
+                                            <td class="Average">{$statistic['Average']}</td>
+                                        </tr>
+                                    </tbody>
+                             </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12" style="float:none;margin-left:auto;margin-right:auto">
+                <div class="row" >
+                        <div style=" height: 450px; width:1300px;margin: auto; border: 1px solid #FFFFFF; border-radius: 5px;font-size: 18px" id="bar1_line"></div>
+                </div>
+            </div>
+            <div class="row">
+                    <div class="col-lg-12" style="background-color:#f9f9f9;height:120px;">
+                        <div class="m-b-md"  >
+                            <h3>新老客户</h3>
+                        </div>
+                            <form class="form-inline" name="search-form" method="get" action="">
+                                <div class="ibox-content" style="margin-top:10px;background-color:#f9f9f9">
+                                    <!-- <div class="form-group pull-right" id="datepicker">
+                                        <label class="font-noraml"></label>
+                                        <div class="input-group">
+                                            <select name="" id="xinlao" style="width:150px;height:40px;border:dimgray;font-size:18px;">
+                                                {:get_month_text_html(-1)}
+                                              </select>
+                                        </div>
+                                    </div>
+                                    -->
+                                    <div class="form-group pull-right">
+                                            <div class="col-lg-12">
+                                                <a href="javascript:void(0);" class="btn btn-info xinlao" time="b">
+                                                 本月
+                                                </a> 
+                                            </div>
+                                        </div>
+                                        <div class="form-group pull-right">
+                                            <div class="col-lg-12">
+                                                <a href="javascript:void(0);" class="btn xinlao" time="s">
+                                                   上月
+                                                </a> 
+                                            </div>
+                                        </div>
+                                        <div class="form-group pull-right">
+                                            <div class="col-lg-10">
+                                                <a href="" class="btn btn-info">
+                                                <i class="fa fa-download"></i> 导出数据
+                                                </a>
+                                            </div>
+                                        </div>
+                                </div> 
+                            </form>
+                        </div>
+                    </div>
+                    <div class="col-lg-12" style="float:none;margin-left:auto;margin-right:auto;margin-top:30px;">
+                            <div class="row">
+                             <div style="height:200px; margin: auto;">
+                             <table class="table  table-bordered table-hover text-center" style="font-size:14px;">
+                                 <tbody>
+                                     <thead>
+                                         <tr style="height:50px;">
+                                             <th>&nbsp</th> 
+                                             <th>付款金额</th>
+                                             <th>较前一月</th>
+                                             <th>付款人数</th>
+                                             <th>较前一月</th>
+                                         </tr>
+                                     </thead>
+                                     <tr style="height:50px;">
+                                         <td style="color:tomato">新客户</td>
+                                         <td class="addorder_amount">{:round($customer.addorder_amount,2)}元</td>  
+                                         <td class="addtypem">
+                                               {if $customer.addtypem eq 1}
+                                                 {:round($customer.divaddm,2)*100}%<span class="glyphicon glyphicon-arrow-up" style="color:#1691de;font-size:16px;"></span>
+                                                 {elseif $customer.addtypem eq 0}
+                                                 {:round($customer.divaddm,2)*100}%<span class="glyphicon glyphicon-arrow-down" style="color:#1691de;font-size:16px"></span>
+                                                 {else}
+                                                 -
+                                                 {/if}  
+                                         </td>
+                                         <td class="addorder_person">{$customer.addorder_person}人</td>
+                                         <td class="addtype"> {if $customer.addtype eq 1}
+                                                {:round($customer.divadd,2)*100}%<span class="glyphicon glyphicon-arrow-up" style="color:#1691de;font-size:16px;"></span> 
+             
+                                                {elseif $customer.addtype eq 0}
+             
+                                                {:round($customer.divadd,2)*100}%<span class="glyphicon glyphicon-arrow-down" style="color:#1691de;font-size:16px;"></span>
+             
+                                                {else}
+                                                -
+                                                {/if} </td>  
+                                     </tr>
+                                     <tr style="height:50px;">
+                                         <td style="color:darkseagreen">老客户</td>
+                                         <td class="oldorder_amount">{:round($customer.oldorder_amount,2)}元</td>
+                                         <td class="oldtypem">
+                                                 {if $customer.oldtypem eq 1}
+                                                  {:round($customer.divoldm,2)*100}%<span class="glyphicon glyphicon-arrow-up" style="color:#1691de;font-size:16px;"></span>
+                                                 {elseif $customer.oldtypem eq 0}
+                                                  {:round($customer.divoldm,2)*100}%<span class="glyphicon glyphicon-arrow-down" style="color:#1691de;font-size:16px;"></span>
+                                                 {else}
+                                                 -
+                                                 {/if}
+                                         </td>
+                                         <td class="oldorder_person">{$customer.oldorder_person}人</td>
+                                         <td class="oldtype">
+                                                 {if $customer.oldtype eq 1}
+                                                 {:round($customer.divold,2)*100}%<span class="glyphicon glyphicon-arrow-up" style="color:#1691de;font-size:16px;"></span>
+                                                 {elseif $customer.oldtype eq 0}
+                                                 {:round($customer.divold,2)*100}%<span class="glyphicon glyphicon-arrow-down" style="color:#1691de;font-size:16px;"></span>
+                                                 {else}
+                                                 -
+                                                 {/if}
+                                         </td>
+                                     </tr>
+                                 </tbody>
+                             </table>
+                         </div>
+                       </div>
+                   </div>
+                    <div class="col-lg-12" style="float:none;margin-left:auto;margin-right:auto">
+                        <div class="row" >
+                                <div style=" height: 500px; width:500px;margin: auto; border: 1px solid #FFFFFF; border-radius: 5px;font-size: 18px" id="bar2_line"></div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                            <div class="col-lg-12" style="background-color:#f9f9f9;height:120px">
+                                <div class="m-b-md"  >
+                                    <h3>订单金额</h3>
+                                </div>
+                                    <form class="form-inline" name="search-form" method="get" action="">
+                                        <div class="ibox-content" style="background-color:#f9f9f9">
+                                            <div class="form-group pull-right">
+                                                 <div class="col-lg-10">
+                                                        <button class="btn btn-primary pull-right oamont" type="button">
+                                                            搜索
+                                                        </button>
+                                                 </div>
+                                            </div>
+                                            <div class="form-group pull-right" id="datepicker">
+                                                <label class="font-noraml"></label>
+                                                <div class="input-group date">
+                                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                    <input type="text" autocomplete="off" class="form-control" style="width:150px;" placeholder="起始时间" name="amontstartDate" value="{$Think.get.startDate}">
+                                                </div>
+                                                至
+                                                <div class="input-group date">
+                                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                    <input type="text" autocomplete="off" class="form-control" style="width:150px;" placeholder="截止时间" name="amontendDate" value="{$Think.get.endDate}">
+                                                </div>
+                                            </div>
+                                           
+                                              <div class="form-group pull-right">
+                                                    <div class="col-lg-12">
+                                                        <a href="javascript:void(0);" class="btn btn-info tongji" time="yst">
+                                                          昨天
+                                                        </a> 
+                                                    </div>
+                                                </div>
+                                                <div class="form-group pull-right">
+                                                    <div class="col-lg-12">
+                                                        <a href="javascript:void(0);" class="btn tongji" time="day7">
+                                                           最近7天
+                                                        </a> 
+                                                    </div>
+                                                </div>
+                                                <div class="form-group pull-right">
+                                                    <div class="col-lg-12">
+                                                        <a href="javascript:void(0);" class="btn tongji" time="day30">
+                                                           最近30天
+                                                        </a> 
+                                                    </div>
+                                                </div>
+                                                <div class="form-group pull-right">
+                                                    <div class="col-lg-10">
+                                                        <a href="" class="btn btn-info">
+                                                        <i class="fa fa-download"></i> 导出数据
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                        </div> 
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="col-lg-12" style="float:none;margin-left:auto;margin-right:auto">
+                                    <div class="row" >
+                                            <div style=" height: 600px; width:1200px;margin: auto; border: 1px solid #FFFFFF; border-radius: 5px;font-size: 18px" id="bar3_line"></div>
+                                    </div>
+                            </div>
+                            <div class="row">
+                                    <div class="col-lg-12" style="background-color:#f9f9f9;height:120px;">
+                                        <div class="m-b-md">
+                                            <h3>订单来源构成</h3>
+                                        </div>
+                                            <form class="form-inline" name="search-form" method="get" action="">
+                                                <div class="ibox-content" style="margin-top:10px;background-color:#f9f9f9">
+                                                    <!-- <div class="form-group pull-right" id="datepicker">
+                                                        <label class="font-noraml"></label>
+                                                        <div class="input-group">
+                                                            <select name="" id="laiyuan" style="width:150px;height:40px;border:dimgray;font-size:18px;">
+                                                                {:get_month_text_html(-1)}
+                                                              </select>
+                                                        </div>
+                                                    </div> -->
+                                                    <div class="form-group pull-right">
+                                                            <div class="col-lg-12">
+                                                                <a href="javascript:void(0);" class="btn btn-info laiyuan" time="month">
+                                                                 本月
+                                                                </a> 
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group pull-right">
+                                                            <div class="col-lg-12">
+                                                                <a href="javascript:void(0);" class="btn laiyuan" time="smonth">
+                                                                   上月
+                                                                </a> 
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group pull-right">
+                                                            <div class="col-lg-10">
+                                                                <a href="" class="btn">
+                                                                <i class="fa fa-download"></i> 导出数据
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                </div> 
+                                            </form>
+                                        </div>
+                                    </div>
+                               
+                            <div class="col-lg-12" style="float:none;margin-left:auto;margin-right:auto;margin-top:30px;margin-bottom: 50px;">
+                                    <div class="row">
+                                     <div style="height:200px; margin: auto;">
+                                     <table class="table  table-bordered table-hover text-center" style="font-size:14px;">
+                                         <tbody>
+                                             <thead>
+                                                 <tr style="height:50px;">
+                                                     <th>&nbsp</th> 
+                                                     <th>充值金额</th>
+                                                     <th>较前一月</th>
+                                                     <th>充值人数</th>
+                                                     <th>较前一月</th>
+                                                 </tr>
+                                             </thead>
+                                             <tr style="height:50px;">
+                                                 <td style="color:tomato">Ios</td>
+                                                 <td class="iorder_amount">{:round($iosamount.order_amount,2)}元</td>  
+                                                 <td class="iamounttype">
+                                                       {if $iosamount.amounttype eq 1}
+                                                         {:round($iosamount.amountdiv,2)*100}%<span class="glyphicon glyphicon-arrow-up" style="color:#1691de;font-size:16px;"></span>
+                                                         {elseif $iosamount.amounttype eq 0}
+                                                         {:round($iosamount.amountdiv,2)*100}%<span class="glyphicon glyphicon-arrow-down" style="color:#1691de;font-size:16px"></span>
+                                                         {else}
+                                                         -
+                                                                                                    {/if}  
+                                                 </td>
+                                                 <td class="iorder_num">{$iosamount.order_num}人</td>
+                                                 <td class="iordertype"> {if $iosamount.ordertype eq 1}
+                                                        {:round($iosamount.orderdiv,2)*100}%<span class="glyphicon glyphicon-arrow-up" style="color:#1691de;font-size:16px;"></span> 
+                     
+                                                        {elseif $iosamount.ordertype eq 0}
+                     
+                                                        {:round($iosamount.orderdiv,2)*100}%<span class="glyphicon glyphicon-arrow-down" style="color:#1691de;font-size:16px;"></span>
+                     
+                                                        {else}
+                                                        -
+                                                        {/if} 
+                                                    
+                                                    </td>  
+                                             </tr>
+                                             <tr style="height:50px;">
+                                                 <td style="color:darkseagreen">Android</td>
+                                                 <td class="aorder_amount">{:round($anamount.order_amount,2)}元</td>
+                                                 <td class="aamounttype">
+                                                         {if $anamount.amounttype eq 1}
+                                                          {:round($anamount.amountdiv,2)*100}%<span class="glyphicon glyphicon-arrow-up" style="color:#1691de;font-size:16px;"></span>
+                                                         {elseif $anamount.amounttype eq 0}
+                                                          {:round($anamount.amountdiv,2)*100}%<span class="glyphicon glyphicon-arrow-down" style="color:#1691de;font-size:16px;"></span>
+                                                         {else}
+                                                         -
+                                                         {/if}
+                                                 </td>
+                                                 <td class="aorder_num">{$anamount.order_num}人</td>
+                                                 <td class="aordertype">
+                                                         {if $anamount.ordertype eq 1}
+                                                         {:round($anamount.orderdiv,2)*100}%<span class="glyphicon glyphicon-arrow-up" style="color:#1691de;font-size:16px;"></span>
+                                                         {elseif $anamount.ordertype eq 0}
+                                                         {:round($anamount.orderdiv,2)*100}%<span class="glyphicon glyphicon-arrow-down" style="color:#1691de;font-size:16px;"></span>
+                                                         {else}
+                                                         -
+                                                         {/if}
+                                                 </td>
+                                             </tr>
+                                             <tr style="height:50px;">
+                                                    <td style="color:darkseagreen">客服</td>
+                                                    <td class="korder_amount">{:round($kfamount.order_amount,2)}元</td>
+                                                    <td class="kamounttype">
+                                                            {if $kfamount.amounttype eq 1}
+                                                             {:round($kfamount.amountdiv,2)*100}%<span class="glyphicon glyphicon-arrow-up" style="color:#1691de;font-size:16px;"></span>
+                                                            {elseif $kfamount.amounttype eq 0}
+                                                             {:round($kfamount.amountdiv,2)*100}%<span class="glyphicon glyphicon-arrow-down" style="color:#1691de;font-size:16px;"></span>
+                                                            {else}
+                                                            -
+                                                            {/if}
+                                                    </td>
+                                                    <td class="korder_num">{$kfamount.order_num}人</td>
+                                                    <td class="kordertype">
+                                                            {if $kfamount.ordertype eq 1}
+                                                            {:round($kfamount.orderdiv,2)*100}%<span class="glyphicon glyphicon-arrow-up" style="color:#1691de;font-size:16px;"></span>
+                                                            {elseif $kfamount.ordertype eq 0}
+                                                            {:round($kfamount.orderdiv,2)*100}%<span class="glyphicon glyphicon-arrow-down" style="color:#1691de;font-size:16px;"></span>
+                                                            {else}
+                                                            -
+                                                            {/if}
+                                                    </td>
+                                                </tr>
+                                         </tbody>
+                                     </table>
+                                 </div>
+                               </div>
+                           </div>
+
+                           <div class="col-lg-12" style="float:none;margin-left:auto;margin-right:auto;">
+                                <div class="row" >
+                                        <div style="margin:auto; height: 500px; width:1200px; border: 1px solid #FFFFFF; border-radius: 5px;font-size: 18px;" id="bar4_line"></div>
+                                </div>
+                        </div>
+
+
+
+        </div>
+</div>
+    
+{/block}
+{block name="script"}
+
+<script src="__LIB__/echarts4.2/echarts.min.js"></script>
+<script src="__LIB__/echarts4.2/timeline.js"></script>
+<script>
+$(function() {
+    // 基于准备好的dom，初始化echarts实例
+    var myChart1 = echarts.init(document.getElementById('bar1_line'));
+    var myChart2 = echarts.init(document.getElementById('bar2_line'));
+    var myChart3 = echarts.init(document.getElementById('bar3_line'));
+    var myChart4 = echarts.init(document.getElementById('bar4_line'));
+    option = {
+     backgroundColor: '#ffffff',
+    // title: {
+    //     text: '折线图堆叠'
+    // },
+    tooltip: {
+        trigger: 'axis',
+        
+    },
+    legend: {
+        data:['充值人数','充值订单','充值金额']
+    },
+    textStyle: {
+           fontSize: 18,// 用 legend.textStyle.fontSize 更改示例大小
+           fontWeight: 600
+    },
+    grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '3%',
+        containLabel: true,
+        fontSize: 18,
+    },
+    // containLabel: true,
+    // toolbox: {
+    //     show : true,  
+    //     itemSize:20,
+    //     itemGap:5,
+    //     showTitle:false, 
+    //     restore : {
+    //         // saveAsImage: {}
+    //     }
+    // },
+    xAxis: [
+        { 
+            type: 'category',
+            boundaryGap: false,
+            data : {$month_time_arr|json_encode},
+            label: {
+                normal: {
+                    show: true,
+                    position: 'center',
+                    textStyle:{
+                        fontSize:18,
+                        color:'#000'
+                    }
+                }
+            },
+        },
+    ],
+    yAxis: [
+            {
+                type : 'value',
+                name : '金额/人数/订单数',
+                position: 'left',
+                axisLabel : {
+                    formatter: '{value}'
+                }
+            },
+            {
+                type : 'value',
+                name : '',
+                position: 'right',
+                axisLabel : {
+                    formatter: '{value}'
+                }
+            },
+         ],
+    series: [
+        {
+            name:'充值人数',
+            type:'line',
+            stack: '总量',
+            data : {$recharge_player_arr|json_encode},
+        },
+        {
+            name:'充值订单',
+            type:'line',
+            stack: '总量',
+            data : {$recharge_num_arr|json_encode}
+        },
+        {
+            name:'充值金额',
+            type:'line',
+            stack: '总量',
+            data : {$recharge_amount_arr|json_encode}
+        },
+       
+    ]
+  
+};
+option2 = {
+    backgroundColor: '#ffffff',
+    color:['#FF6347','#40E0D0'],
+    textStyle: {
+           fontSize: 20,// 用 legend.textStyle.fontSize 更改示例大小
+           fontWeight: 600
+    },
+    tooltip : {
+        trigger: 'item',
+        formatter: "{a} <br/>{b} : {c} ({d}%)"
+    },
+    legend: {
+        orient: 'vertical',
+        left: 'center',
+        data: ['新客户','老客户']
+    },
+    series : [
+        {
+            name: '',
+            type: 'pie',
+            radius : '55%',
+            center: ['50%', '60%'],
+            data:{$customer.div|json_encode},
+            itemStyle: {
+                emphasis: {
+                    shadowBlur: 10,
+                    shadowOffsetX: 0,
+                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                },
+                
+            }
+        }
+    ]
+};
+
+    option3 = {
+        backgroundColor: '#ffffff',
+        xAxis: {
+            type: 'category',
+            data: ['0-50元', '51-100元', '101-200元', '201-500元', '501-1000元','1001-5000元','5001-10000元','10000元上']
+        },
+        textStyle: {
+           fontSize: 18,// 用 legend.textStyle.fontSize 更改示例大小
+           fontWeight: 600
+         },
+        tooltip : {
+                trigger: 'axis',
+                axisPointer : {
+                    name : 'asd',        // 坐标轴指示器，坐标轴触发有效
+                    type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                }
+        },
+        yAxis: [
+            {
+                type : 'value',
+                name : '订单数 /单',
+                position: 'left',
+                axisLabel : {
+                    formatter: '{value}'
+                }
+            },
+          
+        ],
+ 
+        series: [
+            {
+                name: '订单数量',
+                data : {$orderinfo|json_encode},
+                type: 'bar',
+                label: {
+                    normal: {
+                        color:'#1691de',
+                        size:18,
+                        show: true,
+                        position: 'top'
+                    }
+                },
+                itemStyle:{
+                    normal:{
+                        color:'#1691de'
+                    }
+                },
+            },
+           
+        ]
+       
+};
+option4 = {
+    color:['#FF7F50','#00BFFF','green'],
+    backgroundColor: '#ffffff',
+    title : {
+        text: '左图订单金额，右图订单数量',
+        subtext: '',
+        x:'center'
+    },
+    textStyle: {
+           fontSize: 18,// 用 legend.textStyle.fontSize 更改示例大小
+           fontWeight: 600
+    },
+    tooltip : {
+        trigger: 'item',
+        formatter: "{a} <br/>{b} : {c} ({d}%)"
+    },
+    legend: {
+        fontSize:18,
+        orient: 'vertical',
+        left: 'left',
+        data: ['ios','Android','客服']
+    },
+    series : [
+        {
+            name: '订单金额',
+            type: 'pie',
+            radius : '55%',
+            center: ['30%', '60%'],
+            backgroundColor:'#ffffff',
+            data : {$price|json_encode},
+            itemStyle: {
+                emphasis: {
+                    shadowBlur: 10,
+                    shadowOffsetX: 0,
+                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                },
+                normal:['#4ad2ff','#ffffff','red']
+            }
+        },
+
+           {
+            name: '订单数量',
+            type: 'pie',
+            radius : '55%',
+            center: ['70%', '60%'],
+            backgroundColor:'#ffffff',
+            data : {$order|json_encode},
+            itemStyle: {
+                emphasis: {
+                    shadowBlur: 10,
+                    shadowOffsetX: 0,
+                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                },
+                normal:['#4ad2ff','#ffffff','red'],
+            },
+        }
+    ]
+};
+    //使用刚指定的配置项和数据显示图表。
+    myChart1.setOption(option);
+    myChart2.setOption(option2);
+    myChart3.setOption(option3);
+    myChart4.setOption(option4);
+
+    $('.ajiaoyi').on('click',function(){
+        $startDate = $("input[name='jistartDate']").val();
+        $endDate   = $("input[name='jiendDate']").val();
+        jiaoyi('',$startDate,$endDate);
+    })
+
+
+
+    // $('.laiyuan').on('click',function(){
+    //     $time = $("input[name='laiyuan']").val();
+    //     laiyuan($time);
+    // })
+    
+    $('.jiaoyi').on('click',function(){
+      
+        $('.jiaoyi').removeClass('btn-info');
+         if(!$(this).hasClass('btn-info')){
+            //$(this).removeClass('btn-white');
+              $(this).addClass('btn-info');
+         }
+        var timetype = $(this).attr('time');
+        jiaoyi(timetype);
+    });
+
+    function jiaoyi(timetype = '',startDate = '',endDate = '',){
+        var url = "{:url('total/statistics_time')}";
+        $.ajax({
+                url: url,
+                type: "POST",
+                data: {timetype:timetype,startDate:startDate,endDate:endDate},
+                dataType: "json",
+                success: function(ret) {
+                    if(ret.code){
+                        $('.Average').html(ret.info.Average);
+                        $('.old_recharge_num').html(ret.info.old_recharge_num);
+                        $('.old_recharge_gold').html(ret.info.old_recharge_gold);
+                        $('.old_recharge_player').html(ret.info.old_recharge_player+'人');
+                        $('.old_recharge_amount').html(ret.info.old_recharge_amount+'元');
+                    }
+                }
+         });
+    }
+
+
+
+        $('.xinlao').on('click',function(){
+        var url = "{:url('total/customer')}";
+        $('.xinlao').removeClass('btn-info');
+         if(!$(this).hasClass('btn-info')){
+            //$(this).removeClass('btn-white');
+              $(this).addClass('btn-info');
+         }
+        var timetype = $(this).attr('time');
+       $.ajax({
+                url: url,
+                type: "POST",
+                data: {timetype:timetype},
+                dataType: "json",
+                success: function(ret) {
+                    console.log(ret);
+                    if(ret.code){
+                        $('.addorder_amount').html(ret.info.addorder_amount.toFixed(2)+'元');
+                        if(ret.info.addtypem == 1){
+                            $('.addtypem').html((ret.info.divaddm.toFixed(2))*100+'%'+'<span class="glyphicon glyphicon-arrow-up" style="color:#1691de;font-size:16px;"></span>');
+                        }else{
+                            $('.addtypem').html((ret.info.divaddm.toFixed(2))*100+'%'+'<span class="glyphicon glyphicon-arrow-down" style="color:#1691de;font-size:16px;"></span>');  
+                        }
+                        $('.addorder_person').html(ret.info.addorder_person+'人');
+                        if(ret.info.addtype == 1){
+                            $('.addtype').html((ret.info.divadd.toFixed(2))*100+'%'+'<span class="glyphicon glyphicon-arrow-up" style="color:#1691de;font-size:16px;"></span>');
+                        }else{
+                            $('.addtype').html((ret.info.divadd.toFixed(2))*100+'%'+'<span class="glyphicon glyphicon-arrow-down" style="color:#1691de;font-size:16px;"></span>');  
+                        }
+                        $('.oldorder_amount').html(ret.info.oldorder_amount.toFixed(2)+'元');
+                        $('.oldorder_person').html(ret.info.oldorder_person+'人');
+                        if(ret.info.oldtype == 1){
+                            $('.oldtype').html((ret.info.divold.toFixed(2))*100+'%'+'<span class="glyphicon glyphicon-arrow-up" style="color:#1691de;font-size:16px;"></span>');
+                        }else{
+                            $('.oldtype').html((ret.info.divold.toFixed(2))*100+'%'+'<span class="glyphicon glyphicon-arrow-down" style="color:#1691de;font-size:16px;"></span>');  
+                        }
+                        if(ret.info.oldtypem == 1){
+                            $('.oldtypem').html((ret.info.divoldm*100).toFixed(2)+'%'+'<span class="glyphicon glyphicon-arrow-up" style="color:#1691de;font-size:16px;"></span>');
+                        }else{
+                            $('.oldtypem').html((ret.info.divoldm*100).toFixed(2)+'%'+'<span class="glyphicon glyphicon-arrow-down" style="color:#1691de;font-size:16px;"></span>');  
+                        }
+                        option2.series[0].data = ret.info.div
+                        myChart2.setOption(option2);
+                    }
+                }
+            });
+    });
+
+ $('.oamont').on('click',function(){
+    var startDate = $('input[name="amontstartDate"]').val();
+    var endDate   = $('input[name="amontendDate"]').val();
+    tongji('',startDate,endDate);
+ })
+      $('.tongji').on('click',function(){
+        $('.tongji').removeClass('btn-info');
+         if(!$(this).hasClass('btn-info')){
+            //   $(this).removeClass('btn-white');
+              $(this).addClass('btn-info');
+         }
+         var timetype = $(this).attr('time');
+         tongji(timetype);
+    });
+
+    function  tongji(timetype ='',startDate='',endDate = '') {
+        var url = "{:url('total/statistics_amount')}";
+         $.ajax({
+                url: url,
+                type: "POST",
+                data: {timetype:timetype,startDate:startDate,endDate:endDate},
+                dataType: "json",
+                success: function(ret) {
+                    if(ret.code){
+                        option3.series[0].data = ret.info;
+                        myChart3.setOption(option3);
+                    }
+                }
+            });
+    }
+      $('.laiyuan').on('click',function(){
+        $('.laiyuan').removeClass('btn-info');
+         if(!$(this).hasClass('btn-info')){
+            //   $(this).removeClass('btn-white');
+              $(this).addClass('btn-info');
+         }
+        var timetype = $(this).attr('time');
+        laiyuan(timetype);
+    });
+    function laiyuan(timetype){
+        var url = "{:url('total/order_channel')}";
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: {timetype:timetype},
+            dataType: "json",
+            success: function(ret) {
+                if(ret.code){
+                        $('.iorder_amount').html(parseFloat(ret.info.iosamount.order_amount).toFixed(2)+'元');
+                        if(ret.info.iosamount.amounttype == 1){
+                            $('.iamounttype').html((ret.info.iosamount.amountdiv.toFixed(2))*100+'%'+'<span class="glyphicon glyphicon-arrow-up" style="color:#1691de;font-size:16px;"></span>');
+                        }else{
+                            $('.iamounttype').html((ret.info.iosamount.amountdiv.toFixed(2))*100+'%'+'<span class="glyphicon glyphicon-arrow-down" style="color:#1691de;font-size:16px;"></span>');  
+                        }
+                        $('.iorder_num').html(ret.info.iosamount.order_num+'人');
+                        if(ret.info.iosamount.ordertype == 1){
+                            $('.iordertype').html((ret.info.iosamount.orderdiv.toFixed(2))*100+'%'+'<span class="glyphicon glyphicon-arrow-up" style="color:#1691de;font-size:16px;"></span>');
+                        }else{
+                            $('.iordertype').html((ret.info.iosamount.orderdiv.toFixed(2))*100+'%'+'<span class="glyphicon glyphicon-arrow-down" style="color:#1691de;font-size:16px;"></span>');  
+                        }
+                       $('.aorder_amount').html(parseFloat(ret.info.anamount.order_amount).toFixed(2)+'元');
+                        if(ret.info.anamount.amounttype == 1){
+                            $('.aamounttype').html((ret.info.anamount.amountdiv.toFixed(2))*100+'%'+'<span class="glyphicon glyphicon-arrow-up" style="color:#1691de;font-size:16px;"></span>');
+                        }else{
+                            $('.aamounttype').html((ret.info.anamount.amountdiv.toFixed(2))*100+'%'+'<span class="glyphicon glyphicon-arrow-down" style="color:#1691de;font-size:16px;"></span>');  
+                        }
+                        $('.aorder_num').html(ret.info.anamount.order_num+'人');
+                        if(ret.info.anamount.ordertype == 1){
+                            $('.aordertype').html((ret.info.anamount.orderdiv.toFixed(2))*100+'%'+'<span class="glyphicon glyphicon-arrow-up" style="color:#1691de;font-size:16px;"></span>');
+                        }else{
+                            $('.aordertype').html((ret.info.anamount.orderdiv.toFixed(2))*100+'%'+'<span class="glyphicon glyphicon-arrow-down" style="color:#1691de;font-size:16px;"></span>');  
+                        }
+                        $('.korder_amount').html(parseFloat(ret.info.kfamount.order_amount).toFixed(2)+'元');
+                        if(ret.info.kfamount.amounttype == 1){
+                            $('.kamounttype').html((ret.info.kfamount.amountdiv.toFixed(2))*100+'%'+'<span class="glyphicon glyphicon-arrow-up" style="color:#1691de;font-size:16px;"></span>');
+                        }else{
+                            $('.kamounttype').html((ret.info.kfamount.amountdiv.toFixed(2))*100+'%'+'<span class="glyphicon glyphicon-arrow-down" style="color:#1691de;font-size:16px;"></span>');  
+                        }
+                        $('.korder_num').html(ret.info.kfamount.order_num+'人');
+                        if(ret.info.kfamount.ordertype == 1){
+                            $('.kordertype').html((ret.info.kfamount.orderdiv.toFixed(2))*100+'%'+'<span class="glyphicon glyphicon-arrow-up" style="color:#1691de;font-size:16px;"></span>');
+                        }else{
+                            $('.kordertype').html((ret.info.kfamount.orderdiv.toFixed(2))*100+'%'+'<span class="glyphicon glyphicon-arrow-down" style="color:#1691de;font-size:16px;"></span>');  
+                        }
+                        // console.log(ret.info);
+                        option4.series[0].data = ret.info.price
+                        option4.series[1].data = ret.info.order
+                        myChart4.setOption(option4);
+                    }
+            }
+        });
+    }
+});
+</script>
+{/block}
