@@ -22,17 +22,14 @@ class Login extends \think\Controller
     }
 
     public function login () {
-//        if (Request::instance()->isPost()) {
-        if (Request::instance()->param()) {
-//            $username = input('post.username');
-//            $password = input('post.password');
-            $username = request()->param('username');
-            $password = request()->param('password');
+        if (Request::instance()->isPost()) {
+            $username = input('post.username');
+            $password = input('post.password');
 
             // 实例化验证器
             $validate = Loader::validate('Login');
             // 验证数据
-            $data = ['username' => $username, 'password' => $password, 'captcha' => request()->param('captcha')];
+            $data = ['username' => $username, 'password' => $password, 'captcha' => request()->input('captcha')];
             // 验证
             if (!$validate->check($data)) {
                 return $this->error($validate->getError());
