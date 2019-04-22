@@ -72,40 +72,16 @@
                 </div>
                 <div class="ibox-content">
                     <form method="post" class="form-horizontal" action="">
-
                         <div class="form-group">
-                            <label class="col-sm-2 control-label">分类级别</label>
+                            <label class="col-sm-2 control-label"><span style="color:red;">*</span>商品规格名称</label>
                             <div class="col-sm-9">
-                                <label style="margin-top:4px; margin-right:20px;">
-                                    <input type="radio" {if condition="$info.level eq 2"} checked {/if} value="2" name="level" /> 二级
-                                </label>
-                                <label>
-                                    <input type="radio" {if condition="!$info.level or $info.level eq 3"} checked {/if} value="3" name="level"  /> 三级
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="col-sm-2 control-label">分类广告</label>
-                            <div class="col-sm-9">
-                                    <dd class="upload_area clearfix" style="margin: 0 auto;">
-                                        <ul id="imglist" class="post_imglist">
-                                            {if condition="!$info.img"}
-                                            <li><img class="wh60" id="file0" src="__STATIC__/images/default.jpg" onclick="showimg()"></li>
-                                            {else /}
-                                            <li><img class="wh60" id="file0" src="__IMAGES__/{$info.img}" onclick="showimg()"></li>
-                                            {/if}
-                                        </ul>
-                                        <div class="upload_btn">
-                                            <input type="file" id="upload_image" value="图片上传" accept="image/jpeg,image/gif,image/png" capture="camera">
-                                        </div>
-                                    </dd>
+                                <input type="text" name="spec_name" value="{$info.spec_name}" class="form-control">
                             </div>
                         </div>
 
                         <div class="form-group">
                             <div class="col-sm-4 col-sm-offset-2">
-                                <input type="hidden" name="set_id" value="{$info.set_id|default=''}" />
+                                <input type="hidden" name="spec_id" value="{$info.spec_id}" />
                                 <button class="btn btn-white" onclick="javascript:history.back(-1);return false;">取消</button>
                                 <button class="btn btn-primary" type="submit">提交</button>
                             </div>

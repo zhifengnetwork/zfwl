@@ -8,7 +8,7 @@
                 <div class="ibox-title">
                     <h5>{$meta_title}</h5>
                     <div class="pull-right" style="margin-top:-8px;">
-                            <a class="btn btn-info" href="{:url('goods/goods_type_add')}"><i class="fa fa-plus"></i> 添加商品类型</a>
+                            <a class="btn btn-info" href="{:url('goods/goods_spec_add',['type_id'=>$Request.param.type_id],false)}"><i class="fa fa-plus"></i> 添加商品规格</a>
                     </div>
                 </div>
                 <div class="ibox-content">
@@ -17,7 +17,8 @@
                     <form method="get" action="">
                         
                         <div class="col-sm-2">
-                            <div class="input-group"><input type="text" name="type_name" value="{$type_name}" placeholder="搜索商品类型" class="input-sm form-control"> </div>
+                            <input type="hidden" name="type_id" value="{$Request.param.type_id}" />
+                            <div class="input-group"><input type="text" name="spec_name" value="{$spec_name}" placeholder="搜索商品规格" class="input-sm form-control"> </div>
                         </div>
 
                         <div class="col-sm-3">
@@ -38,19 +39,19 @@
                             <tr>
 
                                 <th><input class="ch_all" type="checkbox">ID</th>
-                                <th>商品类型名称 </th>
+                                <th>商品规格名称 </th>
                                 <th>操作</th>
                             </tr>
                             </thead>
                             <tbody>
                             {volist name="list" id="vo"}
                             <tr>
-                                <td><input type="checkbox" class="i-checks ch_item" name="type_id[]"   value="{$vo.type_id}">{$vo.type_id}</td>
-                                <td>{$vo.type_name}</td>
+                                <td><input type="checkbox" class="i-checks ch_item" name="spec_id[]"   value="{$vo.spec_id}">{$vo.spec_id}</td>
+                                <td>{$vo.spec_name}</td>
                                 <td>
-                                    <a href="{:url('Goods/goods_spec_list',['type_id'=>$vo.type_id],false)}">规格</a>
-                                    <a href="{:url('Goods/goods_type_edit',['type_id'=>$vo.type_id],false)}">编辑</a>
-                                    <a onclick="goods_type_del(this,{$vo.type_id})" href="javascript:;">删除</a>
+                                    <a href="{:url('Goods/goods_spec_val_list',['spec_id'=>$vo.spec_id],false)}">规格值</a>
+                                    <a href="{:url('Goods/goods_spec_edit',['spec_id'=>$vo.spec_id],false)}">编辑</a>
+                                    <a onclick="goods_spec_del(this,{$vo.spec_id})" href="javascript:;">删除</a>
                                 </td>
                             </tr>
                             {/volist}
@@ -75,9 +76,9 @@
 {/block}
 {block name='script'}
 <script>
-    function goods_type_del(obj,type_id){
-        if(window.confirm('确认删除该商品类型吗？')){
-            $.post("{:url('Goods/goods_type_del')}",{'type_id':type_id},function(data){
+    function goods_spec_del(obj,spec_id){
+        if(window.confirm('确认删除该商品规格吗？')){
+            $.post("{:url('Goods/goods_spec_del')}",{'spec_id':spec_id},function(data){
                 alert(data.msg);
                 if(data.code){
                     $(obj).parents('tr').remove();

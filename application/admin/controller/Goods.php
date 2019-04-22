@@ -367,6 +367,10 @@ class Goods extends Common
         if(!$info){
             jason([],'参数错误',0);
         }
+        $spec = Db::name('goods_spec')->where('type_id','=',$type_id)->find();
+        if($spec){
+            jason([],'该类型含有规格，不能删除！',0);
+        }
 
         if( Db::table('goods_type')->where('type_id',$type_id)->delete() ){
             jason([],'删除商品规格成功！');
@@ -374,6 +378,212 @@ class Goods extends Common
             jason([],'删除商品规格失败！',0);
         }
 
+    }
+
+    public function goods_spec_list(){
+        $where = [];
+        $pageParam = ['query' => []];
+
+        $type_id = input('type_id');
+        if(!$type_id){
+            $this->error('参数错误！');
+        }
+
+        $where["type_id"] = ['eq', "{$type_id}"];
+        $pageParam['query']['type_id'] = ['like', "%{$type_id}%"];
+
+        $spec_name = input('spec_name');
+        if( $spec_name ){
+            $where["spec_name"] = ['like', "%{$spec_name}%"];
+            $pageParam['query']['spec_name'] = ['like', "%{$spec_name}%"];
+        }
+
+        $list  = Db::table('goods_spec')->order('spec_id DESC')->where($where)->paginate(10,false,$pageParam);
+
+        return $this->fetch('',[
+            'list'          =>  $list,
+            'spec_name'      =>  $spec_name,
+            'meta_title'    =>  '商品规格管理',
+        ]);
+    }
+
+    public function goods_spec_add(){
+
+        if( Request::instance()->isPost() ){
+            $data = input('post.');
+
+            $data['type_id'] = input('type_id');
+            if(!$data['type_id']){
+                $this->error('参数错误！');
+            }
+            
+            if( !$data['spec_name'] ){
+                $this->error('请填写商品规格名称！');
+            }
+            
+            if ( Db::table('goods_spec')->insert($data) ) {
+                $this->success('添加成功', url('goods/goods_spec_list',['type_id'=>$data['type_id']],false));
+            } else {
+                $this->error('添加失败');
+            }
+        }
+
+        return $this->fetch('',[
+            'meta_title'    =>  '添加商品规格',
+        ]);
+    }
+
+    public function goods_spec_edit(){
+        $spec_id = input('spec_id');
+        
+        if(!$spec_id){
+            $this->error('参数错误！');
+        }
+        
+        $info = Db::table('goods_spec')->find($spec_id);
+
+        if( Request::instance()->isPost() ){
+            $data = input('post.');
+            
+            if( !$data['spec_name'] ){
+                $this->error('请填写商品规格名称！');
+            }
+
+            if ( Db::table('goods_spec')->update($data) ) {
+                $this->success('修改成功', url('goods/goods_spec_list',['type_id'=>$info['type_id']],false));
+            } else {
+                $this->error('修改失败');
+            }
+
+        }
+        
+        return $this->fetch('',[
+            'info'          =>  $info,
+            'meta_title'    =>  '修改商品规格',
+        ]);
+    }
+
+    
+    public function goods_spec_del(){
+        $spec_id = input('spec_id');
+        if(!$spec_id){
+            jason([],'参数错误',0);
+        }
+        $info = Db::table('goods_spec')->find($spec_id);
+        if(!$info){
+            jason([],'参数错误',0);
+        }
+        $spec = Db::name('goods_spec_val')->where('spec_id','=',$spec_id)->find();
+        if($spec){
+            jason([],'该规格含有规格值，不能删除！',0);
+        }
+
+        if( Db::table('goods_spec')->where('spec_id',$spec_id)->delete() ){
+            jason([],'删除商品规格成功！');
+        }else{
+            jason([],'删除商品规格失败！',0);
+        }
+    }
+
+    public function goods_spec_val_list(){
+        $where = [];
+        $pageParam = ['query' => []];
+
+        $spec_id = input('spec_id');
+        if(!$spec_id){
+            $this->error('参数错误！');
+        }
+
+        $where["spec_id"] = ['eq', "{$spec_id}"];
+        $pageParam['query']['spec_id'] = ['like', "%{$spec_id}%"];
+
+        $val_name = input('val_name');
+        if( $val_name ){
+            $where["val_name"] = ['like', "%{$val_name}%"];
+            $pageParam['query']['val_name'] = ['like', "%{$val_name}%"];
+        }
+
+        $list  = Db::table('goods_spec_val')->order('val_id DESC')->where($where)->paginate(10,false,$pageParam);
+
+        return $this->fetch('',[
+            'list'          =>  $list,
+            'val_name'      =>  $val_name,
+            'meta_title'    =>  '商品规格值管理',
+        ]);
+    }
+
+    public function goods_spec_val_add(){
+
+        if( Request::instance()->isPost() ){
+            $data = input('post.');
+
+            $data['spec_id'] = input('spec_id');
+            if(!$data['spec_id']){
+                $this->error('参数错误！');
+            }
+            
+            if( !$data['val_name'] ){
+                $this->error('请填写商品规格值名称！');
+            }
+            
+            if ( Db::table('goods_spec_val')->insert($data) ) {
+                $this->success('添加成功', url('goods/goods_spec_val_list',['spec_id'=>$data['spec_id']],false));
+            } else {
+                $this->error('添加失败');
+            }
+        }
+
+        return $this->fetch('',[
+            'meta_title'    =>  '添加商品规格值',
+        ]);
+    }
+
+    public function goods_spec_val_edit(){
+        $val_id = input('val_id');
+        
+        if(!$val_id){
+            $this->error('参数错误！');
+        }
+        
+        $info = Db::table('goods_spec_val')->find($val_id);
+
+        if( Request::instance()->isPost() ){
+            $data = input('post.');
+            
+            if( !$data['val_name'] ){
+                $this->error('请填写商品规格值名称！');
+            }
+
+            if ( Db::table('goods_spec_val')->update($data) ) {
+                $this->success('修改成功', url('goods/goods_spec_val_list',['spec_id'=>$info['spec_id']],false));
+            } else {
+                $this->error('修改失败');
+            }
+
+        }
+        
+        return $this->fetch('',[
+            'info'          =>  $info,
+            'meta_title'    =>  '修改商品规格值',
+        ]);
+    }
+
+    
+    public function goods_spec_val_del(){
+        $val_id = input('val_id');
+        if(!$val_id){
+            jason([],'参数错误',0);
+        }
+        $info = Db::table('goods_spec_val')->find($val_id);
+        if(!$info){
+            jason([],'参数错误',0);
+        }
+
+        if( Db::table('goods_spec_val')->where('val_id',$val_id)->delete() ){
+            jason([],'删除商品规格成功！');
+        }else{
+            jason([],'删除商品规格失败！',0);
+        }
     }
 
 }
