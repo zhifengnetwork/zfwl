@@ -43,7 +43,6 @@ class Site extends Common
         //生成文件夹
         $names = "site" ;
         $name = "site/" .date('Ymd',time()) ;
-        echo ROOT_PATH .Config('c_pub.img');die;
         if (!file_exists(ROOT_PATH .Config('c_pub.img').$names)){ 
             mkdir(ROOT_PATH .Config('c_pub.img').$names,0777,true);
         } 
