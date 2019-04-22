@@ -8,6 +8,7 @@
 
 namespace app\api\controller;
 
+use think\Db;
 
 class Shop extends ApiBase
 {
@@ -34,5 +35,13 @@ class Shop extends ApiBase
         }else{
             return json(['code'=>0,'msg'=>'没有数据哦','data'=>$list]);
         }
+    }
+
+    public function getGoodsData () {
+        $goods_id = request()->param('goods_id',0,'intval');
+        $data = model('Goods')->where('goods_id',$goods_id)->find();
+        $sku =  Db::table('goods_sku')->where('goods_id',$data['goods_id'])->select();
+        $data['sku'] = $sku;
+        return json(['code'=>1,'msg'=>'','data'=>$data]);
     }
 }
