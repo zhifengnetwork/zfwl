@@ -38,6 +38,8 @@ class Common extends Controller
         } else {
             define('IS_ROOT', null);
         }
+        static $menu;
+
         //权限判断
         $this->auth();
         $this->view->mginfo     = $this->mginfo    = session('admin_user_auth');
@@ -95,7 +97,6 @@ class Common extends Controller
      */
     private function menu($left_menu)
     {
-      
         static $url;
        
         //!$url && $url = strtolower(request()->controller() . '/' . request()->action());
