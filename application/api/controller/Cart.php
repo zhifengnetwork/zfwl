@@ -26,7 +26,6 @@ class Cart extends ApiBase
 
 
 
-
         $data = '购物车数据';
         $this->ajaxReturn(['status' => 0 , 'msg'=>'加入购物车成功','data'=>$data]);
     }
@@ -53,7 +52,6 @@ class Cart extends ApiBase
                 $v['seller_name']="";
             }
         }*/
- 
         foreach($data as $k=>$v){
             unset($v['user_id']);
             unset($v["session_id"]);

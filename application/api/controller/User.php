@@ -10,6 +10,37 @@ use think\Db;
 class User extends ApiBase
 {
 
+<<<<<<< HEAD
+=======
+   /**
+    * 登录接口
+    */
+    public function login()
+    {
+     
+        $mobile    = input('mobile');
+        $password1 = input('password');
+        $password  = md5('TPSHOP'.$password1);
+        //eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJEQyIsImlhdCI6MTU1NTk5MTA1NCwiZXhwIjoxNTU2MDI3MDU0LCJ1c2VyX2lkIjo1NzAzMn0.xIrdf-gY4wPtZw0LvIkp2M4Yubk6EP9Ol6doRVPc79A
+        $data = Db::name("users")->where('mobile',$mobile)
+        ->field('password,user_id')
+        ->find();
+
+        if(!$data){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'手机不存在或错误','data'=>null]);
+        }
+        if ($password != $data['password']) {
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'登录密码错误','data'=>null]);
+        }
+        unset($data['password']);
+        //重写
+        $data['token'] = $this->create_token($data['user_id']);
+        $this->ajaxReturn(['status' => 0 , 'msg'=>'登录成功','data'=>$data]);
+       
+    }
+
+
+>>>>>>> 7dc78601e276180279a0574bbe2df5a4ff1914a6
     public function userinfo(){
         //解密token
         $user_id = $this->get_user_id();
@@ -64,7 +95,7 @@ class User extends ApiBase
       public function update_head_pic(){
 
             $user_id = $this->get_user_id();
-            if($user_id!=""){
+            if($user_id != ""){
                 // 获取表单上传文件 例如上传了001.jpg
                 $file = request()->file('image');
                 // 移动到框架应用根目录/uploads/ 目录下

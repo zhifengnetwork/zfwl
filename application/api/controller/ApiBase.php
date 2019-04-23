@@ -67,7 +67,6 @@ class ApiBase extends Controller
         $headers = [];
         $headers = $this->em_getallheaders();
 
-
         if(!isset($headers['Token'])){
             exit(json_encode(['status' => -1 , 'msg'=>'token不存在','data'=>null]));
         }
