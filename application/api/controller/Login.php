@@ -25,7 +25,6 @@ class Login extends \think\Controller
         if (Request::instance()->isPost()) {
             $username = input('username');
             $password = input('password');
-
             // 实例化验证器
             $validate = Loader::validate('Login');
             // 验证数据
@@ -53,6 +52,8 @@ class Login extends \think\Controller
             return json(['code'=>0,'msg'=>'密码错误！']);
         }
     }
+
+
 
     /*
      *  获取验证码
