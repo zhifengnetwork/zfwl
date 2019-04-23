@@ -14,13 +14,13 @@ return [
     'type'            => 'mysql',
     // 内网数据库
     // 服务器地址
-    'hostname'        => '119.23.100.252',
+    'hostname'        => '127.0.0.1',
     // 数据库名
-    'database'        => 'zfwl123',
+    'database'        => 'test1',
     // 用户名
-    'username'        => 'zfwl123',
+    'username'        => 'root',
     // 密码
-    'password'        => 'Zfwl123456@',
+    'password'        => '123456',
     // 端口
     'hostport'        => '3306',
 

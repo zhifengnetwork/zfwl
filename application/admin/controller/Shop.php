@@ -71,4 +71,21 @@ class Shop extends Common
             return json(['code'=>0,'msg'=>'没有数据哦','data'=>$list]);
         }
     }
+
+
+    public function base_img(){
+        $img      = input('img');
+        $saveName = request()->time().rand(0,99999) . '.png';
+
+        $img      =  base64_decode($img);
+        //生成文件夹
+        $names = "shops" ;
+        $name  = "shops/" .date('Ymd',time()) ;
+        if (!file_exists(ROOT_PATH .Config('c_pub.img').$names)){ 
+            mkdir(ROOT_PATH .Config('c_pub.img').$names,0777,true);
+        } 
+        //保存图片到本地
+        file_put_contents(ROOT_PATH .Config('c_pub.img').$name.$saveName,$img);
+        return json(['code'=>1,'msg'=>'ok','data'=>SITE_URL.'/'.$name.$saveName]);
+    }
 }

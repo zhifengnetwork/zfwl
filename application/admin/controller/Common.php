@@ -25,7 +25,6 @@ class Common extends Controller
             if (!defined('UID')) {
                 define('UID', session('admin_user_auth.mgid'));
             }
-
         } else {
             define('UID', null);
         }
@@ -44,6 +43,8 @@ class Common extends Controller
 
         $this->view->mginfo    = $this->mginfo    = session('admin_user_auth');
         $this->view->left_menu = self::get_leftmenu();
+
+    
         View::share('meta_title', 'GAME');
     }
 
@@ -65,14 +66,14 @@ class Common extends Controller
     protected function get_leftmenu()
     {
         //获取所有可见菜单
-        $all_menu       = Session::get('ALL_MENU_LIST');
+        $all_menu       = '';
         $admin_userinfo = Session::get('admin_user_auth');
         if (!$all_menu) {
             $where['status'] = 1;
             $where['hide']   = 1;
             $all_menu        = Db::table('menu')->where($where)->order('sort ASC')->field("id,title,pid,url,tip,group,sort,icon")->select();
         }
-
+       
         //权限判断
         $auth_rules = get_menu_auth();
         $list       = [];
@@ -81,11 +82,13 @@ class Common extends Controller
                 $list[] = $val;
             }
         }
+      
         $menu_tree = list_to_tree($list);
+        // var_dump($menu_tree);
+        // exit;
+
         Session::set('ALL_MENU_LIST', $menu_tree);
-         $left_menu = self::menu($menu_tree);
-        
-       
+        $left_menu = self::menu($menu_tree);
         return $left_menu;
     }
 
