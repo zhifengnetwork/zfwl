@@ -17,7 +17,6 @@ class Menu extends Common
         $menu_list      = Db::table('menu')->order('sort ASC')->select();
         $menu_list_tree = list_to_tree($menu_list);
         $this->assign('menu_list_tree', $menu_list_tree);
-
         $this->assign('meta_title', '菜单列表');
         return $this->fetch();
     }
@@ -65,7 +64,6 @@ class Menu extends Common
         }
         $info        = [];
         $id && $info = Db::table('menu')->where('id', $id)->find();
-
         $this->assign('info', $info);
         $this->assign('meta_title', $id ? '编辑菜单' : '新增菜单');
         return $this->fetch();

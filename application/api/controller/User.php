@@ -16,10 +16,10 @@ class User extends ApiBase
     public function login()
     {
      
-        $mobile = I('mobile');
-        $password1 = I('password');
-        $password = md5('TPSHOP'.$password1);
-
+        $mobile    = input('mobile');
+        $password1 = input('password');
+        $password  = md5('TPSHOP'.$password1);
+        //eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJEQyIsImlhdCI6MTU1NTk5MTA1NCwiZXhwIjoxNTU2MDI3MDU0LCJ1c2VyX2lkIjo1NzAzMn0.xIrdf-gY4wPtZw0LvIkp2M4Yubk6EP9Ol6doRVPc79A
         $data = Db::name("users")->where('mobile',$mobile)
         ->field('password,user_id')
         ->find();
@@ -92,7 +92,7 @@ class User extends ApiBase
       public function update_head_pic(){
 
             $user_id = $this->get_user_id();
-            if($user_id!=""){
+            if($user_id != ""){
                 // 获取表单上传文件 例如上传了001.jpg
                 $file = request()->file('image');
                 // 移动到框架应用根目录/uploads/ 目录下
