@@ -40,11 +40,22 @@ class Common extends Controller
         }
         //权限判断
         $this->auth();
+        static $url;
+        !$url && $url = request()->path();
+        $url = str_replace('admin/', '', $url);
+        
+        $this->view->mginfo     = $this->mginfo    = session('admin_user_auth');
 
-        $this->view->mginfo    = $this->mginfo    = session('admin_user_auth');
-        $this->view->left_menu = self::get_leftmenu();
-
-    
+        $array = self::get_leftmenu();
+        foreach( $array as $v){
+            if($url == $v['url']){ 
+                $array2 = $v;
+                break;
+            }
+        }
+        $this->view->left_menu  = self::get_leftmenu();
+       
+        $this->view->lefts_menu = $array2;
         View::share('meta_title', 'GAME');
     }
 
@@ -84,9 +95,9 @@ class Common extends Controller
         }
       
         $menu_tree = list_to_tree($list);
-        // var_dump($menu_tree);
-        // exit;
-
+       
+       
+       
         Session::set('ALL_MENU_LIST', $menu_tree);
         $left_menu = self::menu($menu_tree);
         return $left_menu;
@@ -103,6 +114,7 @@ class Common extends Controller
         //!$url && $url = strtolower(request()->controller() . '/' . request()->action());
        !$url && $url = request()->path();
         $url = str_replace('admin/', '', $url);
+
         foreach ($left_menu as $key => &$val) {
             if (!empty($val['_child'])) {
                 $val['_child'] = self::menu($val['_child']);
