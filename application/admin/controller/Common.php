@@ -43,10 +43,29 @@ class Common extends Controller
         $this->view->mginfo     = $this->mginfo    = session('admin_user_auth');
         $leftmenu =  self::get_leftmenu();
         $left_array = array();
+     
         foreach($leftmenu as $v ){
             if(isset($v['left'])){
                 $left_array = array($v);
                 break;
+            }
+            if(!empty($v['_child'])){
+                foreach($v['_child'] as $k){
+                    if(isset($k['left'])){
+                        $left_array = array($v);
+                        break;
+                    }
+
+                    if(!empty($k['_child'])){
+                        foreach($k['_child'] as $j){
+                            if(isset($j['left'])){
+                                $left_array = array($v);
+                                break;
+                            }
+                        }
+
+                    }
+                }              
             }
 
         }
@@ -110,6 +129,8 @@ class Common extends Controller
             if($url == $val['url']){
                 $val['left'] = 1;
             }
+           
+            
             if (!empty($val['_child'])) {
                 $val['_child'] = self::menu($val['_child']);
                 if ($url == $val['url']) {
