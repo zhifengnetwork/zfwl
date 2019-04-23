@@ -13,8 +13,8 @@ class User extends ApiBase
 
     public function userinfo(){
         //解密token
-        $user_id = $this->get_user_id();
-        if($user_id!=""){
+        $user_id = $this->uid;
+        if(!empty($user_id)){
             $data = Db::name("users")->where('user_id',$user_id)->field('user_id,nickname,user_money,head_pic,agent_user,first_leader,realname,mobile,is_distribut,is_agent')->find();
         }else{
             $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
@@ -24,20 +24,24 @@ class User extends ApiBase
     }
     
     public function reset_pwd(){//重置密码
-        $user_id = $this->get_user_id();
+        $user_id = $this->uid;
         if(!$user_id){
             $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
         }
-        $password1 = I('password');
+        $password1 = input('password');
         $password = md5('TPSHOP'.$password1);
-        $data = array('password'=>$password);
-        $data = Db::name('users')->data($data)->where('user_id',$user_id)->save();
-        if($data){
-            $this->ajaxReturn(['status' => 0 , 'msg'=>'修改成功','data'=>$data]);
+        $find = Db::name('users')->where('user_id',$user_id)->field('password')->find();
+        if ($password == $find['password']){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'新密码和旧密码不能相同']);
         }else{
-            $this->ajaxReturn(['status' => -1 , 'msg'=>'修改失败','data'=>$data]);
+            $data = array('password'=>$password);
+            $update = Db::name('users')->where('user_id',$user_id)->data($data)->update();
+            if($update){
+                $this->ajaxReturn(['status' => 0 , 'msg'=>'修改成功']);
+            }else{
+                $this->ajaxReturn(['status' => -1 , 'msg'=>'修改失败']);
+            }
         }
-        
     }
 
     /*
@@ -64,7 +68,7 @@ class User extends ApiBase
      */
       public function update_head_pic(){
 
-            $user_id = $this->get_user_id();
+            $user_id = $this->uid;
             if($user_id != ""){
                 // 获取表单上传文件 例如上传了001.jpg
                 $file = request()->file('image');

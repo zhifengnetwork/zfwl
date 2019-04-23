@@ -48,6 +48,7 @@ class ApiBase extends Controller
     private function freeLoginController () {
         $controller = [
             'Shop' => 'shop',
+            'User' => 'user',
         ];
         return $controller;
     }
@@ -85,8 +86,8 @@ class ApiBase extends Controller
         if($res['iat']>$res['exp']){
             exit(json_encode(['status' => -1 , 'msg'=>'token已过期','data'=>null]));
         }
-        
-        
+
+
        return $res['user_id'];
        
     }

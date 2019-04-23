@@ -13,6 +13,7 @@ use think\Loader;
 use think\Request;
 use think\Session;
 use think\captcha\Captcha;
+use app\common\util\jwt\JWT;
 
 class Login extends \think\Controller
 {
@@ -52,7 +53,7 @@ class Login extends \think\Controller
     /**
      * 生成token
      */
-    public function create_token($user_id){
+    private function create_token($user_id){
         $time = time();
         $payload = array(
             "iss"=> "DC",
