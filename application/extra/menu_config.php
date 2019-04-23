@@ -1,19 +1,9 @@
 <?php
 return [
-    //首页
-    'index'           => [
-        'id'    => 10000,
-        'title' => '首页',
-        'sort'  => 1,
-        'url'   => 'index/index',
-        'hide'  => 1,
-        'icon'  => 'fa-th-large',
-    ],
-
     //商品分类
     'good'      => [
         'id'    => 20000,
-        'title' => '商品分类',
+        'title' => '内容管理',
         'sort'  => 2,
         'url'   => 'user/index',
         'hide'  => 1,
@@ -21,18 +11,83 @@ return [
         'child' => [
             [
                 'id'    => 20100,
-                'title' => '分类管理',
+                'title' => '测试1',
                 'sort'  => 1,
                 'url'   => 'category/index',
                 'hide'  => 1,
-                
+                'child' => [
+                    [
+                        'id'    => 20101,
+                        'title' => '添加规格',
+                        'sort'  => 1,
+                        'url'   => 'goods/goods_sku_add',
+                        'hide'  => 1,
+                    ],
+                ],
             ],
             [
                 'id'    => 20200,
-                'title' => '分类层级设置',
+                'title' => '测试2',
                 'sort'  => 1,
-                'url'   => 'category/category_set',
+                'url'   => 'category/index',
                 'hide'  => 1,
+                'child' => [
+                    [
+                        'id'    => 20201,
+                        'title' => '添加规格',
+                        'sort'  => 1,
+                        'url'   => 'goods/goods_sku_add',
+                        'hide'  => 1,
+                    ],
+                ],
+            ],
+            [
+                'id'    => 20300,
+                'title' => '测试三',
+                'sort'  => 1,
+                'url'   => 'category/index',
+                'hide'  => 1,
+                'child' => [
+                    [
+                        'id'    => 20301,
+                        'title' => '添加规格',
+                        'sort'  => 1,
+                        'url'   => 'goods/goods_sku_add',
+                        'hide'  => 1,
+                    ],
+                ],
+            ],
+            [
+                'id'    => 20400,
+                'title' => '测试4',
+                'sort'  => 1,
+                'url'   => 'category/index',
+                'hide'  => 1,
+                'child' => [
+                    [
+                        'id'    => 20401,
+                        'title' => '添加规格',
+                        'sort'  => 1,
+                        'url'   => 'goods/goods_sku_add',
+                        'hide'  => 1,
+                    ],
+                ],
+            ],
+            [
+                'id'    => 20500,
+                'title' => '测试5',
+                'sort'  => 1,
+                'url'   => 'category/index',
+                'hide'  => 1,
+                'child' => [
+                    [
+                        'id'    => 20501,
+                        'title' => '添加规格',
+                        'sort'  => 1,
+                        'url'   => 'goods/goods_sku_add',
+                        'hide'  => 1,
+                    ],
+                ],
             ],
         ],
     ],
@@ -144,7 +199,7 @@ return [
     ],
 
       //数据分析
-      'baobiao'      => [
+      'total'      => [
         'id'    => 60000,
         'title' => '数据管理',
         'sort'  => 2,
@@ -180,54 +235,54 @@ return [
 
     
     
-    //配置管理
-    'pz_config' => [
-        'id'    => 50000,
-        'title' => '配置管理',
-        'sort'  => 8,
-        'url'   => 'config/index',
-        'hide'  => 1,
-        'icon'  => 'fa-gear',
-        'child' => [
-            [
-                'id'    => 50100,
-                'title' => '首页轮播图',
-                'sort'  => 1,
-                'url'   => 'advertisement/index',
-                'hide'  => 1,
-                'child' => [
-                    [
-                        'id'    => 50101,
-                        'title' => '首页轮播图',
-                        'sort'  => 1,
-                        'url'   => 'advertisement/index',
-                        'hide'  => 1,
-                    ],
-                    [
-                        'id'    => 50201,
-                        'title' => '轮播图编辑',
-                        'sort'  => 1,
-                        'url'   => 'advertisement/edit',
-                        'hide'  => 1,
-                    ],
-                ],
-            ],
-            [
-                'id'    => 50200,
-                'title' => '配送方式',
-                'sort'  => 2,
-                'url'   => 'delivery/index',
-                'hide'  => 1,
-            ],
-            [
-                'id'    => 50300,
-                'title' => '客服设置',
-                'sort'  => 3,
-                'url'   => 'config/get_config',
-                'hide'  => 1,
-            ],
-        ],
-    ],
+    // //配置管理
+    // 'pz_config' => [
+    //     'id'    => 50000,
+    //     'title' => '配置管理',
+    //     'sort'  => 8,
+    //     'url'   => 'config/index',
+    //     'hide'  => 1,
+    //     'icon'  => 'fa-gear',
+    //     'child' => [
+    //         [
+    //             'id'    => 50100,
+    //             'title' => '首页轮播图',
+    //             'sort'  => 1,
+    //             'url'   => 'advertisement/index',
+    //             'hide'  => 1,
+    //             'child' => [
+    //                 [
+    //                     'id'    => 50101,
+    //                     'title' => '首页轮播图',
+    //                     'sort'  => 1,
+    //                     'url'   => 'advertisement/index',
+    //                     'hide'  => 1,
+    //                 ],
+    //                 [
+    //                     'id'    => 50201,
+    //                     'title' => '轮播图编辑',
+    //                     'sort'  => 1,
+    //                     'url'   => 'advertisement/edit',
+    //                     'hide'  => 1,
+    //                 ],
+    //             ],
+    //         ],
+    //         [
+    //             'id'    => 50200,
+    //             'title' => '配送方式',
+    //             'sort'  => 2,
+    //             'url'   => 'delivery/index',
+    //             'hide'  => 1,
+    //         ],
+    //         [
+    //             'id'    => 50300,
+    //             'title' => '客服设置',
+    //             'sort'  => 3,
+    //             'url'   => 'config/get_config',
+    //             'hide'  => 1,
+    //         ],
+    //     ],
+    // ],
 
 
 
@@ -370,5 +425,5 @@ return [
                 ],
             ],
         ],
-    ],
+     ],
 ];

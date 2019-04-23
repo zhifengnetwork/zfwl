@@ -28,12 +28,9 @@
     	
     	 <div id="wrap" >
 		        <div id="tit">
-		            <span class="biaoti select" ><p class="glyphicon glyphicon-lock" aria-hidden="true"></p><p style="display: inline-block;">商品管理</p></span>
-		    		<span class="biaoti" ><p class="glyphicon glyphicon-user"></p><p style="display: inline-block;">用户中心</p></span>
-                    <span class="biaoti" ><p class="glyphicon glyphicon-cog"></p><p style="display: inline-block;">系统设置</p></span>
-                    <span class="biaoti" ><p class="glyphicon glyphicon-object-align-vertical"></p><p style="display: inline-block;">分销管理</p></span>
-		    		<span class="biaoti" ><p class="glyphicon glyphicon-list-alt"></p><p style="display: inline-block;">订单管理</p></span>
-                    <span class="biaoti" ><p class="glyphicon glyphicon-hdd"></p><p style="display: inline-block;">权限分配</p></span>
+                     {volist name="left_menu" id="vo"}
+                         <a href="{:url($vo['url'])}"><span class="biaoti {$vo['class']}" ><p class="glyphicon glyphicon-menu-hamburger" aria-hidden="true"></p><p style="display: inline-block;">{$vo.title}</p></span></a>
+                     {/volist}
 		        </div>
 		        <ul id="con" > 
 		            <li style="position:absolute;left:0px;">
@@ -49,23 +46,73 @@
 		                 	<nav class="navbar-default navbar-static-side" role="navigation">
 			                   <div class="sidebar-collapse">
 			                    <ul class="nav metismenu" id="side-menu">
-                                        {volist name="left_menu" id="vo"}
+                                      {volist name="lefts_menu" id="vo"}
                                         <li class="active">
-                                            <a href="{:url($vo['url'])}">
-                                                <i class="fa {$vo.icon}"></i><span class="nav-label">{$vo.title}</span> 
-                                                {notempty name="vo['_child']"}<span class="fa arrow"></span>{/notempty}
-                                            </a>
-                                            {notempty name="vo['_child']"}
-                                            <ul class="nav nav-second-level">
-                                                {volist name="vo['_child']" id="v"}<li class="active"><a href="{:url($v['url'])}">{$v.title}</a></li>{/volist}
-                                            </ul>
+                                           {notempty name="vo['_child']"}
+                                                {volist name="vo['_child']" id="v"}
+                                                        <a href="{:url($v['url'])}">
+                                                            <i class="fa {$v.icon}"></i><span class="nav-label">{$v.title}</span> 
+                                                            {notempty name="v['_child']"}<span class="fa arrow"></span>{/notempty}
+                                                        </a>
+                                                        <ul class="nav nav-second-level">
+                                                           {notempty name="v['_child']"}
+                                                                {volist name="v['_child']" id="k"}
+                                                                    <li class="active">
+                                                                        <a href="{:url($k['url'])}"> {$k.title} </a>
+                                                                    </li>
+                                                                {/volist}
+                                                            {/notempty}
+                                                        </ul>
+                                                  {/volist}
                                             {/notempty}
                                         </li>
                                         {/volist}
 			                    </ul>
 			                </div>
                          </nav>
-		            </li>
+
+
+                         <!-- <nav class="navbar-default navbar-static-side" role="navigation">
+                                <div class="sidebar-collapse">
+                                 <ul class="nav metismenu" id="side-menu">
+                                         {volist name="left_menu" id="vo"}
+                                         <li class="active">
+                                          <a href="{:url($vo['url'])}">
+                                                 <i class="fa {$vo.icon}"></i><span class="nav-label">{$vo.title}</span> 
+                                              {notempty name="vo['_child']"}<span class="fa arrow"></span>{/notempty}
+                                             </a>  
+                                               {notempty name="vo['_child']"}
+                                                 {volist name="vo['_child']" id="v"}
+                                                   <a href="{:url($v['url'])}">
+                                                        <i class="fa {$v.icon}"></i><span class="nav-label">{$v.title}</span> 
+                                                        <span class="fa arrow"></span>
+                                                    </a> 
+                                                    {volist name="vo['_child']" id="v"}
+                                                            <ul class="nav nav-second-level">
+                                                         {volist name="vo['_child']" id="v"}
+                                                             <li class="active">
+                                                                 <a href="{:url($v['url'])}"> {$v.title} </a>
+                                                             </li>
+                                                         {/volist}
+                                                            </ul>
+                                                     {/volist}
+
+                                                  {/volist}
+
+                                                     <ul class="nav nav-second-level">
+                                                         {volist name="vo['_child']" id="v"}
+                                                             <li class="active">
+                                                                 <a href="{:url($v['url'])}"> {$v.title} </a>
+                                                             </li>
+                                                         {/volist}
+                                                     </ul> 
+                                                {/notempty}
+                                         </li>
+                                         {/volist}
+                                 </ul>
+                             </div>
+                          </nav> -->
+                    </li>
 		        </ul>
          </div>
     	
@@ -326,7 +373,7 @@
               	line-height: 80px;
               	cursor: pointer;
               	text-align: center;
-              	
+                  color: white;
               }
               .biaoti p{
               	

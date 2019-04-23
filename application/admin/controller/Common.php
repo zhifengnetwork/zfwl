@@ -25,7 +25,6 @@ class Common extends Controller
             if (!defined('UID')) {
                 define('UID', session('admin_user_auth.mgid'));
             }
-
         } else {
             define('UID', null);
         }
@@ -41,9 +40,37 @@ class Common extends Controller
         }
         //权限判断
         $this->auth();
+        $this->view->mginfo     = $this->mginfo    = session('admin_user_auth');
+        $leftmenu =  self::get_leftmenu();
+        $left_array = array();
+     
+        foreach($leftmenu as $v ){
+            if(isset($v['left'])){
+                $left_array = array($v);
+                break;
+            }
+            if(!empty($v['_child'])){
+                foreach($v['_child'] as $k){
+                    if(isset($k['left'])){
+                        $left_array = array($v);
+                        break;
+                    }
 
-        $this->view->mginfo    = $this->mginfo    = session('admin_user_auth');
-        $this->view->left_menu = self::get_leftmenu();
+                    if(!empty($k['_child'])){
+                        foreach($k['_child'] as $j){
+                            if(isset($j['left'])){
+                                $left_array = array($v);
+                                break;
+                            }
+                        }
+
+                    }
+                }              
+            }
+
+        }
+        $this->view->lefts_menu  = $left_array;
+        $this->view->left_menu   = $leftmenu;
         View::share('meta_title', 'GAME');
     }
 
@@ -65,14 +92,14 @@ class Common extends Controller
     protected function get_leftmenu()
     {
         //获取所有可见菜单
-        $all_menu       = Session::get('ALL_MENU_LIST');
+        $all_menu       = '';
         $admin_userinfo = Session::get('admin_user_auth');
         if (!$all_menu) {
             $where['status'] = 1;
             $where['hide']   = 1;
             $all_menu        = Db::table('menu')->where($where)->order('sort ASC')->field("id,title,pid,url,tip,group,sort,icon")->select();
         }
-
+       
         //权限判断
         $auth_rules = get_menu_auth();
         $list       = [];
@@ -83,9 +110,7 @@ class Common extends Controller
         }
         $menu_tree = list_to_tree($list);
         Session::set('ALL_MENU_LIST', $menu_tree);
-         $left_menu = self::menu($menu_tree);
-        
-       
+        $left_menu = self::menu($menu_tree);
         return $left_menu;
     }
 
@@ -94,21 +119,28 @@ class Common extends Controller
      */
     private function menu($left_menu)
     {
-      
         static $url;
+       
         //!$url && $url = strtolower(request()->controller() . '/' . request()->action());
-        !$url && $url = request()->path();
-        
+       !$url && $url = request()->path();
+        $url = str_replace('admin/', '', $url);
+        $array = array();
         foreach ($left_menu as $key => &$val) {
+            if($url == $val['url']){
+                $val['left'] = 1;
+            }
+           
+            
             if (!empty($val['_child'])) {
                 $val['_child'] = self::menu($val['_child']);
                 if ($url == $val['url']) {
-                    $val['class'] = 'active';
+                    $val['class'] = 'select';
+                    $val['left']  =  1;
                 } else {
-                    $val['class'] = empty(array_filter(array_column($val['_child'], 'class'))) ? '' : 'active';
+                    $val['class'] = empty(array_filter(array_column($val['_child'], 'class'))) ? '' : 'select';
                 }
             } else {
-                $val['class'] = $url == $val['url'] ? 'active' : '';
+                $val['class'] = $url == $val['url'] ? 'select' : '';
             }
         }
         return $left_menu;
