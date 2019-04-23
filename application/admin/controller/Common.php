@@ -42,34 +42,8 @@ class Common extends Controller
         $this->auth();
         $this->view->mginfo     = $this->mginfo    = session('admin_user_auth');
         $leftmenu =  self::get_leftmenu();
-        $left_array = array();
-     
-        foreach($leftmenu as $v ){
-            if(isset($v['left'])){
-                $left_array = array($v);
-                break;
-            }
-            if(!empty($v['_child'])){
-                foreach($v['_child'] as $k){
-                    if(isset($k['left'])){
-                        $left_array = array($v);
-                        break;
-                    }
-
-                    if(!empty($k['_child'])){
-                        foreach($k['_child'] as $j){
-                            if(isset($j['left'])){
-                                $left_array = array($v);
-                                break;
-                            }
-                        }
-
-                    }
-                }              
-            }
-
-        }
-        $this->view->lefts_menu  = $left_array;
+        
+        $this->view->lefts_menu  = self::lefts_menu($leftmenu);
         $this->view->left_menu   = $leftmenu;
         View::share('meta_title', 'GAME');
     }
@@ -135,6 +109,7 @@ class Common extends Controller
                 $val['_child'] = self::menu($val['_child']);
                 if ($url == $val['url']) {
                     $val['class'] = 'select';
+                    $val['active'] = 'active';
                     $val['left']  =  1;
                 } else {
                     $val['class'] = empty(array_filter(array_column($val['_child'], 'class'))) ? '' : 'select';
@@ -145,6 +120,36 @@ class Common extends Controller
         }
         return $left_menu;
     }
+
+    private function lefts_menu($leftmenu){
+        $left_array = array();
+        foreach($leftmenu as $v ){
+            if(isset($v['left'])){
+                $left_array = array($v);
+                break;
+            }
+            if(!empty($v['_child'])){
+                foreach($v['_child'] as $k){
+                    if(isset($k['left'])){
+                        $left_array = array($v);
+                        break;
+                    }
+                    if(!empty($k['_child'])){
+                        foreach($k['_child'] as $j){
+                            if(isset($j['left'])){
+                                $left_array = array($v);
+                                break;
+                            }
+                        }
+
+                    }
+                }              
+            }
+
+        }
+        return $left_array;
+    }
+     
 
     /*
      * 权限判断

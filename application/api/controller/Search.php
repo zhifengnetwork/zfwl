@@ -64,7 +64,7 @@ class Search extends ApiBase
             $filter_goods_id = array_intersect($filter_goods_id, $goods_id_4);
         }
 
-        $filter_menu = $goodsLogic->get_filter_menu($filter_param, 'search'); // 获取显示的筛选菜单
+        $filter_menu  = $goodsLogic->get_filter_menu($filter_param, 'search'); // 获取显示的筛选菜单
         $filter_price = $goodsLogic->get_filter_price($filter_goods_id, $filter_param, 'search'); // 筛选的价格期间
         $filter_brand = $goodsLogic->get_filter_brand($filter_goods_id, $filter_param, 'search'); // 获取指定分类下的筛选品牌
 

@@ -17,31 +17,16 @@ class ApiBase extends Controller
     protected $user_name;
 
     public function _initialize () {
-//        config((new Config)->getConfig());
-//        if (session('admin_user_auth')) {
-//            $this->uid = session('admin_user_auth.uid');
-//            $this->user_name = session('admin_user_auth.user_name');
-//        } else {
-//            exit(json_encode(['code'=>0,'msg'=>'您未登录，请登录！']));
-//        }
-        $controller = Request::instance()->controller();
-        $access = $this->freeLoginController();
-        if (!isset($access[$controller])){
-            //一定需要登录
-            $this->uid = $this->get_user_id();
-        }else{
-            //可以获取user_id就获取，没有就当作游客访问
-            $headers = $this->em_getallheaders();
-            if (isset($headers['Token'])){
-                $res = $this->decode_token($headers['Token']);
-                if ($res && isset($res['iat']) && isset($res['exp'])
-                    && isset($res['user_id']) && $res['iat']<=$res['exp']){
-                    $this->uid = $res['user_id'];
-                }
-            }
+        config((new Config)->getConfig());
+        if (session('admin_user_auth')) {
+            $this->uid = session('admin_user_auth.uid');
+            $this->user_name = session('admin_user_auth.user_name');
+        } else {
+            exit(json_encode(['code'=>0,'msg'=>'您未登录，请登录！']));
         }
     }
 
+<<<<<<< HEAD
     /*
      *  开放有可能不需登录controller
      */
@@ -52,6 +37,9 @@ class ApiBase extends Controller
         ];
         return $controller;
     }
+=======
+    
+>>>>>>> update
 
     public function ajaxReturn($data){
         header('Access-Control-Allow-Origin:*');
@@ -60,52 +48,20 @@ class ApiBase extends Controller
         exit(json_encode($data,JSON_UNESCAPED_UNICODE));
     }
 
-
     /**
-     * 获取user_id
+     * 生成token
      */
-    public function get_user_id(){
-        $headers = [];
-        $headers = $this->em_getallheaders();
-
-        if(!isset($headers['Token'])){
-            exit(json_encode(['status' => -1 , 'msg'=>'token不存在','data'=>null]));
-        }
-        $token = $headers['Token'];
-        $res = $this->decode_token($token);
-
-        if(!$res){
-            exit(json_encode(['status' => -1 , 'msg'=>'token已过期','data'=>null]));
-
-        }
-
-        if(!isset($res['iat']) || !isset($res['exp']) || !isset($res['user_id']) ){
-            exit(json_encode(['status' => -1 , 'msg'=>'token已过期：'.$res,'data'=>null]));
-        }
-
-        if($res['iat']>$res['exp']){
-            exit(json_encode(['status' => -1 , 'msg'=>'token已过期','data'=>null]));
-        }
-
-
-       return $res['user_id'];
-       
-    }
-
-    /**
-     *
-     *接收头信息
-     **/
-    public function em_getallheaders()
-    {
-        foreach ($_SERVER as $name => $value)
-        {
-            if (substr($name, 0, 5) == 'HTTP_')
-            {
-                $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
-            }
-        }
-        return $headers;
+    public function create_token($user_id){
+        $time = time();
+        $payload = array(
+            "iss"=> "DC",
+            "iat"=> $time ,  
+            "exp"=> $time + 36000 , 
+            "user_id"=> $user_id
+        );
+        $key = 'zhelishimiyao';
+        $token = JWT::encode($payload, $key, $alg = 'HS256', $keyId = null, $head = null);
+        return $token;
     }
 
     /**
@@ -117,6 +73,56 @@ class ApiBase extends Controller
         return $payload;
     }
 
+    /**
+    *
+    *接收头信息
+    **/
+    public function em_getallheaders()
+    {
+       foreach ($_SERVER as $name => $value)
+       {
+           if (substr($name, 0, 5) == 'HTTP_')
+           {
+               $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
+           }
+       }
+       return $headers;
+    }
+
+    /**
+     * 获取user_id
+     */
+    public function get_user_id(){
+        $headers = $this->em_getallheaders();
+
+        $token   = input('token'); 
+        // if(){
+             
+        // }
+        // $token = $headers['Token'];
+        if(!$token){
+              $this->ajaxReturn(['status' => -1 , 'msg'=>'token不存在','data'=>null]);
+        }
+
+        $res = $this->decode_token($token);
+
+        if(!$res){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'token已过期','data'=>null]);
+
+        }
+
+        if(!isset($res['iat']) || !isset($res['exp']) || !isset($res['user_id']) ){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'token已过期：'.$res,'data'=>null]);
+        }
+
+        if($res['iat']>$res['exp']){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'token已过期','data'=>null]);
+        }
+
+
+       return $res['user_id'];
+       
+    }
     /**
      * 空
      */

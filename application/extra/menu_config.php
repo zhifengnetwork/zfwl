@@ -5,7 +5,7 @@ return [
         'id'    => 20000,
         'title' => '内容管理',
         'sort'  => 2,
-        'url'   => 'user/index',
+        'url'   => 'index/index',
         'hide'  => 1,
         'icon'  => 'fa-user',
         'child' => [
@@ -25,6 +25,7 @@ return [
                     ],
                 ],
             ],
+
             [
                 'id'    => 20200,
                 'title' => '测试2',
@@ -116,8 +117,16 @@ return [
                         'url'   => 'goods/add',
                         'hide'  => 0,
                     ],
+                    [
+                        'id'    => 30102,
+                        'title' => '商品列表',
+                        'sort'  => 1,
+                        'url'   => 'goods/index',
+                        'hide'  => 1,
+                    ],
                 ],
             ],
+
             [
                 'id'    => 30200,
                 'title' => '商品规格管理',
@@ -131,6 +140,13 @@ return [
                         'sort'  => 1,
                         'url'   => 'goods/goods_sku_add',
                         'hide'  => 0,
+                    ],
+                    [
+                        'id'    => 30202,
+                        'title' => '商品规格列表',
+                        'sort'  => 1,
+                        'url'   => 'goods/goods_type_list',
+                        'hide'  => 1,
                     ],
                 ],
             ],
@@ -209,7 +225,7 @@ return [
     ],
 
       //数据分析
-      'total'      => [
+      'baobiao'      => [
         'id'    => 60000,
         'title' => '数据管理',
         'sort'  => 2,
@@ -235,6 +251,7 @@ return [
                 'url'   => 'total/finance',
                 'hide'  => 1,
                 'child' => [
+
                 ],
             ],
            
@@ -245,54 +262,55 @@ return [
 
     
     
-    // //配置管理
-    // 'pz_config' => [
-    //     'id'    => 50000,
-    //     'title' => '配置管理',
-    //     'sort'  => 8,
-    //     'url'   => 'config/index',
-    //     'hide'  => 1,
-    //     'icon'  => 'fa-gear',
-    //     'child' => [
-    //         [
-    //             'id'    => 50100,
-    //             'title' => '首页轮播图',
-    //             'sort'  => 1,
-    //             'url'   => 'advertisement/index',
-    //             'hide'  => 1,
-    //             'child' => [
-    //                 [
-    //                     'id'    => 50101,
-    //                     'title' => '首页轮播图',
-    //                     'sort'  => 1,
-    //                     'url'   => 'advertisement/index',
-    //                     'hide'  => 1,
-    //                 ],
-    //                 [
-    //                     'id'    => 50201,
-    //                     'title' => '轮播图编辑',
-    //                     'sort'  => 1,
-    //                     'url'   => 'advertisement/edit',
-    //                     'hide'  => 1,
-    //                 ],
-    //             ],
-    //         ],
-    //         [
-    //             'id'    => 50200,
-    //             'title' => '配送方式',
-    //             'sort'  => 2,
-    //             'url'   => 'delivery/index',
-    //             'hide'  => 1,
-    //         ],
-    //         [
-    //             'id'    => 50300,
-    //             'title' => '客服设置',
-    //             'sort'  => 3,
-    //             'url'   => 'config/get_config',
-    //             'hide'  => 1,
-    //         ],
-    //     ],
-    // ],
+    //配置管理
+    'pz_config' => [
+        'id'    => 50000,
+        'title' => '配置管理',
+        'sort'  => 8,
+        'url'   => 'config/index',
+        'hide'  => 1,
+        'icon'  => 'fa-gear',
+        'child' => [
+            [
+                'id'    => 50100,
+                'title' => '首页轮播图',
+                'sort'  => 1,
+                'url'   => 'advertisement/index',
+                'hide'  => 1,
+                'child' => [
+                    [
+                        'id'    => 50101,
+                        'title' => '首页轮播图',
+                        'sort'  => 1,
+                        'url'   => 'advertisement/index',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 50201,
+                        'title' => '轮播图编辑',
+                        'sort'  => 1,
+                        'url'   => 'advertisement/edit',
+                        'hide'  => 0,
+                    ],
+                ],
+            ],
+            [
+                'id'    => 50200,
+                'title' => '配送方式',
+                'sort'  => 2,
+                'url'   => 'delivery/index',
+                'hide'  => 1,
+            ],
+            [
+                'id'    => 50300,
+                'title' => '客服设置',
+                'sort'  => 3,
+                'url'   => 'config/get_config',
+                'hide'  => 1,
+            ],
+           
+        ],
+    ],
 
 
 
@@ -301,23 +319,24 @@ return [
         'id'    => 210000,
         'title' => '系统设置',
         'sort'  => 21,
-        'url'   => 'menu/index',
+        'url'   => 'auths/auth_group',
         'hide'  => 1,
         'icon'  => 'fa-cogs',
         'child' => [
             [
                 'id'    => 210100,
-                'title' => '用户',
+                'title' => '管理员',
                 'sort'  => 1,
-                'url'   => 'mguser/index',
+                'url'   => 'auths/auth_group',
                 'hide'  => 1,
                 'child' => [
+                   
                     [
                         'id'    => 210101,
                         'title' => '编辑',
                         'sort'  => 1,
                         'url'   => 'mguser/edit',
-                        'hide'  => 1,
+                        'hide'  => 0,
                     ],
                     [
                         'id'    => 210102,
@@ -333,64 +352,49 @@ return [
                         'url'   => 'mguser/update_pwsd',
                         'hide'  => 0,
                     ],
-                ],
-            ],
-            [
-                'id'    => 210400,
-                'title' => '管理员',
-                'sort'  => 1,
-                'url'   => 'mguser/index',
-                'hide'  => 1,
-                'child' => [
                     [
-                        'id'    => 210401,
-                        'title' => '编辑',
+                        'id'    => 210104,
+                        'title' => '管理人员',
                         'sort'  => 1,
-                        'url'   => 'mguser/edit',
+                        'url'   => 'mguser/index',
                         'hide'  => 1,
-                    ],
-                    [
-                        'id'    => 210402,
-                        'title' => '用户授权',
-                        'sort'  => 2,
-                        'url'   => 'mguser/set_authgroup',
-                        'hide'  => 1,
-                    ],
-                    [
-                        'id'    => 210403,
-                        'title' => '修改密码',
-                        'sort'  => 3,
-                        'url'   => 'mguser/update_pwsd',
-                        'hide'  => 0,
                     ],
                 ],
             ],
             [
                 'id'    => 210200,
-                'title' => '权限',
+                'title' => '权限管理',
                 'sort'  => 2,
                 'url'   => 'auths/auth_group',
                 'hide'  => 1,
                 'child' => [
+                  
                     [
                         'id'    => 210201,
                         'title' => '编辑分组',
                         'sort'  => 1,
                         'url'   => 'auths/edit',
-                        'hide'  => 1,
+                        'hide'  => 0,
                     ],
                     [
                         'id'    => 210202,
                         'title' => '分组授权',
                         'sort'  => 2,
                         'url'   => 'auths/manage_auths',
-                        'hide'  => 1,
+                        'hide'  => 0,
                     ],
                     [
                         'id'    => 210203,
                         'title' => '授权用户',
                         'sort'  => 3,
                         'url'   => 'auths/auth_user',
+                        'hide'  => 0,
+                    ],
+                    [
+                        'id'    => 210204,
+                        'title' => '权限管理',
+                        'sort'  => 1,
+                        'url'   => 'auths/auth_group',
                         'hide'  => 1,
                     ],
                 ],
@@ -409,24 +413,17 @@ return [
                         'url'   => 'menu/import_menu',
                         'hide'  => 1,
                     ],
-                    [
-                        'id'    => 210302,
-                        'title' => '初始化数据库',
-                        'sort'  => 2,
-                        'url'   => 'database/cleanDatabase',
-                        'hide'  => 1,
-                    ],
                 ],
             ],
             [
-                'id'    => 210500,
+                'id'    => 210400,
                 'title' => '网站设置',
                 'sort'  => 4,
                 'url'   => 'site/index',
                 'hide'  => 1,
                 'child' => [
                     [
-                        'id'    => 210501,
+                        'id'    => 210401,
                         'title' => '网站设置',
                         'sort'  => 2,
                         'url'   => 'site/index',

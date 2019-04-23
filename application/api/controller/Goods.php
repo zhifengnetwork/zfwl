@@ -57,7 +57,7 @@ class Goods extends ApiBase
         $sort_asc = I('sort_asc', 'desc');  // 排序
         $price = I('price', '');            // 价钱
         $start_price = trim(I('start_price', '0'));         // 输入框价钱
-        $end_price = trim(I('end_price', '0'));             // 输入框价钱
+        $end_price   = trim(I('end_price', '0'));             // 输入框价钱
         if ($start_price && $end_price) $price = $start_price . '-' . $end_price; // 如果输入框有价钱 则使用输入框的价钱
 
         //如果分类是数字
@@ -103,7 +103,7 @@ class Goods extends ApiBase
         }
         if ($attr)  // 属性
         {
-            
+
             $goods_id_3 = $goodsLogic->getGoodsIdByAttr($attr);                 // 根据 规格 查找当所有商品id
             $filter_goods_id = array_intersect($filter_goods_id, $goods_id_3);  // 获取多个筛选条件的结果 的交集
         }
