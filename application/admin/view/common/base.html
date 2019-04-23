@@ -36,7 +36,6 @@
                     <span class="biaoti" ><p class="glyphicon glyphicon-cog"></p><p style="display: inline-block;">系统设置</p></span>
 		        </div>
 		        <ul id="con" > 
-		    
 		            <li style="position:absolute;left:0px;">
 		            	    <!--头像区域-->
 		            	    <p class="nav-header">
@@ -50,92 +49,22 @@
 		                 	<nav class="navbar-default navbar-static-side" role="navigation">
 			                   <div class="sidebar-collapse">
 			                    <ul class="nav metismenu" id="side-menu">
-			                        <li class="">
-			                            <a href="/admin/user/index.html">
-			                                <i class="fa fa-user"></i>
-			                                <span class="nav-label">商品分类</span> 
-			                                <span class="fa arrow"></span>
-			                            </a>
-			                            <ul class="nav nav-second-level collapse" style="height: 0px;">
-			                                <li class="">
-			                                    <a href="/admin/category/index.html">分类管理</a>
-			                                </li>
-			                                <li class="">
-			                                    <a href="/admin/category/category_set.html">分类层级设置</a>
-			                                </li>
-			                            </ul>
-			                        </li>
+                                        {volist name="left_menu" id="vo"}
+                                        <li class="active">
+                                            <a href="{:url($vo['url'])}">
+                                                <i class="fa {$vo.icon}"></i><span class="nav-label">{$vo.title}</span> 
+                                                {notempty name="vo['_child']"}<span class="fa arrow"></span>{/notempty}
+                                            </a>
+                                            {notempty name="vo['_child']"}
+                                            <ul class="nav nav-second-level">
+                                                {volist name="vo['_child']" id="v"}<li class="active"><a href="{:url($v['url'])}">{$v.title}</a></li>{/volist}
+                                            </ul>
+                                            {/notempty}
+                                        </li>
+                                        {/volist}
 			                    </ul>
 			                </div>
                          </nav>
-		            </li>
-		            <li style="display: none;position: absolute;left: 0px;">
-		            	 <!--头像区域-->
-		            	    <p class="nav-header">
-                                <div class="dropdown profile-element"  >
-                                    <span><img alt="image" class="img-circle" src="__INSPINIA__/img/profile_small.jpg" /></span>
-                                </div>
-                                <span class="block m-t-xs" > <strong class="font-bold" style="color: white">{$Think.session.admin_user_auth.username}</strong>
-                                 </span>
-                                <div class="logo-element">GAME</div>
-                            </p>
-		            	<nav class="navbar-default navbar-static-side" role="navigation">
-			                   <div class="sidebar-collapse">
-			                    <ul class="nav metismenu" id="side-menu">
-			                        <li class="">
-			                            <a href="/admin/user/index.html">
-			                                <i class="fa fa-user"></i>
-			                                <span class="nav-label">商品分类2</span> 
-			                                <span class="fa arrow"></span>
-			                            </a>
-			                            <ul class="nav nav-second-level collapse" style="height: 0px;">
-			                                <li class="">
-			                                    <a href="/admin/category/index.html">分类管理2</a>
-			                                </li>
-			                                <li class="">
-			                                    <a href="/admin/category/category_set.html">分类层级设置2</a>
-			                                </li>
-			                            </ul>
-			                        </li>
-			                    </ul>
-			                </div>
-                          </nav>
-		            	
-		            	
-		            </li>
-		            <li style="display: none;position: absolute;left: 0px;">
-		            	 <!--头像区域-->
-		            	    <p class="nav-header">
-                                <div class="dropdown profile-element"  >
-                                    <span><img alt="image" class="img-circle" src="__INSPINIA__/img/profile_small.jpg" /></span>
-                                </div>
-                                <span class="block m-t-xs" > <strong class="font-bold" style="color: white">{$Think.session.admin_user_auth.username}</strong>
-                                 </span>
-                                <div class="logo-element">GAME</div>
-                            </p>
-		            	<nav class="navbar-default navbar-static-side" role="navigation">
-			                   <div class="sidebar-collapse">
-			                    <ul class="nav metismenu" id="side-menu">
-			                        <li class="">
-			                            <a href="/admin/user/index.html">
-			                                <i class="fa fa-user"></i>
-			                                <span class="nav-label">商品分类3</span> 
-			                                <span class="fa arrow"></span>
-			                            </a>
-			                            <ul class="nav nav-second-level collapse" style="height: 0px;">
-			                                <li class="">
-			                                    <a href="/admin/category/index.html">分类管理3</a>
-			                                </li>
-			                                <li class="">
-			                                    <a href="/admin/category/category_set.html">分类层级设置3</a>
-			                                </li>
-			                            </ul>
-			                        </li>
-			                    </ul>
-			                </div>
-                          </nav>
-		            	
-		            	
 		            </li>
 		        </ul>
          </div>

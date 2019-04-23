@@ -103,6 +103,7 @@ class Goods extends ApiBase
         }
         if ($attr)  // 属性
         {
+            
             $goods_id_3 = $goodsLogic->getGoodsIdByAttr($attr);                 // 根据 规格 查找当所有商品id
             $filter_goods_id = array_intersect($filter_goods_id, $goods_id_3);  // 获取多个筛选条件的结果 的交集
         }
