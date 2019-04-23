@@ -13,9 +13,7 @@ class Shop extends Common
 {
     public function _initialize () {
         parent::_initialize();
-        header('Access-Control-Allow-Origin:*');
-        header('Access-Control-Allow-Headers:*');
-        header('Content-Type:application/json; charset=utf-8');
+      
         $info = session('admin_user_auth');
         $this->admin_id = $info['mgid'];
     }
@@ -89,8 +87,20 @@ class Shop extends Common
         } 
         //保存图片到本地
         file_put_contents(ROOT_PATH .Config('c_pub.img').$name.$saveName,$img);
-        return json(['code'=>1,'msg'=>'ok','data'=>SITE_URL.'/'.$name.$saveName]);
+        $this->ajaxReturn(['code'=>1,'msg'=>'ok','data'=>SITE_URL.'/'.$name.$saveName]);
     }
+
+
+
+    public function ajaxReturn($data){
+        header('Access-Control-Allow-Origin:*');
+        header('Access-Control-Allow-Headers:*');
+        header('Content-Type:application/json; charset=utf-8');
+        exit(json_encode($data,JSON_UNESCAPED_UNICODE));
+    }
+
+
+    
 
    
 }

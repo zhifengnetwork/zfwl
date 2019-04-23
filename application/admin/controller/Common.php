@@ -101,17 +101,18 @@ class Common extends Controller
         static $url;
        
         //!$url && $url = strtolower(request()->controller() . '/' . request()->action());
-        !$url && $url = request()->path();
+       !$url && $url = request()->path();
+        $url = str_replace('admin/', '', $url);
         foreach ($left_menu as $key => &$val) {
             if (!empty($val['_child'])) {
                 $val['_child'] = self::menu($val['_child']);
                 if ($url == $val['url']) {
-                    $val['class'] = 'active';
+                    $val['class'] = 'select';
                 } else {
-                    $val['class'] = empty(array_filter(array_column($val['_child'], 'class'))) ? '' : 'active';
+                    $val['class'] = empty(array_filter(array_column($val['_child'], 'class'))) ? '' : 'select';
                 }
             } else {
-                $val['class'] = $url == $val['url'] ? 'active' : '';
+                $val['class'] = $url == $val['url'] ? 'select' : '';
             }
         }
       
