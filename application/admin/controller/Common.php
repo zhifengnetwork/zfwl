@@ -99,9 +99,9 @@ class Common extends Controller
     {
       
         static $url;
+       
         //!$url && $url = strtolower(request()->controller() . '/' . request()->action());
         !$url && $url = request()->path();
-        
         foreach ($left_menu as $key => &$val) {
             if (!empty($val['_child'])) {
                 $val['_child'] = self::menu($val['_child']);
@@ -114,6 +114,7 @@ class Common extends Controller
                 $val['class'] = $url == $val['url'] ? 'active' : '';
             }
         }
+      
         return $left_menu;
     }
 

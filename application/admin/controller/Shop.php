@@ -13,6 +13,9 @@ class Shop extends Common
 {
     public function _initialize () {
         parent::_initialize();
+        header('Access-Control-Allow-Origin:*');
+        header('Access-Control-Allow-Headers:*');
+        header('Content-Type:application/json; charset=utf-8');
         $info = session('admin_user_auth');
         $this->admin_id = $info['mgid'];
     }
@@ -77,7 +80,7 @@ class Shop extends Common
         $img      = input('img');
         $saveName = request()->time().rand(0,99999) . '.png';
 
-        $img      =  base64_decode($img);
+        $img      = base64_decode($img);
         //生成文件夹
         $names = "shops" ;
         $name  = "shops/" .date('Ymd',time()) ;
@@ -88,4 +91,6 @@ class Shop extends Common
         file_put_contents(ROOT_PATH .Config('c_pub.img').$name.$saveName,$img);
         return json(['code'=>1,'msg'=>'ok','data'=>SITE_URL.'/'.$name.$saveName]);
     }
+
+   
 }

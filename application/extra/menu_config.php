@@ -199,7 +199,7 @@ return [
     ],
 
       //数据分析
-      'baobiao'      => [
+      'total'      => [
         'id'    => 60000,
         'title' => '数据管理',
         'sort'  => 2,

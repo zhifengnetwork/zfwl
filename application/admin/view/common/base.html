@@ -29,9 +29,8 @@
     	 <div id="wrap" >
 		        <div id="tit">
                      {volist name="left_menu" id="vo"}
-                         <a href="{:url($vo['url'])}"><span class="biaoti" ><p class="glyphicon glyphicon-menu-hamburger" aria-hidden="true"></p><p style="display: inline-block;">{$vo.title}</p></span></a>
+                         <a href="{:url($vo['url'])}"><span class="biaoti " ><p class="glyphicon glyphicon-menu-hamburger" aria-hidden="true"></p><p style="display: inline-block;">{$vo.title}</p></span></a>
                      {/volist}
-                    
 		    		<!-- <span class="biaoti" ><p class="glyphicon glyphicon-user"></p><p style="display: inline-block;">用户中心</p></span>
                     <span class="biaoti" ><p class="glyphicon glyphicon-cog"></p><p style="display: inline-block;">系统设置</p></span>
                     <span class="biaoti"><p class="glyphicon glyphicon-menu-hamburger" aria-hidden="true"></p><p style="display: inline-block;">内容管理</p></span>
@@ -57,19 +56,23 @@
 			                    <ul class="nav metismenu" id="side-menu">
                                       {volist name="left_menu" id="vo"}
                                         <li class="active">
-                                            <a href="{:url($vo['url'])}">
-                                                <i class="fa {$vo.icon}"></i><span class="nav-label">{$vo.title}</span> 
-                                             {notempty name="vo['_child']"}<span class="fa arrow"></span>{/notempty}
-                                            </a>
-                                                {notempty name="vo['_child']"}
-                                                    <ul class="nav nav-second-level">
-                                                        {volist name="vo['_child']" id="v"}
-                                                            <li class="active">
-                                                                <a href="{:url($v['url'])}"> {$v.title} </a>
-                                                            </li>
-                                                        {/volist}
-                                                    </ul>
-                                               {/notempty}
+                                           {notempty name="vo['_child']"}
+                                                {volist name="vo['_child']" id="v"}
+                                                        <a href="{:url($v['url'])}">
+                                                            <i class="fa {$v.icon}"></i><span class="nav-label">{$v.title}</span> 
+                                                            {notempty name="v['_child']"}<span class="fa arrow"></span>{/notempty}
+                                                        </a>
+                                                        <ul class="nav nav-second-level">
+                                                           {notempty name="v['_child']"}
+                                                                {volist name="v['_child']" id="k"}
+                                                                    <li class="active">
+                                                                        <a href="{:url($k['url'])}"> {$k.title} </a>
+                                                                    </li>
+                                                                {/volist}
+                                                            {/notempty}
+                                                        </ul>
+                                                   {/volist}
+                                            {/notempty}
                                         </li>
                                         {/volist}
 			                    </ul>
@@ -378,7 +381,7 @@
               	line-height: 80px;
               	cursor: pointer;
               	text-align: center;
-              	
+                  color: white;
               }
               .biaoti p{
               	
