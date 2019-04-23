@@ -40,19 +40,9 @@ class Common extends Controller
         }
         //权限判断
         $this->auth();
-        static $url;
-        !$url && $url = request()->path();
-        $url   = str_replace('admin/', '', $url);
         $this->view->mginfo     = $this->mginfo    = session('admin_user_auth');
         $leftmenu =  self::get_leftmenu();
-        foreach($leftmenu as $v){
-            if($url == $v['url']){ 
-                $array = array($v);
-                break;
-            }
-        }
         $this->view->left_menu  = $leftmenu;
-        $this->view->lefts_menu = $array;
         View::share('meta_title', 'GAME');
     }
 
