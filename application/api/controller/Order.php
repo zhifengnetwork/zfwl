@@ -119,20 +119,20 @@ class Order extends ApiBase
             $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
         }	
 
-        $address_id = input("address_id/d", 0); //  收货地址id
+        $address_id    = input("address_id/d", 0); //  收货地址id
         $invoice_title = input('invoice_title');  // 发票  
-        $taxpayer = input('taxpayer');       // 纳税人识别号
-        $invoice_desc = input('invoice_desc');       // 发票内容
-        $coupon_id = input("coupon_id/d"); //  优惠券id
-        $pay_points = input("pay_points/d", 0); //  使用积分
-        $user_money = input("user_money/f", 0); //  使用余额
-        $user_note = input("user_note/s", ''); // 用户留言
-        $pay_pwd = input("pay_pwd/s", ''); // 支付密码
-        $goods_id = input("goods_id/d",0); // 商品id
-        $goods_num = input("goods_num/d",0);// 商品数量
-        $item_id = input("item_id/d",0); // 商品规格id
-        $action = input("action/d",0); // 立即购买
-        $shop_id = input('shop_id/d', 0);//自提点id
+        $taxpayer      = input('taxpayer');       // 纳税人识别号
+        $invoice_desc  = input('invoice_desc');       // 发票内容
+        $coupon_id     = input("coupon_id/d"); //  优惠券id
+        $pay_points    = input("pay_points/d", 0); //  使用积分
+        $user_money    = input("user_money/f", 0); //  使用余额
+        $user_note     = input("user_note/s", ''); // 用户留言
+        $pay_pwd       = input("pay_pwd/s", ''); // 支付密码
+        $goods_id      = input("goods_id/d",0); // 商品id
+        $goods_num     = input("goods_num/d",0);// 商品数量
+        $item_id       = input("item_id/d",0); // 商品规格id
+        $action        = input("action/d",0); // 立即购买
+        $shop_id       = input('shop_id/d', 0);//自提点id
         $take_time = input('take_time/d');//自提时间
         $consignee = input('consignee/s');//自提点收货人
         $mobile = input('mobile/s');//自提点联系方式

@@ -52,7 +52,6 @@ class Cart extends ApiBase
                 $v['seller_name']="";
             }
         }*/
- 
         foreach($data as $k=>$v){
             unset($v['user_id']);
             unset($v["session_id"]);
