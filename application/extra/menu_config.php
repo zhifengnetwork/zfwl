@@ -134,6 +134,16 @@ return [
                     ],
                 ],
             ],
+            [
+                'id'    => 30300,
+                'title' => '配送方式',
+                'sort'  => 1,
+                'url'   => 'goods/goods_delivery_list',
+                'hide'  => 1,
+                'child' => [
+                    
+                ],
+            ],
         ],
     ],
 
