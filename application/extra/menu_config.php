@@ -7,7 +7,7 @@ return [
         'sort'  => 2,
         'url'   => 'index/index',
         'hide'  => 1,
-        'icon'  => 'fa-user',
+        'icon'  => 'glyphicon glyphicon-duplicate',
         'child' => [
             [
                 'id'    => 20100,
@@ -101,7 +101,7 @@ return [
         'sort'  => 2,
         'url'   => 'goods/index',
         'hide'  => 1,
-        'icon'  => 'fa-user',
+        'icon'  => 'glyphicon glyphicon-briefcase',
         'child' => [
             [
                 'id'    => 30100,
@@ -170,7 +170,7 @@ return [
         'sort'  => 2,
         'url'   => 'order/index',
         'hide'  => 1,
-        'icon'  => 'fa-user',
+        'icon'  => 'glyphicon glyphicon-edit',
         'child' => [
             [
                 'id'    => 40100,
@@ -317,7 +317,7 @@ return [
         'sort'  => 2,
         'url'   => 'total/index',
         'hide'  => 1,
-        'icon'  => 'fa-th-large',
+        'icon'  => 'glyphicon glyphicon-file',
         'child' => [
             [
                 'id'    => 60100,
@@ -355,7 +355,7 @@ return [
         'sort'  => 8,
         'url'   => 'config/index',
         'hide'  => 1,
-        'icon'  => 'fa-gear',
+        'icon'  => 'glyphicon glyphicon-wrench',
         'child' => [
             [
                 'id'    => 50100,
@@ -407,7 +407,7 @@ return [
         'sort'  => 21,
         'url'   => 'auths/auth_group',
         'hide'  => 1,
-        'icon'  => 'fa-cogs',
+        'icon'  => 'glyphicon glyphicon-cog',
         'child' => [
             [
                 'id'    => 210100,
