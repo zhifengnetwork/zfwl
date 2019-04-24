@@ -83,8 +83,8 @@ class Shop extends Common
         $base64_string  = explode(',', $img);
         $imgs           = base64_decode($base64_string[1]);
         //生成文件夹
-        $names = "shops" ;
-        $name  = "shops/" .date('Ymd',time()) ;
+        $names = "shops";
+        $name  = "shops/" .date('Ymd',time());
         if (!file_exists(ROOT_PATH .Config('c_pub.img').$names)){ 
             mkdir(ROOT_PATH .Config('c_pub.img').$names,0777,true);
         } 
