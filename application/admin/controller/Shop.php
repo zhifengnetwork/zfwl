@@ -76,6 +76,9 @@ class Shop extends Common
 
     public function base_img(){
         $img      = input('img');
+        if(empty($img)){
+            $this->ajaxReturn(['code'=>0,'msg'=>'上传图片不能为空','data'=>'']);
+        }
         $saveName = request()->time().rand(0,99999) . '.png';
 
         $img      = base64_decode($img);
