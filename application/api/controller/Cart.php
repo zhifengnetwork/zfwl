@@ -37,14 +37,15 @@ class Cart extends ApiBase
     public function cartlist()
     {
 
-        $user_id = $this->get_user_id();
-        if(!$user_id){
-            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
-        }
+        // $user_id = $this->get_user_id();
+        // if(!$user_id){
+        //     $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+        // }
+        $user_id   = 52974;
         $cartLogic = new CartLogic();
         $cartLogic->setUserId($user_id);
-        $data = $cartLogic->getCartList();//用户购物车
-        $seller = Db::name('seller')->select();
+        $data      = $cartLogic->getCartList();//用户购物车
+        $seller    = Db::name('seller')->select();
         /*foreach ($data as $k=>$v) {
             if($v['goods']['seller_id']==$seller[0]['seller_id']){
                 $v['seller_name']=$seller[0]['seller_name'];
@@ -68,7 +69,6 @@ class Cart extends ApiBase
             unset($v["sku"]);
             unset($v["combination_group_id"]);
         }
-        
         $res[0] = array(
             'seller_id'=> 0,
             'seller_name'=>'ZF智丰自营',

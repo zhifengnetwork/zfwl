@@ -42,34 +42,8 @@ class Common extends Controller
         $this->auth();
         $this->view->mginfo     = $this->mginfo    = session('admin_user_auth');
         $leftmenu =  self::get_leftmenu();
-        $left_array = array();
-     
-        foreach($leftmenu as $v ){
-            if(isset($v['left'])){
-                $left_array = array($v);
-                break;
-            }
-            if(!empty($v['_child'])){
-                foreach($v['_child'] as $k){
-                    if(isset($k['left'])){
-                        $left_array = array($v);
-                        break;
-                    }
-
-                    if(!empty($k['_child'])){
-                        foreach($k['_child'] as $j){
-                            if(isset($j['left'])){
-                                $left_array = array($v);
-                                break;
-                            }
-                        }
-
-                    }
-                }              
-            }
-
-        }
-        $this->view->lefts_menu  = $left_array;
+        
+        $this->view->lefts_menu  = self::lefts_menu($leftmenu);
         $this->view->left_menu   = $leftmenu;
         View::share('meta_title', 'GAME');
     }
@@ -129,22 +103,54 @@ class Common extends Controller
             if($url == $val['url']){
                 $val['left'] = 1;
             }
-           
-            
             if (!empty($val['_child'])) {
                 $val['_child'] = self::menu($val['_child']);
                 if ($url == $val['url']) {
-                    $val['class'] = 'select';
+                    $val['class']  = 'active';
+                    $val['class2'] = 'slelct';
                     $val['left']  =  1;
                 } else {
-                    $val['class'] = empty(array_filter(array_column($val['_child'], 'class'))) ? '' : 'select';
+                    $val['class2'] = empty(array_filter(array_column($val['_child'], 'class2'))) ? '' : 'select';
+                    $val['class'] = empty(array_filter(array_column($val['_child'], 'class'))) ? '' : 'active';
                 }
             } else {
-                $val['class'] = $url == $val['url'] ? 'select' : '';
+                $val['class']  = $url == $val['url'] ? 'active' : '';
+                $val['class2'] = $url == $val['url'] ? 'select' : '';
             }
         }
         return $left_menu;
     }
+
+    private function lefts_menu($leftmenu){
+        $left_array = array();
+        foreach($leftmenu as $v ){
+            if(isset($v['left'])){
+                $left_array = array($v);
+                break;
+            }
+            if(!empty($v['_child'])){
+                foreach($v['_child'] as $k){
+                    if(isset($k['left'])){
+                        $left_array = array($v);
+                        break;
+                    }
+                    if(!empty($k['_child'])){
+                        foreach($k['_child'] as $j){
+                            if(isset($j['left'])){
+                                $left_array = $v;
+                                break;
+                            }
+                        }
+
+                    }
+                }              
+            }
+
+        }
+        $left_array = isset($left_array[0]['_child'])?$left_array[0]['_child']:array();
+        return $left_array;
+    }
+     
 
     /*
      * 权限判断
@@ -190,6 +196,25 @@ class Common extends Controller
         //     return $this->error("没有权限");
         // }
 
+    }
+
+    public function base_img($base,$names,$images='',$info=''){
+        $saveName = request()->time().rand(0,99999) . '.png';
+
+        $img=base64_decode($base);
+        //生成文件夹
+        // $names = "distribution_set" ;
+        $name = "{$names}/" .date('Ymd',time()) ;
+        if (!file_exists(ROOT_PATH .Config('c_pub.img').$names)){ 
+            mkdir(ROOT_PATH .Config('c_pub.img').$names,0777,true);
+        } 
+        //保存图片到本地
+        file_put_contents(ROOT_PATH .Config('c_pub.img').$name.$saveName,$img);
+
+        if( $info ){
+            @unlink( ROOT_PATH .Config('c_pub.img') . $info );
+        }
+        return $name.$saveName;
     }
 
 }

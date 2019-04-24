@@ -114,8 +114,8 @@ class Goods extends Common
 
                 $img=base64_decode($data['img']);
                 //生成文件夹
-                $names = "goods" ;
-                $name = "goods/" .date('Ymd',time()) ;
+                $names =  "goods" ;
+                $name  =  "goods/" .date('Ymd',time()) ;
                 if (!file_exists(ROOT_PATH .Config('c_pub.img').$names)){ 
                     mkdir(ROOT_PATH .Config('c_pub.img').$names,0777,true);
                 } 
@@ -688,8 +688,113 @@ class Goods extends Common
     public function del_sku(){
         if( request()->isAjax() ){
             $sku_id = input('sku_id');
+            if( Db::table('goods_sku')->where('sku_id','=',$sku_id)->delete() ){
+                jason([],'删除商品规格成功！');
+            }else{
+                jason([],'删除商品规格成功！',0);
+            }
+        }
+    }
+
+    /**
+     * 配送方式列表
+     */
+    public function goods_delivery_list(){
+
+        $where = [];
+        $pageParam = ['query' => []];
+
+        $name = input('name');
+        if( $name ){
+            $where["name"] = ['like', "%{$name}%"];
+            $pageParam['query']['name'] = ['like', "%{$name}%"];
+        }
+
+        $list = Db::table('goods_delivery')->order('delivery_id DESC')->where($where)->paginate(10,false,$pageParam);
+
+        return $this->fetch('',[
+            'name'          =>  $name,
+            'list'          =>  $list,
+            'meta_title'    =>  '配送方式列表',
+        ]);
+    }
+
+    /**
+     * 添加配送方式
+     */
+    public function goods_delivery_add(){
+
+        if( Request::instance()->isPost() ){
+            $data = input('post.');
             
-            return Db::talbe('goods_sku')->where('sku_id','=',$sku_id)->delete();
+            //验证
+            $validate = Loader::validate('Delivery');
+            if(!$validate->scene('add')->check($data)){
+                $this->error( $validate->getError() );
+            }
+
+            if($data['is_default']){
+                Db::table('goods_delivery')->where('delivery_id','neq',0)->update(['is_default'=>0]);
+            }
+            
+            if ( Db::table('goods_delivery')->insert($data) ) {
+                $this->success('添加成功', url('goods/goods_delivery_list','',false));
+            } else {
+                $this->error('添加失败');
+            }
+        }
+
+        return $this->fetch('',[
+            'meta_title'    =>  '添加配送方式',
+        ]);
+    }
+
+    /**
+     * 修改配送方式
+     */
+    public function goods_delivery_edit(){
+
+        $delivery_id = input('delivery_id');
+        if(!$delivery_id) $this->error('参数错误！');
+        $info = Db::table('goods_delivery')->find($delivery_id);
+
+        if( Request::instance()->isPost() ){
+            $data = input('post.');
+            
+            //验证
+            $validate = Loader::validate('Delivery');
+            if(!$validate->scene('edit')->check($data)){
+                $this->error( $validate->getError() );
+            }
+
+            if($data['is_default']){
+                Db::table('goods_delivery')->where('delivery_id','neq',0)->update(['is_default'=>0]);
+            }
+            
+            if ( Db::table('goods_delivery')->update($data) ) {
+                $this->success('修改成功', url('goods/goods_delivery_list','',false));
+            } else {
+                $this->error('修改失败');
+            }
+        }
+
+        return $this->fetch('',[
+            'meta_title'    =>  '修改配送方式',
+            'info'          =>  $info,
+        ]);
+    }
+
+    /**
+     * 删除配送方式
+     */
+    public function goods_delivery_del(){
+        if( request()->isAjax() ){
+            $delivery_id = input('delivery_id');
+            if( Db::table('goods_delivery')->where('delivery_id','=',$delivery_id)->delete() ){
+                jason([],'删除配送方式成功！');
+            }else{
+                jason([],'删除配送方式成功！',0);
+            }
         }
     }
 }
