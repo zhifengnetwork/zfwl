@@ -29,7 +29,7 @@
     	 <div id="wrap" >
 		        <div id="tit">
                      {volist name="left_menu" id="vo"}
-                         <a href="{:url($vo['url'])}"><span class="biaoti {$vo['class']}" ><p class="{$vo['icon']}" aria-hidden="true"></p><p style="display: inline-block;">{$vo.title}</p></span></a>
+                         <a href="{:url($vo['url'])}"><span class="biaoti {$vo['class2']}" ><p class="glyphicon glyphicon-menu-hamburger" aria-hidden="true"></p><p style="display: inline-block;">{$vo.title}</p></span></a>
                      {/volist}
 		        </div>
 		        <ul id="con" > 
@@ -43,35 +43,25 @@
                                  </span>
                                 <div class="logo-element">GAME</div>
                             </p>
-		                 	<nav class="navbar-default navbar-static-side" role="navigation">
-			                   <div class="sidebar-collapse">
-			                    <ul class="nav metismenu" id="side-menu">
-                                    {volist name="lefts_menu" id="vo"}
-                                    <li class="active">
-                                        {notempty name="vo['_child']"}
-                                            {volist name="vo['_child']" id="v"}
-                                            
-                                            <a href="{:url($v['url'])}">
-                                                <i class="fa {$v.icon}"></i><span class="nav-label">{$v.title}</span> 
-                                                {notempty name="v['_child']"}<span class="fa arrow"></span>{/notempty}
-                                            </a>
-
-                                            <ul class="nav nav-second-level">
-                                                {notempty name="v['_child']"}
-                                                    {volist name="v['_child']" id="k"}
-                                                        <li class="active">
-                                                            <a href="{:url($k['url'])}"> {$k.title} </a>
-                                                        </li>
-                                                    {/volist}
+                            <nav class="navbar-default navbar-static-side" role="navigation">
+                                    <div class="sidebar-collapse">
+                                        <ul class="nav metismenu" id="side-menu">
+                                            {volist name="lefts_menu" id="vo"}
+                                            <li class="{$vo.class}">
+                                                <a href="{:url($vo['url'])}">
+                                                    <i class="fa {$vo.icon}"></i><span class="nav-label">{$vo.title}</span> 
+                                                    {notempty name="vo['_child']"}<span class="fa arrow"></span>{/notempty}
+                                                </a>
+                                                {notempty name="vo['_child']"}
+                                                <ul class="nav nav-second-level">
+                                                    {volist name="vo['_child']" id="v"}<li class="{$vo.class}"><a href="{:url($v['url'])}">{$v.title}</a></li>{/volist}
+                                                </ul>
                                                 {/notempty}
-                                            </ul>
+                                            </li>
                                             {/volist}
-                                        {/notempty}
-                                    </li>
-                                    {/volist}
-                                </ul>
-			                </div>
-                         </nav>
+                                        </ul>
+                                    </div>
+                                </nav>
                     </li>
 		        </ul>
          </div>
