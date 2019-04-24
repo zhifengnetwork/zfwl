@@ -3,11 +3,11 @@ return [
     //商品分类
     'good'      => [
         'id'    => 20000,
-        'title' => '内容管理',
+        'title' => '测试标签',
         'sort'  => 2,
         'url'   => 'index/index',
         'hide'  => 1,
-        'icon'  => 'glyphicon glyphicon-duplicate',
+        'icon'  => 'fa-user',
         'child' => [
             [
                 'id'    => 20100,
@@ -101,7 +101,7 @@ return [
         'sort'  => 2,
         'url'   => 'goods/index',
         'hide'  => 1,
-        'icon'  => 'glyphicon glyphicon-briefcase',
+        'icon'  => 'fa-user',
         'child' => [
             [
                 'id'    => 30100,
@@ -170,56 +170,142 @@ return [
         'sort'  => 2,
         'url'   => 'order/index',
         'hide'  => 1,
-        'icon'  => 'glyphicon glyphicon-edit',
+        'icon'  => 'fa-user',
         'child' => [
             [
                 'id'    => 40100,
-                'title' => '全部订单',
+                'title' => '销售订单',
                 'sort'  => 1,
-                'url'   => 'order/index',
+                'url'   => 'order/index2',
                 'hide'  => 1,
                 'child' => [
                     [
                         'id'    => 40101,
-                        'title' => '订单详情',
+                        'title' => '全部订单',
                         'sort'  => 1,
-                        'url'   => 'order/edit',
+                        'url'   => 'order/index',
                         'hide'  => 1,
                     ],
-                   
+                    [
+                        'id'    => 40102,
+                        'title' => '待付款',
+                        'sort'  => 1,
+                        'url'   => '',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 40103,
+                        'title' => '待发货',
+                        'sort'  => 1,
+                        'url'   => '',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 40104,
+                        'title' => '待收货',
+                        'sort'  => 1,
+                        'url'   => '',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 40105,
+                        'title' => '已完成',
+                        'sort'  => 1,
+                        'url'   => '',
+                        'hide'  => 1,
+                    ],
                 ],
 
             ],
             [
                 'id'    => 40200,
-                'title' => '退货退款',
-                'sort'  => 1,
-                'url'   => 'order_refund/index',
+                'title' => '退款订单',
+                'sort'  => 2,
+                'url'   => '',
                 'hide'  => 1,
                 'child' => [
                     [
                         'id'    => 40201,
-                        'title' => '退款详情',
+                        'title' => '退款申请',
                         'sort'  => 1,
-                        'url'   => 'order_refund/edit',
+                        'url'   => '',
                         'hide'  => 1,
                     ],
-                   
+                    [
+                        'id'    => 40202,
+                        'title' => '已退款',
+                        'sort'  => 1,
+                        'url'   => '',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 40203,
+                        'title' => '已关闭',
+                        'sort'  => 1,
+                        'url'   => '',
+                        'hide'  => 1,
+                    ],
                 ],
+
             ],
             [
                 'id'    => 40300,
-                'title' => '评价列表',
-                'sort'  => 1,
-                'url'   => 'comment/index',
+                'title' => '快递助手',
+                'sort'  => 3,
+                'url'   => '',
                 'hide'  => 1,
-            ],
-            [
-                'id'    => 40400,
-                'title' => '打印设置',
-                'sort'  => 1,
-                'url'   => 'machine/index',
-                'hide'  => 1,
+                'child' => [
+                    [
+                        'id'    => 40301,
+                        'title' => '发货人信息管理',
+                        'sort'  => 1,
+                        'url'   => '',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 40302,
+                        'title' => '单个打印',
+                        'sort'  => 1,
+                        'url'   => '',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 40303,
+                        'title' => '批量打印',
+                        'sort'  => 1,
+                        'url'   => '',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 40304,
+                        'title' => '快递单模板管理',
+                        'sort'  => 1,
+                        'url'   => '',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 40305,
+                        'title' => '发货单模板管理',
+                        'sort'  => 1,
+                        'url'   => '',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 40306,
+                        'title' => '商品简称',
+                        'sort'  => 1,
+                        'url'   => '',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 40307,
+                        'title' => '打印设置',
+                        'sort'  => 1,
+                        'url'   => '',
+                        'hide'  => 1,
+                    ],
+                ],
+
             ],
         ],
     ],
@@ -231,7 +317,7 @@ return [
         'sort'  => 2,
         'url'   => 'total/index',
         'hide'  => 1,
-        'icon'  => 'glyphicon glyphicon-file',
+        'icon'  => 'fa-th-large',
         'child' => [
             [
                 'id'    => 60100,
@@ -269,7 +355,7 @@ return [
         'sort'  => 8,
         'url'   => 'config/index',
         'hide'  => 1,
-        'icon'  => 'glyphicon glyphicon-wrench',
+        'icon'  => 'fa-gear',
         'child' => [
             [
                 'id'    => 50100,
@@ -321,13 +407,13 @@ return [
         'sort'  => 21,
         'url'   => 'auths/auth_group',
         'hide'  => 1,
-        'icon'  => 'glyphicon glyphicon-cog',
+        'icon'  => 'fa-cogs',
         'child' => [
             [
                 'id'    => 210100,
                 'title' => '管理员',
                 'sort'  => 1,
-                'url'   => 'auths/auth_group',
+                'url'   => 'mguser/index',
                 'hide'  => 1,
                 'child' => [
                    
@@ -342,8 +428,8 @@ return [
                         'id'    => 210102,
                         'title' => '用户授权',
                         'sort'  => 2,
-                        'url'   => 'mguser/set_authgroup',
-                        'hide'  => 1,
+                        'url'   => '',
+                        'hide'  => 0,
                     ],
                     [
                         'id'    => 210103,
