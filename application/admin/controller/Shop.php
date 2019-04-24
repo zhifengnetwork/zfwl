@@ -87,7 +87,7 @@ class Shop extends Common
         } 
         //保存图片到本地
         file_put_contents(ROOT_PATH .Config('c_pub.img').$name.$saveName,$img);
-        $this->ajaxReturn(['code'=>1,'msg'=>'ok','data'=>SITE_URL.'/'.$name.$saveName]);
+        $this->ajaxReturn(['code'=>1,'msg'=>'ok','data'=>SITE_URL.'/upload/images/'.$name.$saveName]);
     }
 
 
