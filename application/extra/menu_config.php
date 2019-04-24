@@ -519,4 +519,68 @@ return [
             ],
         ],
      ],
+
+     //分销管理
+    'distribution' => [
+        'id'    => 70000,
+        'title' => '分销管理',
+        'sort'  => 9,
+        'url'   => 'distribution/index',
+        'hide'  => 1,
+        'icon'  => 'glyphicon glyphicon-wrench',
+        'child' => [
+            [
+                'id'    => 70100,
+                'title' => '分销中心',
+                'sort'  => 1,
+                'url'   => 'distribution/index',
+                'hide'  => 1,
+                'child' => [
+                    [
+                        'id'    => 70101,
+                        'title' => '分销中心入口',
+                        'sort'  => 1,
+                        'url'   => 'distribution/distribution_center',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 70201,
+                        'title' => '分销设置',
+                        'sort'  => 2,
+                        'url'   => 'distribution/distribution_set',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 70301,
+                        'title' => '分销商',
+                        'sort'  => 3,
+                        'url'   => 'distribution/index',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 70401,
+                        'title' => '分销商等级',
+                        'sort'  => 4,
+                        'url'   => 'distribution/distribution_grade',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 70501,
+                        'title' => '分销关系',
+                        'sort'  => 5,
+                        'url'   => 'distribution/distribution_relations',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 70601,
+                        'title' => '通知设置',
+                        'sort'  => 6,
+                        'url'   => 'distribution/distribution_notify',
+                        'hide'  => 1,
+                    ],
+                ],
+            ],
+        ],
+    ],
+
 ];
