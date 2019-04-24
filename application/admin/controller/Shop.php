@@ -79,9 +79,9 @@ class Shop extends Common
         if(empty($img)){
             $this->ajaxReturn(['code'=>0,'msg'=>'上传图片不能为空','data'=>'']);
         }
-        $saveName = request()->time().rand(0,99999) . '.png';
-
-        $img      = base64_decode($img);
+        $saveName       = request()->time().rand(0,99999) . '.png';
+        $base64_string  = explode(',', $img);
+        $imgs           = base64_decode($base64_string[1]);
         //生成文件夹
         $names = "shops" ;
         $name  = "shops/" .date('Ymd',time()) ;
@@ -89,7 +89,7 @@ class Shop extends Common
             mkdir(ROOT_PATH .Config('c_pub.img').$names,0777,true);
         } 
         //保存图片到本地
-        file_put_contents(ROOT_PATH .Config('c_pub.img').$name.$saveName,$img);
+        $r   = file_put_contents(ROOT_PATH .Config('c_pub.img').$name.$saveName,$imgs);
         $this->ajaxReturn(['code'=>1,'msg'=>'ok','data'=>SITE_URL.'/upload/images/'.$name.$saveName]);
     }
 
