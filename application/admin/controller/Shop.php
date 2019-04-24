@@ -74,7 +74,7 @@ class Shop extends Common
     }
 
 
-    public function base_img(){
+    public function shop_img(){
         $img      = input('img');
         if(empty($img)){
             $this->ajaxReturn(['code'=>0,'msg'=>'上传图片不能为空','data'=>'']);
