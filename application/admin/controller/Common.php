@@ -103,19 +103,19 @@ class Common extends Controller
             if($url == $val['url']){
                 $val['left'] = 1;
             }
-           
-            
             if (!empty($val['_child'])) {
                 $val['_child'] = self::menu($val['_child']);
                 if ($url == $val['url']) {
-                    $val['class'] = 'select';
-                    $val['active'] = 'active';
+                    $val['class']  = 'active';
+                    $val['class2'] = 'slelct';
                     $val['left']  =  1;
                 } else {
-                    $val['class'] = empty(array_filter(array_column($val['_child'], 'class'))) ? '' : 'select';
+                    $val['class2'] = empty(array_filter(array_column($val['_child'], 'class2'))) ? '' : 'select';
+                    $val['class'] = empty(array_filter(array_column($val['_child'], 'class'))) ? '' : 'active';
                 }
             } else {
-                $val['class'] = $url == $val['url'] ? 'select' : '';
+                $val['class']  = $url == $val['url'] ? 'active' : '';
+                $val['class2'] = $url == $val['url'] ? 'select' : '';
             }
         }
         return $left_menu;
@@ -137,7 +137,7 @@ class Common extends Controller
                     if(!empty($k['_child'])){
                         foreach($k['_child'] as $j){
                             if(isset($j['left'])){
-                                $left_array = array($v);
+                                $left_array = $v;
                                 break;
                             }
                         }
@@ -147,6 +147,7 @@ class Common extends Controller
             }
 
         }
+        $left_array = isset($left_array[0]['_child'])?$left_array[0]['_child']:array();
         return $left_array;
     }
      

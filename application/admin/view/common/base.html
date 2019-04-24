@@ -29,7 +29,7 @@
     	 <div id="wrap" >
 		        <div id="tit">
                      {volist name="left_menu" id="vo"}
-                         <a href="{:url($vo['url'])}"><span class="biaoti {$vo['class2']}" ><p class="glyphicon glyphicon-menu-hamburger" aria-hidden="true"></p><p style="display: inline-block;">{$vo.title}</p></span></a>
+                         <a href="{:url($vo['url'])}"><span class="biaoti {$vo['class2']}" ><p class="{$vo['icon']}" aria-hidden="true"></p><p style="display: inline-block;">{$vo.title}</p></span></a>
                      {/volist}
 		        </div>
 		        <ul id="con" > 
