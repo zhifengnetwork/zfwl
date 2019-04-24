@@ -114,8 +114,8 @@ class Goods extends Common
 
                 $img=base64_decode($data['img']);
                 //生成文件夹
-                $names = "goods" ;
-                $name = "goods/" .date('Ymd',time()) ;
+                $names =  "goods" ;
+                $name  =  "goods/" .date('Ymd',time()) ;
                 if (!file_exists(ROOT_PATH .Config('c_pub.img').$names)){ 
                     mkdir(ROOT_PATH .Config('c_pub.img').$names,0777,true);
                 } 

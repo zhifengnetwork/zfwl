@@ -26,7 +26,6 @@ class ApiBase extends Controller
         }
     }
 
-<<<<<<< HEAD
     /*
      *  开放有可能不需登录controller
      */
@@ -37,9 +36,6 @@ class ApiBase extends Controller
         ];
         return $controller;
     }
-=======
-    
->>>>>>> update
 
     public function ajaxReturn($data){
         header('Access-Control-Allow-Origin:*');
@@ -68,7 +64,7 @@ class ApiBase extends Controller
      * 解密token
      */
     public function decode_token($token){
-        $key = 'zhelishimiyao';
+        $key     = 'zhelishimiyao';
         $payload = json_decode(json_encode(JWT::decode($token, $key, ['HS256'])),true);
         return $payload;
     }
@@ -118,8 +114,6 @@ class ApiBase extends Controller
         if($res['iat']>$res['exp']){
             $this->ajaxReturn(['status' => -1 , 'msg'=>'token已过期','data'=>null]);
         }
-
-
        return $res['user_id'];
        
     }
