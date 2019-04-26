@@ -22,6 +22,49 @@
 		<link href="__INSPINIA__/css/animate.css" rel="stylesheet">
 		<link href="__INSPINIA__/css/style.css?v=20170510" rel="stylesheet"> {block name="style"}{/block}
 	</head>
+	<style>
+		#tit {
+			margin-left: -15px;
+			font-size: 15px;
+			background: #233645;
+			color: white;
+			min-width: 1200px;
+		}
+		#tit a{
+			
+			color: white;
+			
+		}
+		
+		.biaoti {
+			position: relative;
+			display: inline-block;
+			width: 9%;
+			height: 80px;
+			line-height: 80px;
+			cursor: pointer;
+			text-align: center;
+			min-width: 90px;
+		}
+		
+		.biaoti p {
+			display: inline-block;
+		}
+		
+		.biaoti p:nth-child(1) {
+			position: absolute;
+			top: 34px;
+		}
+		
+		.biaoti p:nth-child(2) {
+			margin-left: 22px;
+		}
+		
+		.select {
+			background: black;
+			border-bottom: 6px solid #1AB394;
+		}
+	</style>
 
 	<body>
 
@@ -199,58 +242,16 @@
 					$(this).remove();
 				})
 			})
-			//          顶部导航切换
-			$('#tit a').click(function() {
-				var i = $(this).index(); //下标第一种写法
-				//var i = $('tit').index(this);//下标第二种写法
-				$(this).addClass('select').siblings().removeClass('select');
-				//          $('#con>li').eq(i).show().siblings().hide();
+			// //          顶部导航切换
+			// $('#tit a').click(function() {
+			// 	var i = $(this).index(); //下标第一种写法
+			// 	//var i = $('tit').index(this);//下标第二种写法
+			// 	$(this).addClass('select').siblings().removeClass('select');
+			// 	//          $('#con>li').eq(i).show().siblings().hide();
 
-			});
+			// });
 		</script>
-		<style>
-			#tit {
-				margin-left: -15px;
-				font-size: 15px;
-				background: #233645;
-				color: white;
-				min-width: 1200px;
-			}
-			#tit a{
-				
-				color: white;
-				
-			}
-			
-			.biaoti {
-				position: relative;
-				display: inline-block;
-				width: 9%;
-				height: 80px;
-				line-height: 80px;
-				cursor: pointer;
-				text-align: center;
-				min-width: 90px;
-			}
-			
-			.biaoti p {
-				display: inline-block;
-			}
-			
-			.biaoti p:nth-child(1) {
-				position: absolute;
-				top: 34px;
-			}
-			
-			.biaoti p:nth-child(2) {
-				margin-left: 22px;
-			}
-			
-			.select {
-				background: black;
-				border-bottom: 6px solid #1AB394;
-			}
-		</style>
+	
 	</body>
 
 </html>
