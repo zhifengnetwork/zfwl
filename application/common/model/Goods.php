@@ -24,9 +24,9 @@ class Goods extends Model
         if (!empty($cat_id)){
             $list = $this->where($where)->where(function ($query) use ($cat_id) {
                 $query->where('cat_id1', $cat_id)->whereor('cat_id2', $cat_id);})
-                ->field($field)->paginate(10,false,['page'=>$page]);
+                ->field($field)->paginate(6,false,['page'=>$page]);
         }else{
-            $list = $this->where($where)->field($field)->paginate(2,false,['page'=>$page]);
+            $list = $this->where($where)->field($field)->paginate(6,false,['page'=>$page]);
         }
         return $list;
     }
