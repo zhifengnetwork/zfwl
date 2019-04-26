@@ -93,6 +93,13 @@ class Shop extends Common
         $this->ajaxReturn(['code'=>1,'msg'=>'ok','data'=>SITE_URL.'/upload/images/'.$name.$saveName]);
     }
 
+    public function ajaxReturn($data){
+        header('Access-Control-Allow-Origin:*');
+        header('Access-Control-Allow-Headers:*');
+        header('Content-Type:application/json; charset=utf-8');
+        exit(json_encode($data,JSON_UNESCAPED_UNICODE));
+    }
+
 
 
 
