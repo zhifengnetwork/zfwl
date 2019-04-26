@@ -32,7 +32,7 @@ class ApiBase extends Controller
     private function freeLoginController () {
         $controller = [
             'Shop' => 'shop',
-            'User' => 'user',
+//            'User' => 'user',
         ];
         return $controller;
     }

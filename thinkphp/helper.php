@@ -458,6 +458,9 @@ if (!function_exists('json')) {
      */
     function json($data = [], $code = 200, $header = [], $options = [])
     {
+        header('Access-Control-Allow-Origin:*');
+        header('Access-Control-Allow-Headers:*');
+        header('Content-Type:application/json; charset=utf-8');
         return Response::create($data, 'json', $code, $header, $options);
     }
 }
