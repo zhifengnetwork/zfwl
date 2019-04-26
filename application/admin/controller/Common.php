@@ -42,8 +42,11 @@ class Common extends Controller
         $this->auth();
         $this->view->mginfo     = $this->mginfo    = session('admin_user_auth');
         $leftmenu =  self::get_leftmenu();
+    
         $this->view->lefts_menu  = self::lefts_menu($leftmenu);
         $this->view->left_menu   = $leftmenu;
+        // var_dump(self::lefts_menu($leftmenu));
+        // exit;
         View::share('meta_title', 'GAME');
     }
 
@@ -69,7 +72,7 @@ class Common extends Controller
         $admin_userinfo = Session::get('admin_user_auth');
         if (!$all_menu) {
             $where['status'] = 1;
-            $where['hide']   = 1;
+            // $where['hide']   = 1;
             $all_menu        = Db::table('menu')->where($where)->order('sort ASC')->field("id,title,pid,url,tip,group,sort,icon")->select();
         }
        
@@ -93,7 +96,6 @@ class Common extends Controller
     private function menu($left_menu)
     {
         static $url;
-       
         //!$url && $url = strtolower(request()->controller() . '/' . request()->action());
        !$url && $url = request()->path();
         $url = str_replace('admin/', '', $url);
@@ -133,6 +135,7 @@ class Common extends Controller
                         $left_array = array($v);
                         break;
                     }
+                
                     if(!empty($k['_child'])){
                         foreach($k['_child'] as $j){
                             if(isset($j['left'])){

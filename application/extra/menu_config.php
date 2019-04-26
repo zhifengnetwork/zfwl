@@ -14,12 +14,67 @@ return [
                 'title' => '商城设置',
                 'sort'  => 1,
                 'icon'  => 'fa-th-large',
-                'url'   => '',
+                'url'   => 'index/index',
                 'hide'  => 1,
                 'child' => [
                     [
                         'id'    => 20101,
                         'title' => '店铺装修',
+                        'sort'  => 1,
+                        'url'   => '',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 20102,
+                        'title' => '基本设置',
+                        'sort'  => 1,
+                        'url'   => 'site/index',
+                        'hide'  => 1,
+                    ],
+                ],
+            ],
+            [
+                'id'    => 20200,
+                'title' => '支付交易设置',
+                'sort'  => 2,
+                'icon'  => 'fa-th-large',
+                'url'   => '',
+                'hide'  => 1,
+                'child' => [
+                    [
+                        'id'    => 20201,
+                        'title' => '支付方式',
+                        'sort'  => 1,
+                        'url'   => '',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 20202,
+                        'title' => '支付参数',
+                        'sort'  => 1,
+                        'url'   => '',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 20203,
+                        'title' => '支付交易设置',
+                        'sort'  => 1,
+                        'url'   => '',
+                        'hide'  => 1,
+                    ],
+                ],
+            ],
+            [
+                'id'    => 20300,
+                'title' => '消息提醒模板',
+                'sort'  => 3,
+                'icon'  => 'fa-th-large',
+                'url'   => '',
+                'hide'  => 1,
+                'child' => [
+                    [
+                        'id'    => 20301,
+                        'title' => '商城提醒',
                         'sort'  => 1,
                         'url'   => '',
                         'hide'  => 1,
@@ -53,7 +108,7 @@ return [
                         'title' => '添加商品',
                         'sort'  => 1,
                         'url'   => 'goods/add',
-                        'hide'  => 0,
+                        'hide'  => 1,
                     ],
                     [
                         'id'    => 30102,
@@ -78,7 +133,7 @@ return [
                         'title' => '添加规格',
                         'sort'  => 1,
                         'url'   => 'goods/goods_sku_add',
-                        'hide'  => 0,
+                        'hide'  => 1,
                     ],
                     [
                         'id'    => 30202,
@@ -97,7 +152,13 @@ return [
                 'hide'  => 1,
                 'icon'  => 'fa-th-large',
                 'child' => [
-                    
+                    [
+                        'id'    => 30301,
+                        'title' => '新增配送',
+                        'sort'  => 1,
+                        'url'   => 'goods/goods_delivery_add',
+                        'hide'  => 1,
+                    ],
                 ],
             ],
         ],
@@ -250,31 +311,13 @@ return [
                 ],
 
             ],
-            [
-                'id'    => 40400,
-                'title' => '测试',
-                'sort'  => 3,
-                'url'   => '',
-                'hide'  => 1,
-                'icon'  => 'fa-th-large',
-                'child' => [
-                    [
-                        'id'    => 40401,
-                        'title' => '测试1',
-                        'sort'  => 1,
-                        'url'   => '',
-                        'hide'  => 1,
-                    ],
-                ],
-
-            ],
         ],
     ],
 
       //数据分析
       'baobiao'      => [
         'id'    => 60000,
-        'title' => '数据管理',
+        'title' => '财务管理',
         'sort'  => 2,
         'url'   => 'total/index',
         'hide'  => 1,
@@ -282,23 +325,64 @@ return [
         'child' => [
             [
                 'id'    => 60100,
-                'title' => '业务数据',
+                'title' => '财务管理',
                 'sort'  => 1,
-                'url'   => 'total/business',
+                'url'   => '',
                 'hide'  => 1,
                 'child' => [
-                    
+                    [
+                        'id'    => 60101,
+                        'title' => '余额记录',
+                        'sort'  => 1,
+                        'url'   => '',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 60102,
+                        'title' => '积分记录',
+                        'sort'  => 1,
+                        'url'   => '',
+                        'hide'  => 1,
+                    ],
                 ],
 
             ],
             [
                 'id'    => 60200,
-                'title' => '财务数据',
+                'title' => '余额体现',
                 'sort'  => 1,
                 'url'   => 'total/finance',
                 'hide'  => 1,
                 'child' => [
-
+                    [
+                        'id'    => 60201,
+                        'title' => '带审核',
+                        'sort'  => 1,
+                        'url'   => '',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 60202,
+                        'title' => '通过审批',
+                        'sort'  => 1,
+                        'url'   => '',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 60203,
+                        'title' => '不通过审批',
+                        'sort'  => 1,
+                        'url'   => '',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 60204,
+                        'title' => '余额提现设置',
+                        'sort'  => 1,
+                        'url'   => '',
+                        'hide'  => 1,
+                    ],
+                   
                 ],
             ],
            
@@ -316,7 +400,7 @@ return [
         'sort'  => 8,
         'url'   => 'config/index',
         'hide'  => 1,
-        'icon'  => 'glyphicon glyphicon-wrench',
+        'icon'  => 'glyphicon glyphicon-link',
         'child' => [
             [
                 'id'    => 50100,
@@ -468,23 +552,6 @@ return [
                     ],
                 ],
             ],
-            [
-                'id'    => 210400,
-                'title' => '网站设置',
-                'sort'  => 4,
-                'url'   => 'site/index',
-                'hide'  => 1,
-                'icon'  => 'fa-th-large',
-                'child' => [
-                    [
-                        'id'    => 210401,
-                        'title' => '网站设置',
-                        'sort'  => 2,
-                        'url'   => 'site/index',
-                        'hide'  => 1,
-                    ],
-                ],
-            ],
         ],
      ],
 
@@ -495,7 +562,7 @@ return [
         'sort'  => 9,
         'url'   => 'distribution/index',
         'hide'  => 1,
-        'icon'  => 'glyphicon glyphicon-wrench',
+        'icon'  => 'glyphicon glyphicon-fullscreen',
         'child' => [
             [
                 'id'    => 70100,
@@ -545,6 +612,160 @@ return [
                         'title' => '通知设置',
                         'sort'  => 6,
                         'url'   => 'distribution/distribution_notify',
+                        'hide'  => 1,
+                    ],
+                ],
+            ],
+        ],
+    ],
+
+
+    'statistics' => [
+        'id'    => 80000,
+        'title' => '统计中心',
+        'sort'  => 9,
+        'url'   => 'statistics/index',
+        'hide'  => 1,
+        'icon'  => 'glyphicon glyphicon-wrench',
+        'child' => [
+            [
+                'id'    => 80100,
+                'title' => '会员分析',
+                'sort'  => 1,
+                'url'   => 'distribution/index',
+                'hide'  => 1,
+                'icon'  => 'fa-th-large',
+                'child' => [
+                    [
+                        'id'    => 80101,
+                        'title' => '会员消费排行',
+                        'sort'  => 1,
+                        'url'   => '',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 80102,
+                        'title' => '会员增长趋势',
+                        'sort'  => 2,
+                        'url'   => '',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 80103,
+                        'title' => '分销商增长趋势统计',
+                        'sort'  => 3,
+                        'url'   => 'distribution/index',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 80104,
+                        'title' => '会员积分统计',
+                        'sort'  => 4,
+                        'url'   => 'distribution/distribution_grade',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 80105,
+                        'title' => '会员余额统计',
+                        'sort'  => 5,
+                        'url'   => 'distribution/distribution_relations',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 80106,
+                        'title' => '会员现金消费统计',
+                        'sort'  => 6,
+                        'url'   => 'distribution/distribution_notify',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 80107,
+                        'title' => '用户分析',
+                        'sort'  => 6,
+                        'url'   => 'distribution/distribution_notify',
+                        'hide'  => 1,
+                    ],
+                ],
+            ],
+            [
+                'id'    => 80200,
+                'title' => '销售分析',
+                'sort'  => 1,
+                'url'   => 'distribution/index',
+                'hide'  => 1,
+                'icon'  => 'fa-th-large',
+                'child' => [
+                    [
+                        'id'    => 80201,
+                        'title' => '销售统计',
+                        'sort'  => 1,
+                        'url'   => '',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 80203,
+                        'title' => '销售指标',
+                        'sort'  => 2,
+                        'url'   => '',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 80204,
+                        'title' => '订单统计',
+                        'sort'  => 3,
+                        'url'   => 'distribution/index',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 80205,
+                        'title' => '流量入口统计',
+                        'sort'  => 4,
+                        'url'   => 'distribution/distribution_grade',
+                        'hide'  => 1,
+                    ],
+                ],
+            ],
+            [
+                'id'    => 80300,
+                'title' => '商品分析',
+                'sort'  => 1,
+                'url'   => 'distribution/index',
+                'hide'  => 1,
+                'icon'  => 'fa-th-large',
+                'child' => [
+                    [
+                        'id'    => 80301,
+                        'title' => '商品销售明细',
+                        'sort'  => 1,
+                        'url'   => '',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 80302,
+                        'title' => '商品销售排行',
+                        'sort'  => 2,
+                        'url'   => '',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 80303,
+                        'title' => '商品销售转化率',
+                        'sort'  => 3,
+                        'url'   => 'distribution/index',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 80304,
+                        'title' => '入驻商家销售排行',
+                        'sort'  => 4,
+                        'url'   => 'distribution/distribution_grade',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 80305,
+                        'title' => '入驻商家流量排行',
+                        'sort'  => 4,
+                        'url'   => 'distribution/distribution_grade',
                         'hide'  => 1,
                     ],
                 ],

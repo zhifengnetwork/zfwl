@@ -788,9 +788,9 @@ class Goods extends Common
      * 删除配送方式
      */
     public function goods_delivery_del(){
-        if( request()->isAjax() ){
+        if( request()->isAjax()){
             $delivery_id = input('delivery_id');
-            if( Db::table('goods_delivery')->where('delivery_id','=',$delivery_id)->delete() ){
+            if( Db::table('goods_delivery')->where('delivery_id','=',$delivery_id)->delete()){
                 jason([],'删除配送方式成功！');
             }else{
                 jason([],'删除配送方式成功！',0);
