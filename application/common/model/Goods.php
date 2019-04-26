@@ -10,7 +10,7 @@ class Goods extends Model
 
     protected $autoWriteTimestamp = true;
 
-    public function getGoodsList ($keyword = '',$cat_id = '') {
+    public function getGoodsList ($keyword = '',$cat_id = '',$page = 1) {
         $where = [];
         $where_cat = [];
         $where['is_show'] = 1;
@@ -24,9 +24,9 @@ class Goods extends Model
         if (!empty($cat_id)){
             $list = $this->where($where)->where(function ($query) use ($cat_id) {
                 $query->where('cat_id1', $cat_id)->whereor('cat_id2', $cat_id);})
-                ->field($field)->select();
+                ->field($field)->paginate(12,false,['page'=>$page]);
         }else{
-            $list = $this->where($where)->field($field)->select();
+            $list = $this->where($where)->field($field)->paginate(12,false,['page'=>$page]);
         }
         return $list;
     }
