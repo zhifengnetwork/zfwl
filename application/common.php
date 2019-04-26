@@ -121,7 +121,18 @@ function isMobile($mobile)
 function curl_post_query($url, $data)
 {
     //初始化
-    $ch1 = curl_init(); //初始化一个CURL对象
+    $ch = curl_init(); //初始化一个CURL对象
+
+    // curl_setopt($ch, CURLOPT_URL, $url);
+    // curl_setopt($ch, CURLOPT_FAILONERROR, false);
+    // curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    // curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    // curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+    // curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
+    // curl_setopt($ch, CURLOPT_HTTPHEADER, array('content-type: application/x-www-form-urlencoded;charset=UTF-8'));
+    // curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+
+
     curl_setopt($ch1, CURLOPT_URL, $url);
     //设置你所需要抓取的URL
     curl_setopt($ch1, CURLOPT_RETURNTRANSFER, 1);
@@ -130,9 +141,13 @@ function curl_post_query($url, $data)
     curl_setopt($ch1, CURLOPT_HEADER, false);
     //post提交
     curl_setopt($ch1, CURLOPT_POSTFIELDS, http_build_query($data));
-    $data = curl_exec($ch1);
+    $data = curl_exec($ch);
+    // var_dump(curl_error($ch));
     //运行curl,请求网页。
-    curl_close($ch1);
+    curl_close($ch);
+    
+    // var_dump($data);
+    // exit;
     //显示获得的数据
     return $data;
 }

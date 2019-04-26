@@ -42,7 +42,6 @@ class Common extends Controller
         $this->auth();
         $this->view->mginfo     = $this->mginfo    = session('admin_user_auth');
         $leftmenu =  self::get_leftmenu();
-        
         $this->view->lefts_menu  = self::lefts_menu($leftmenu);
         $this->view->left_menu   = $leftmenu;
         View::share('meta_title', 'GAME');
@@ -107,7 +106,7 @@ class Common extends Controller
                 $val['_child'] = self::menu($val['_child']);
                 if ($url == $val['url']) {
                     $val['class']  = 'active';
-                    $val['class2'] = 'slelct';
+                    $val['class2'] = 'select';
                     $val['left']  =  1;
                 } else {
                     $val['class2'] = empty(array_filter(array_column($val['_child'], 'class2'))) ? '' : 'select';

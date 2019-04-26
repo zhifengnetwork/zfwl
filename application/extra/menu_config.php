@@ -3,89 +3,25 @@ return [
     //商品分类
     'good'      => [
         'id'    => 20000,
-        'title' => '测试标签',
+        'title' => '手机商城',
         'sort'  => 2,
         'url'   => 'index/index',
         'hide'  => 1,
-        'icon'  => 'glyphicon glyphicon-duplicate',
+        'icon'  => 'glyphicon glyphicon-apple',
         'child' => [
             [
                 'id'    => 20100,
-                'title' => '测试1',
+                'title' => '商城设置',
                 'sort'  => 1,
-                'url'   => 'category/index',
+                'icon'  => 'fa-th-large',
+                'url'   => '',
                 'hide'  => 1,
                 'child' => [
                     [
                         'id'    => 20101,
-                        'title' => '添加规格',
+                        'title' => '店铺装修',
                         'sort'  => 1,
-                        'url'   => 'goods/goods_sku_add',
-                        'hide'  => 1,
-                    ],
-                ],
-            ],
-
-            [
-                'id'    => 20200,
-                'title' => '测试2',
-                'sort'  => 1,
-                'url'   => 'category/index',
-                'hide'  => 1,
-                'child' => [
-                    [
-                        'id'    => 20201,
-                        'title' => '添加规格',
-                        'sort'  => 1,
-                        'url'   => 'goods/goods_sku_add',
-                        'hide'  => 1,
-                    ],
-                ],
-            ],
-            [
-                'id'    => 20300,
-                'title' => '测试三',
-                'sort'  => 1,
-                'url'   => 'category/index',
-                'hide'  => 1,
-                'child' => [
-                    [
-                        'id'    => 20301,
-                        'title' => '添加规格',
-                        'sort'  => 1,
-                        'url'   => 'goods/goods_sku_add',
-                        'hide'  => 1,
-                    ],
-                ],
-            ],
-            [
-                'id'    => 20400,
-                'title' => '测试4',
-                'sort'  => 1,
-                'url'   => 'category/index',
-                'hide'  => 1,
-                'child' => [
-                    [
-                        'id'    => 20401,
-                        'title' => '添加规格',
-                        'sort'  => 1,
-                        'url'   => 'goods/goods_sku_add',
-                        'hide'  => 1,
-                    ],
-                ],
-            ],
-            [
-                'id'    => 20500,
-                'title' => '测试5',
-                'sort'  => 1,
-                'url'   => 'category/index',
-                'hide'  => 1,
-                'child' => [
-                    [
-                        'id'    => 20501,
-                        'title' => '添加规格',
-                        'sort'  => 1,
-                        'url'   => 'goods/goods_sku_add',
+                        'url'   => '',
                         'hide'  => 1,
                     ],
                 ],
@@ -100,6 +36,7 @@ return [
         'title' => '商品模块',
         'sort'  => 2,
         'url'   => 'goods/index',
+        'icon'  => 'fa-th-large',
         'hide'  => 1,
         'icon'  => 'glyphicon glyphicon-briefcase',
         'child' => [
@@ -109,6 +46,7 @@ return [
                 'sort'  => 1,
                 'url'   => 'goods/index',
                 'hide'  => 1,
+                'icon'  => 'fa-th-large',
                 'child' => [
                     [
                         'id'    => 30101,
@@ -133,6 +71,7 @@ return [
                 'sort'  => 1,
                 'url'   => 'goods/goods_type_list',
                 'hide'  => 1,
+                'icon'  => 'fa-th-large',
                 'child' => [
                     [
                         'id'    => 30201,
@@ -156,6 +95,7 @@ return [
                 'sort'  => 1,
                 'url'   => 'goods/goods_delivery_list',
                 'hide'  => 1,
+                'icon'  => 'fa-th-large',
                 'child' => [
                     
                 ],
@@ -178,6 +118,7 @@ return [
                 'sort'  => 1,
                 'url'   => 'order/index2',
                 'hide'  => 1,
+                'icon'  => 'fa-th-large',
                 'child' => [
                     [
                         'id'    => 40101,
@@ -223,6 +164,7 @@ return [
                 'sort'  => 2,
                 'url'   => '',
                 'hide'  => 1,
+                'icon'  => 'fa-th-large',
                 'child' => [
                     [
                         'id'    => 40201,
@@ -254,6 +196,7 @@ return [
                 'sort'  => 3,
                 'url'   => '',
                 'hide'  => 1,
+                'icon'  => 'fa-th-large',
                 'child' => [
                     [
                         'id'    => 40301,
@@ -313,6 +256,7 @@ return [
                 'sort'  => 3,
                 'url'   => '',
                 'hide'  => 1,
+                'icon'  => 'fa-th-large',
                 'child' => [
                     [
                         'id'    => 40401,
@@ -380,6 +324,7 @@ return [
                 'sort'  => 1,
                 'url'   => 'advertisement/index',
                 'hide'  => 1,
+                'icon'  => 'fa-th-large',
                 'child' => [
                     [
                         'id'    => 50101,
@@ -402,6 +347,7 @@ return [
                 'title' => '配送方式',
                 'sort'  => 2,
                 'url'   => 'delivery/index',
+                'icon'  => 'fa-th-large',
                 'hide'  => 1,
             ],
             [
@@ -409,6 +355,7 @@ return [
                 'title' => '客服设置',
                 'sort'  => 3,
                 'url'   => 'config/get_config',
+                'icon'  => 'fa-th-large',
                 'hide'  => 1,
             ],
            
@@ -432,6 +379,7 @@ return [
                 'sort'  => 1,
                 'url'   => 'mguser/index',
                 'hide'  => 1,
+                'icon'  => 'fa-th-large',
                 'child' => [
                    
                     [
@@ -470,6 +418,7 @@ return [
                 'sort'  => 2,
                 'url'   => 'auths/auth_group',
                 'hide'  => 1,
+                'icon'  => 'fa-th-large',
                 'child' => [
                   
                     [
@@ -508,6 +457,7 @@ return [
                 'sort'  => 3,
                 'url'   => 'menu/index',
                 'hide'  => 1,
+                'icon'  => 'fa-th-large',
                 'child' => [
                     [
                         'id'    => 210301,
@@ -524,6 +474,7 @@ return [
                 'sort'  => 4,
                 'url'   => 'site/index',
                 'hide'  => 1,
+                'icon'  => 'fa-th-large',
                 'child' => [
                     [
                         'id'    => 210401,
@@ -552,6 +503,7 @@ return [
                 'sort'  => 1,
                 'url'   => 'distribution/index',
                 'hide'  => 1,
+                'icon'  => 'fa-th-large',
                 'child' => [
                     [
                         'id'    => 70101,
