@@ -185,7 +185,7 @@ return [
                 'id'    => 40100,
                 'title' => '销售订单',
                 'sort'  => 1,
-                'url'   => 'order/index2',
+                'url'   => 'order/index',
                 'hide'  => 1,
                 'icon'  => 'fa-th-large',
                 'child' => [
@@ -197,33 +197,13 @@ return [
                         'hide'  => 1,
                     ],
                     [
-                        'id'    => 40102,
-                        'title' => '待付款',
+                        'id'    => 40106,
+                        'title' => '订单详情',
                         'sort'  => 1,
-                        'url'   => '',
-                        'hide'  => 1,
+                        'url'   => 'order/edit',
+                        'hide'  => 0,
                     ],
-                    [
-                        'id'    => 40103,
-                        'title' => '待发货',
-                        'sort'  => 1,
-                        'url'   => '',
-                        'hide'  => 1,
-                    ],
-                    [
-                        'id'    => 40104,
-                        'title' => '待收货',
-                        'sort'  => 1,
-                        'url'   => '',
-                        'hide'  => 1,
-                    ],
-                    [
-                        'id'    => 40105,
-                        'title' => '已完成',
-                        'sort'  => 1,
-                        'url'   => '',
-                        'hide'  => 1,
-                    ],
+                   
                 ],
 
             ],
@@ -237,21 +217,7 @@ return [
                 'child' => [
                     [
                         'id'    => 40201,
-                        'title' => '退款申请',
-                        'sort'  => 1,
-                        'url'   => '',
-                        'hide'  => 1,
-                    ],
-                    [
-                        'id'    => 40202,
-                        'title' => '已退款',
-                        'sort'  => 1,
-                        'url'   => '',
-                        'hide'  => 1,
-                    ],
-                    [
-                        'id'    => 40203,
-                        'title' => '已关闭',
+                        'title' => '退款订单',
                         'sort'  => 1,
                         'url'   => '',
                         'hide'  => 1,

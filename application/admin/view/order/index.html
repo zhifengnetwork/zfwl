@@ -15,7 +15,7 @@
                         <div class="col-sm-2">
                                 <div class="form-group">
                                     <label class="control-label" for="status">支付方式</label>
-                                    <select name="type" class="form-control" style="width:150px;">
+                                    <select name="type" class="form-control" style="width:180px;">
                                             <option value="0">默认全部</option>
                                             {foreach $type_list as $key => $vo}
                                             <option value="{$key}" {$Think.get.type==$key?='selected' }>{$vo}</option>
@@ -25,27 +25,28 @@
                             </div>
                             <div class="col-sm-2">
                                     <div class="form-group">
-                                        <label class="control-label" for="good_name">商品名称</label>
-                                        <input type="text" placeholder="商品名称" name="good_name" value="{$good_name}" class="form-control">
+                                        <label class="control-label" for="status">订单状态</label>
+                                        <select name="status" class="form-control" style="width:180px;">
+                                                <option value="0">默认全部</option>
+                                                {foreach $status_list as $key => $vo}
+                                                <option value="{$key}" {$Think.get.status==$key?='selected' }>{$vo}</option>
+                                                {/foreach}
+                                            </select>
                                     </div>
-                                </div>
-                                <div class="col-sm-2">
+                                    </div>
+                            <div class="col-sm-2">
                                     <div class="form-group">
                                         <label class="control-label" for="order_id">订单号</label>
                                         <input type="text" placeholder="订单号" name="order_id" value="{$order_id}" class="form-control">
                                     </div>
-                                </div>
-                                <div class="col-sm-2">
+                             </div>
+                            <div class="col-sm-2">
                                 <div class="form-group">
-                                    <label class="control-label" for="status">订单状态</label>
-                                    <select name="status" class="form-control" style="width:150px;">
-                                            <option value="0">默认全部</option>
-                                            {foreach $status_list as $key => $vo}
-                                            <option value="{$key}" {$Think.get.status==$key?='selected' }>{$vo}</option>
-                                            {/foreach}
-                                        </select>
+                                    <label class="control-label" for="order_id">快递单号</label>
+                                    <input type="text" placeholder="快递单号" name="order_id" value="{$order_id}" class="form-control">
                                 </div>
-                                </div>
+                            </div>
+                               
                                 <div class="col-sm-2">
                                     <div class="form-group">
                                         <label class="control-label" for="kw">用户信息</label>

@@ -19,15 +19,16 @@ class Order extends Common
      */
     public function index()
     {
-        $params_key       = ['shipping_status', 'pay_status',  'kw', 'order_id','good_name'];
+        $params_key       = ['status', 'pay_status',  'kw', 'order_id','invoice_no'];
 
         //携带参数
         $where            = $this->get_where($params_key, $param_arr);
-        
-        $list             = OrderModel::alias('uo')->field('*')
+        $list             = OrderModel::alias('uo')->field('uo.*,d.order_id as order_idd,d.invoice_no')
+            ->join("delivery_doc d",'uo.order_id=d.order_id','LEFT')
+            ->join("users a",'uo.user_id=a.user_id','LEFT')
             ->where($where)
-            ->order('order_id DESC')
-            ->paginate(2, false, ['query' => $where]);
+            ->order('uo.order_id DESC')
+            ->paginate(10, false, ['query' => $where]);
         // 导出设置
         $param_arr['tpl_type'] = 'export';
         // 模板变量赋值
@@ -45,12 +46,12 @@ class Order extends Common
         return $this->fetch();
       
     }
-
+    
     /**
      * 订单详情
      */
     public function edit(){
-        $order_id   = input('order_id','');
+        $order_id       = input('order_id','');
         $orderGoodsMdel = new OrdeGoodsModel();
         $orderModel     = new OrderModel();
         $order_info     =  $orderModel->where(['order_id'=>$order_id])->find();
@@ -156,48 +157,49 @@ class Order extends Common
         $begin_time  = input('begin_time', '');
         $end_time    = input('end_time', '');
         $order_id    = input('order_id', '');
-        $good_name   = input('good_name', '');
+        $invoice_no  = input('invoice_no', '');
         $status      = input('status/d',0);
         $kw          = input('kw', '');
+        $invoice_no  = input('invoice_no', '');
         $type        = input('type/d', 0);
         $where = [];
         if (!empty($order_id)) {
             $where['uo.order_id']    = $order_id;
         }
-        if (!empty($good_name)) {
-            $where['uo.good_name']   = $good_name;
+        if (!empty($invoice_no)) {
+            $where['d.invoice_no']   = $invoice_no;
         }
         if($status > 0){
-            $where['uo.status'] = $status;
+            $where['uo.order_status'] = $status;
         }
 
         if($type >  0){
-            $where['uo.type'] = $type;
+            $where['uo.pay_status'] = $type;
         }
 
         if(!empty($kw)){
-            is_numeric($kw)?$where['uo.mobile'] = $kw:$where['uo.user_name'] = $kw;
+            is_numeric($kw)?$where['a.mobile'] = $kw:$where['a.realname'] = $kw;
         }
        
 
-        if ($begin_time && $end_time) {
-            $where['uo.create_time'] = [['EGT', $begin_time], ['LT', $end_time]];
-        } elseif ($begin_time) {
-            $where['uo.create_time'] = ['EGT', $begin_time];
-        } elseif ($end_time) {
-            $where['uo.create_time'] = ['LT', $end_time];
-        }
+        // if ($begin_time && $end_time) {
+        //     $where['uo.create_time'] = [['EGT', $begin_time], ['LT', $end_time]];
+        // } elseif ($begin_time) {
+        //     $where['uo.create_time'] = ['EGT', $begin_time];
+        // } elseif ($end_time) {
+        //     $where['uo.create_time'] = ['LT', $end_time];
+        // }
         $params_arr = array(
             'begin_time'      => $begin_time,
             'end_time'        => $end_time,
         );
         $this->assign('kw', $kw);
-        $this->assign('good_name', $good_name);
+        $this->assign('invoice_no', $invoice_no);
+        $this->assign('status', $status);
         $this->assign('type', $type);
         $this->assign('order_id', $order_id);
-        $this->assign('begin_time', $begin_time);
-        $this->assign('end_time', $end_time);
-        $this->assign('status', $status);
+        $this->assign('begin_time', empty($begin_time)?date('Y-m-d'):$begin_time);
+        $this->assign('end_time', empty($end_time)?date('Y-m-d'):$end_time);
         $this->assign('params_arr', $params_arr);
         
         return $where;
