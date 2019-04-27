@@ -142,6 +142,14 @@ return [
                         'url'   => 'goods/goods_type_list',
                         'hide'  => 1,
                     ],
+                    [
+                        'id'    => 30203,
+                        'title' => '添加商品类型',
+                        'sort'  => 3,
+                        'url'   => 'goods/goods_type_add',
+                        'hide'  => 1,
+                    ],
+                    
                 ],
             ],
             [
