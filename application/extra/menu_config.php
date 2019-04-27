@@ -129,13 +129,6 @@ return [
                 'icon'  => 'fa-th-large',
                 'child' => [
                     [
-                        'id'    => 30201,
-                        'title' => '添加规格',
-                        'sort'  => 1,
-                        'url'   => 'goods/goods_sku_add',
-                        'hide'  => 1,
-                    ],
-                    [
                         'id'    => 30202,
                         'title' => '商品规格列表',
                         'sort'  => 1,
