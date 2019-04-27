@@ -45,8 +45,8 @@ class Common extends Controller
     
         $this->view->lefts_menu  = self::lefts_menu($leftmenu);
         $this->view->left_menu   = $leftmenu;
-        // var_dump(self::lefts_menu($leftmenu));
-        // exit;
+        // var_dump(self::lefts_menu($leftmenu)[0]['_child']);
+        
         View::share('meta_title', 'GAME');
     }
 
@@ -73,7 +73,7 @@ class Common extends Controller
         if (!$all_menu) {
             $where['status'] = 1;
             // $where['hide']   = 1;
-            $all_menu        = Db::table('menu')->where($where)->order('sort ASC')->field("id,title,pid,url,tip,group,sort,icon")->select();
+            $all_menu        = Db::table('menu')->where($where)->order('sort ASC')->field("id,title,pid,url,hide,tip,group,sort,icon")->select();
         }
        
         //权限判断

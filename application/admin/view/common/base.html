@@ -88,9 +88,12 @@
 							{notempty name="vo['_child']"}
 							<ul class="nav nav-second-level">
 								{volist name="vo['_child']" id="v"}
-								<li class="{$v.class}">
-									<a href="{:url($v['url'])}">{$v.title}</a>
-								</li>{/volist}
+								  {eq name="v.hide" value="1"}
+									<li class="{$v.class}">
+										<a href="{:url($v['url'])}">{$v.title}</a>
+									</li>
+								   {/eq}
+								{/volist}
 							</ul>
 							{/notempty}
 						</li>
