@@ -36,7 +36,7 @@ class Shop extends Common
 
     public function editShops () {
             $id = input('id');
-            $page_name = input('page_name');
+            $page_name = input('name');
             dump($page_name);die;
             $data = input('data');
             if (empty($page_name)){
