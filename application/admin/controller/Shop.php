@@ -13,7 +13,10 @@ class Shop extends Common
 {
     public function _initialize () {
         parent::_initialize();
-      
+
+        header('Access-Control-Allow-Origin:*');
+        header('Access-Control-Allow-Headers:*');
+        header('Content-Type:application/json; charset=utf-8');
         $info = session('admin_user_auth');
         $this->admin_id = $info['mgid'];
     }
@@ -27,10 +30,14 @@ class Shop extends Common
     }
 
     public function editShop () {
-        if (request()->isPost()){
+
+            $id = request()->param('id',0,'intval');
+            $page_name = request()->param('page_name');
             $data = request()->param('data');
-            if (!empty($data)){
-                $res = model('DiyEweiShop')->edit($data,$this->admin_id);
+            if (empty($page_name)){
+                return json(['code'=>0,'msg'=>'请填写页面名称']);
+            }else if (!empty($data)){
+                $res = model('DiyEweiShop')->edit($data,$this->admin_id,$page_name,$id);
                 if ($res){
                     return json(['code'=>1,'msg'=>'保存成功']);
                 }else{
@@ -40,7 +47,7 @@ class Shop extends Common
             }else{
                 return json(['code'=>0,'msg'=>'首页不能为空，请您添加组件']);
             }
-        }
+
     }
 
     public function getShopData () {
