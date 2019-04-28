@@ -44,7 +44,7 @@ class Shop extends Common
             if (!empty($data)){
                 $res = model('DiyEweiShop')->edit($data,$this->admin_id,$page_name,$id);
                 if ($res){
-                    return json(['code'=>1,'msg'=>'保存成功']);
+                    return json(['code'=>1,'msg'=>'保存成功','data'=>['id'=>$res]]);
                 }else{
                     return json(['code'=>0,'msg'=>'保存失败']);
                 }
