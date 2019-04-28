@@ -38,14 +38,14 @@ return [
                 'title' => '支付交易设置',
                 'sort'  => 2,
                 'icon'  => 'fa-th-large',
-                'url'   => '',
+                'url'   => 'index/pay_set',
                 'hide'  => 1,
                 'child' => [
                     [
                         'id'    => 20201,
                         'title' => '支付方式',
                         'sort'  => 1,
-                        'url'   => '',
+                        'url'   => 'index/pay_set',
                         'hide'  => 1,
                     ],
                     [

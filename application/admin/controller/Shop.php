@@ -13,7 +13,6 @@ class Shop extends Common
 {
     public function _initialize () {
         parent::_initialize();
-
         header('Access-Control-Allow-Origin:*');
         header('Access-Control-Allow-Headers:*');
         header('Content-Type:application/json; charset=utf-8');
@@ -95,7 +94,7 @@ class Shop extends Common
         $name  = "shops/" .date('Ymd',time());
         if (!file_exists(ROOT_PATH .Config('c_pub.img').$names)){ 
             mkdir(ROOT_PATH .Config('c_pub.img').$names,0777,true);
-        } 
+        }
         //保存图片到本地
         $r   = file_put_contents(ROOT_PATH .Config('c_pub.img').$name.$saveName,$imgs);
         $this->ajaxReturn(['code'=>1,'msg'=>'ok','data'=>SITE_URL.'/upload/images/'.$name.$saveName]);
