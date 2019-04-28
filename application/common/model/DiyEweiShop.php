@@ -16,13 +16,13 @@ class DiyEweiShop extends Model
     protected $table = 'diy_ewei_shop';
 
     public function edit ($data,$admin_id,$page_name,$id = 0) {
-
+        $where = [];
         if (!empty($id)){
-            $where = [];
             $where['id'] = $id;
             $where['status'] >= 0;
-            $find = $this->where($where)->find();
+
         }
+        $find = $this->where($where)->find();
         try{
             if (!empty($find)){
                 //修改
