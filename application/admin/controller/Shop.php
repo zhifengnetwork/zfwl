@@ -27,7 +27,7 @@ class Shop extends Common
     }
 
     public function editShop () {
-        if (request()->isPost()){
+
             $id = request()->param('id',0,'intval');
             $page_name = request()->param('page_name');
             $data = request()->param('data');
@@ -44,7 +44,7 @@ class Shop extends Common
             }else{
                 return json(['code'=>0,'msg'=>'首页不能为空，请您添加组件']);
             }
-        }
+        
     }
 
     public function getShopData () {

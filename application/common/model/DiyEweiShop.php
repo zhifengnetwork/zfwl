@@ -65,7 +65,8 @@ class DiyEweiShop extends Model
                 $data = json_decode($getData['data']);
                 $res = towArraySort($data,'key_num');
                 if ($res){
-                    return $res;
+                    $list = ['id'=>$getData['id'],'page_name'=>$getData['page_name'],'data'=>$res];
+                    return $list;
                 }else {
                     return false;
                 }
