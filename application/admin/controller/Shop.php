@@ -13,7 +13,10 @@ class Shop extends Common
 {
     public function _initialize () {
         parent::_initialize();
-      
+
+        header('Access-Control-Allow-Origin:*');
+        header('Access-Control-Allow-Headers:*');
+        header('Content-Type:application/json; charset=utf-8');
         $info = session('admin_user_auth');
         $this->admin_id = $info['mgid'];
     }
@@ -44,7 +47,7 @@ class Shop extends Common
             }else{
                 return json(['code'=>0,'msg'=>'首页不能为空，请您添加组件']);
             }
-        
+
     }
 
     public function getShopData () {
