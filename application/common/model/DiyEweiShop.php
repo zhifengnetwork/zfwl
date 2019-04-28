@@ -56,7 +56,6 @@ class DiyEweiShop extends Model
         $where = [];
         if (!empty($id)){
             $where['id'] = $id;
-            $where['status'] >= 0;
         }else{
             $where['status'] = 1;
         }
