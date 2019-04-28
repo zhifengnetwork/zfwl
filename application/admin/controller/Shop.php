@@ -14,8 +14,13 @@ class Shop extends Common
     public function _initialize () {
         parent::_initialize();
         header('Access-Control-Allow-Origin:*');
+        header('Access-Control-Allow-Methods:POST,GET,OPTIONS,DELETE');
         header('Access-Control-Allow-Headers:*');
         header('Content-Type:application/json; charset=utf-8');
+
+
+
+
         $info = session('admin_user_auth');
         $this->admin_id = $info['mgid'];
     }
@@ -29,16 +34,16 @@ class Shop extends Common
     }
 
     public function editShop () {
-
-            $id = request()->param('id',0,'intval');
+            $id = request()->param('id');
             $page_name = request()->param('page_name');
-            $data = request()->param('data');
+            $data = request()->param('data/a');
             if (empty($page_name)){
                 return json(['code'=>0,'msg'=>'请填写页面名称']);
-            }else if (!empty($data)){
+            }
+            if (!empty($data)){
                 $res = model('DiyEweiShop')->edit($data,$this->admin_id,$page_name,$id);
                 if ($res){
-                    return json(['code'=>1,'msg'=>'保存成功']);
+                    return json(['code'=>1,'msg'=>'保存成功','data'=>['id'=>$res]]);
                 }else{
                     return json(['code'=>0,'msg'=>'保存失败']);
                 }
@@ -50,8 +55,9 @@ class Shop extends Common
     }
 
     public function getShopData () {
+        $id = request()->param('id');
 
-        $res = model('DiyEweiShop')->getShopData();
+        $res = model('DiyEweiShop')->getShopData($id);
         if (!empty($res)){
             return json(['code'=>1,'msg'=>'','data'=>$res]);
         }else{
