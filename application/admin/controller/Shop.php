@@ -37,7 +37,7 @@ class Shop extends Common
     public function editShop () {
             $id = request()->param('id');
             $page_name = request()->param('page_name');
-            $data = request()->param('data');
+            $data = request()->param('data/a');
             if (empty($page_name)){
                 return json(['code'=>0,'msg'=>'请填写页面名称']);
             }

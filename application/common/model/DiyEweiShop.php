@@ -20,7 +20,8 @@ class DiyEweiShop extends Model
         if (!empty($id)){
             $where['id'] = $id;
             $where['status'] >= 0;
-
+        }else{
+            $where['id'] = 0;
         }
         $find = $this->where($where)->find();
         try{
