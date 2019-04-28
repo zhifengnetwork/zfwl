@@ -15,9 +15,13 @@ class Shop extends Common
         parent::_initialize();
 
         header('Access-Control-Allow-Origin:*');
+        header('Access-Control-Allow-Methods:POST,GET,OPTIONS,DELETE');
         header('Access-Control-Allow-Headers:*');
-        header('Access-Control-Allow-Methods:POST, GET');
         header('Content-Type:application/json; charset=utf-8');
+
+
+
+
         $info = session('admin_user_auth');
         $this->admin_id = $info['mgid'];
     }
