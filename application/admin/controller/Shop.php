@@ -14,6 +14,10 @@ class Shop extends Common
     public function _initialize () {
         parent::_initialize();
 
+        header('Access-Control-Allow-Origin:*');
+        header('Access-Control-Allow-Headers:*');
+        header('Access-Control-Allow-Methods:POST, GET');
+        header('Content-Type:application/json; charset=utf-8');
         $info = session('admin_user_auth');
         $this->admin_id = $info['mgid'];
     }
@@ -28,7 +32,7 @@ class Shop extends Common
 
     public function editShop () {
             $id = request()->param('id',0,'intval');
-            $page_name = input('post.page_name');
+            $page_name = request()->param('page_name');
             $data = request()->param('data');
             if (empty($page_name)){
                 return json(['code'=>0,'msg'=>'请填写页面名称']);
