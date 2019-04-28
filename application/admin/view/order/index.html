@@ -25,10 +25,10 @@
                             </div>
                             <div class="col-sm-2">
                                     <div class="form-group">
-                                        <label class="control-label" for="status">订单状态</label>
+                                        <label class="control-label" for="status">支付状态</label>
                                         <select name="status" class="form-control" style="width:180px;">
                                                 <option value="0">默认全部</option>
-                                                {foreach $status_list as $key => $vo}
+                                                {foreach $pay_status as $key => $vo}
                                                 <option value="{$key}" {$Think.get.status==$key?='selected' }>{$vo}</option>
                                                 {/foreach}
                                             </select>
@@ -112,7 +112,7 @@
                                     <td>{$vo.total_amount}</td>
                                     <td>{$vo.pay_name}</td>
                                     <td>{$status_list[$vo.order_status]}</td>
-                                    <td>{$pay_status[$vo.order_status]}</td>
+                                    <td>{$pay_status[$vo.pay_status]}</td>
                                     <td>{$vo.add_time}</td>
                                     <td>
                                         <a class="btn btn-default" href="{:url('order/edit',['order_id'=>$vo.order_id])}"><i class="fa fa-list"></i> 查看订单</a>

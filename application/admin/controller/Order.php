@@ -19,16 +19,17 @@ class Order extends Common
      */
     public function index()
     {
+
         $params_key       = ['status', 'pay_status',  'kw', 'order_id','invoice_no'];
 
         //携带参数
         $where            = $this->get_where($params_key, $param_arr);
         $list             = OrderModel::alias('uo')->field('uo.*,d.order_id as order_idd,d.invoice_no')
-            ->join("delivery_doc d",'uo.order_id=d.order_id','LEFT')
-            ->join("users a",'uo.user_id=a.user_id','LEFT')
-            ->where($where)
-            ->order('uo.order_id DESC')
-            ->paginate(10, false, ['query' => $where]);
+                ->join("delivery_doc d",'uo.order_id=d.order_id','LEFT')
+                ->join("users a",'uo.user_id=a.user_id','LEFT')
+                ->where($where)
+                ->order('uo.order_id DESC')
+                ->paginate(10, false, ['query' => $where]);
         // 导出设置
         $param_arr['tpl_type'] = 'export';
         // 模板变量赋值
@@ -76,6 +77,13 @@ class Order extends Common
         $this->assign('order_info', $order_info);
         $this->assign('meta_title', '订单详情');
         return $this->fetch();
+    }
+
+
+
+    public function refund(){
+
+
     }
 
     /**
@@ -220,6 +228,10 @@ class Order extends Common
           return in_array($this->_loginRole,  ['super_manager', 'manager']) ? true : false;
       }
     }
+
+
+
+
 
    
      
