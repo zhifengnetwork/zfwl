@@ -242,24 +242,6 @@ return [
 
             ],
             [
-                'id'    => 40200,
-                'title' => '退款订单',
-                'sort'  => 2,
-                'url'   => '',
-                'hide'  => 1,
-                'icon'  => 'fa-th-large',
-                'child' => [
-                    [
-                        'id'    => 40201,
-                        'title' => '退款订单',
-                        'sort'  => 1,
-                        'url'   => '',
-                        'hide'  => 1,
-                    ],
-                ],
-
-            ],
-            [
                 'id'    => 40300,
                 'title' => '快递助手',
                 'sort'  => 3,
@@ -357,28 +339,14 @@ return [
             ],
             [
                 'id'    => 60200,
-                'title' => '余额体现',
+                'title' => '余额提现',
                 'sort'  => 2,
                 'url'   => 'total/finance',
                 'hide'  => 1,
                 'child' => [
                     [
                         'id'    => 60201,
-                        'title' => '待审核',
-                        'sort'  => 1,
-                        'url'   => '',
-                        'hide'  => 1,
-                    ],
-                    [
-                        'id'    => 60202,
-                        'title' => '通过审批',
-                        'sort'  => 1,
-                        'url'   => '',
-                        'hide'  => 1,
-                    ],
-                    [
-                        'id'    => 60203,
-                        'title' => '不通过审批',
+                        'title' => '余额提现列表',
                         'sort'  => 1,
                         'url'   => '',
                         'hide'  => 1,
