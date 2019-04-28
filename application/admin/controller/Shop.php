@@ -34,9 +34,10 @@ class Shop extends Common
         return json($list);
     }
 
-    public function editShop () {
-            $id = input('id',0,'intval');
+    public function editShops () {
+            $id = input('id');
             $page_name = input('page_name');
+            dump($page_name);die;
             $data = input('data');
             if (empty($page_name)){
                 return json(['code'=>0,'msg'=>'请填写页面名称']);
