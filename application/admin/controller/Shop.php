@@ -57,7 +57,7 @@ class Shop extends Common
 
     public function getShopData () {
         $id = request()->param('id');
-        
+
         $res = model('DiyEweiShop')->getShopData($id);
         if (!empty($res)){
             return json(['code'=>1,'msg'=>'','data'=>$res]);

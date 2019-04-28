@@ -60,6 +60,7 @@ class DiyEweiShop extends Model
             $where['status'] = 1;
         }
         $getData = $this->where($where)->find();
+        dump($getData);die;
         if (!empty($getData)){
             if (!empty($getData['data'])){
                 $data = json_decode($getData['data']);
