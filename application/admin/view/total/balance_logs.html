@@ -1,0 +1,167 @@
+{extend name="common:base" /}
+{block name="style"}
+<style type="text/css">
+.table>thead>tr>th {
+    text-align: center;
+}
+
+.fant {
+    font-weight: 600;
+}
+</style>
+{/block}
+{block name="content"}
+<div class="ibox-content m-b-sm border-bottom">
+    <div class="row">
+        
+        <div class="col-sm-4">
+            <div class="form-group">
+                <label class="control-label" for="product_name">会员信息</label>
+                <input type="text" id="product_name" name="product_name" value="" placeholder="可搜索会员昵称/姓名/手机号" class="form-control">
+            </div>
+        </div>
+
+        <div class="col-sm-4">
+            <div class="form-group">
+                <label class="control-label" for="price">充值单号</label>
+                <input type="text" id="price" name="price" value="" placeholder="可搜索充值单号" class="form-control">
+            </div>
+        </div>
+
+        <div class="col-sm-4">
+            <div class="form-group">
+                <label class="control-label" for="status">会员等级</label>
+                <select name="status" id="status" class="form-control">
+                    <option value="1" selected>会员等级一</option>
+                    <option value="0">会员等级二</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="col-sm-4">
+            <div class="form-group">
+                <label class="control-label" for="status">会员分组</label>
+                <select name="status" id="status" class="form-control">
+                    <option value="1" selected>会员一</option>
+                    <option value="0">会员二</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="col-sm-4">
+            <div class="form-group">
+                <label class="control-label" for="status">状态</label>
+                <select name="status" id="status" class="form-control">
+                    <option value="1" selected>充值成功</option>
+                    <option value="0">未充值</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="col-sm-4">
+            <div class="form-group">
+                <label class="control-label" for="status">充值方式</label>
+                <select name="status" id="status" class="form-control">
+                    <option value="1" selected>微信</option>
+                    <option value="0">支付宝</option>
+                    <option value="0">后台</option>
+                    <option value="0">后台扣款</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="col-sm-4">
+            <div class="form-group">
+                <label class="control-label">日期</label>
+                <div class="input-daterange input-group" data-provide="datepicker">
+                    <input autocomplete="off" class="form-control" name="begin_time" placeholder="起始时间" type="text" value=""/>
+                    <span class="input-group-addon">到</span>
+                    <input autocomplete="off" class="form-control" name="end_time" placeholder="终止时间" type="text" value=""/>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-2">
+            <div class="form-group">
+                <label class="control-label" for="status">　</label>
+                <div>
+                    <button class="btn btn-primary">查询</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<div class="row wrapper border-bottom white-bg page-heading">
+       
+        <div class="col-lg-2">
+
+        </div>
+
+        <div class="ibox-content">
+                <div class="table-responsive">
+                    <table class="table  table-bordered table-hover text-center">
+                        <thead>
+                            <tr>
+                                <th>订单号</th>
+                                <th class="col-lg-2">收货人</th>
+                                <th>手机号码</th>
+                                <th>订单金额（元）</th>
+                                <th>支付方式</th>
+                                <th>订单状态</th>
+                                <th>支付状态</th>
+                                <th>下单时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead> 
+                        <tbody>
+                            {notempty name="list"}
+                            {volist name="list" id="vo"}
+                            <tr>
+                                <td>{$vo.order_sn}</td>
+                                <td>{$vo.consignee}</td>
+                                <td>{$vo.mobile}</td>
+                                <td>{$vo.total_amount}</td>
+                                <td>{$vo.pay_name}</td>
+                                <td>{$status_list[$vo.order_status]}</td>
+                                <td>{$pay_status[$vo.order_status]}</td>
+                                <td>{$vo.add_time}</td>
+                                <td>
+                                    <a class="btn btn-default" href="{:url('order/edit',['order_id'=>$vo.order_id])}"><i class="fa fa-list"></i> 查看订单</a>
+                                </td>
+                            </tr>
+                            {/volist}
+                            {/notempty}
+                        </tbody>
+                    </table>
+                    {$list->render()}
+                </div>
+            </div>
+
+
+    </div>
+    <div class="footer">
+        <div class="pull-right">
+            10GB of <strong>250GB</strong> Free.
+        </div>
+        <div>
+            <strong>Copyright</strong> Example Company &copy; 2014-2015
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{/block}

@@ -301,14 +301,14 @@ return [
                         'id'    => 60101,
                         'title' => '余额记录',
                         'sort'  => 1,
-                        'url'   => '',
+                        'url'   => 'total/balance_logs',
                         'hide'  => 1,
                     ],
                     [
                         'id'    => 60102,
                         'title' => '积分记录',
                         'sort'  => 1,
-                        'url'   => '',
+                        'url'   => 'total/integral_logs',
                         'hide'  => 1,
                     ],
                 ],
@@ -317,13 +317,13 @@ return [
             [
                 'id'    => 60200,
                 'title' => '余额体现',
-                'sort'  => 1,
+                'sort'  => 2,
                 'url'   => 'total/finance',
                 'hide'  => 1,
                 'child' => [
                     [
                         'id'    => 60201,
-                        'title' => '带审核',
+                        'title' => '待审核',
                         'sort'  => 1,
                         'url'   => '',
                         'hide'  => 1,
