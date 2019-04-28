@@ -831,4 +831,237 @@ class Goods extends Common
             }
         }
     }
+
+    /**
+     * 虚拟物品模版列表
+     */
+    public function virtual_goods_list(){
+
+        $where = [];
+        $pageParam = ['query' => []];
+
+        $title = input('title');
+        if( $title ){
+            $where["title"] = ['like', "%{$title}%"];
+            $pageParam['query']['title'] = ['like', "%{$title}%"];
+        }
+
+        $list = Db::table('virtual_goods')->where($where)->paginate(10,false,$pageParam);
+
+        return $this->fetch('',[
+            'meta_title'    =>  '虚拟物品模版列表',
+            'list'          =>  $list,
+            'title'         =>  $title,
+        ]);
+    }
+
+    /**
+     * 添加新模板
+     */
+    public function virtual_goods_add(){
+
+        $id = input('id');
+        
+        if( Request::instance()->isPost() ){
+            $data = input('post.');
+            $fields = array();
+            foreach($data['fields'] as $key=>$value){
+                $fields[$value] = $data['fields_name'][$key];
+            }
+            $data['fields'] = serialize($fields);
+            if($id){
+                Db::table('virtual_goods')->strict(false)->update($data);
+                $this->success('修改成功！',url('goods/virtual_goods_list'));
+            }else{
+                Db::table('virtual_goods')->strict(false)->insert($data);
+                $this->success('添加成功！',url('goods/virtual_goods_list'));
+            }
+        }
+
+        $info = Db::table('virtual_goods')->where('id',$id)->find();
+        if($info['fields']) $info['fields'] = unserialize($info['fields']);
+        
+        $cate = Db::table('virtual_category')->select();
+
+        return $this->fetch('',[
+            'meta_title'    =>  '添加新模板',
+            'cate'          =>  $cate,
+            'info'          =>  $info,
+        ]);
+    }
+
+    /**
+     * 删除虚拟商品
+     */
+    public function virtual_goods_del(){
+        if( request()->isAjax()){
+            $id = input('id');
+            if( Db::table('virtual_goods')->where('id','=',$id)->delete()){
+                jason([],'删除虚拟商品成功！');
+            }else{
+                jason([],'删除虚拟商品成功！',0);
+            }
+        }
+    }
+
+    /**
+     * 数据列表
+     */
+    public function virtual_data_list(){
+        $type_id = input('type_id');
+        if(!$type_id) $this->error('参数错误！');
+
+        $where['g.id'] = $type_id;
+        $pageParam['query']['type_id'] = $type_id;
+
+        $pvalue = input('pvalue');
+        if( $pvalue ){
+            $where["d.pvalue"] = ['like', "%{$pvalue}%"];
+            $pageParam['query']['pvalue'] = ['like', "%{$pvalue}%"];
+        }
+
+        $list = Db::table('virtual_data')->alias('d')
+                ->join('virtual_goods g','g.id=d.type_id','LEFT')
+                ->where($where)
+                ->field('g.fields,d.*')
+                ->paginate(10,false,$pageParam);
+        
+        $key_title = Db::name('virtual_goods')->where('id',$type_id)->value('fields');
+        $key_title = unserialize($key_title);
+        
+
+        return $this->fetch('',[
+            'meta_title'    =>  '数据列表',
+            'list'          =>  $list,
+            'pvalue'        =>  $pvalue,
+            'key_title'     =>  $key_title,
+        ]);
+    }
+
+    /**
+     * 添加数据
+     */
+    public function virtual_data_add(){
+
+        $id = input('id');
+        $type_id = input('type_id');
+        
+        if(!$type_id) $this->error('参数错误！');
+
+        $key_title = Db::name('virtual_goods')->where('id',$type_id)->value('fields');
+        $key_title = unserialize($key_title);
+        
+        if( Request::instance()->isPost() ){
+            $data = input('post.');
+
+
+            $arr = [];
+            foreach ($data['tp_id'] as $index => $type_id) {
+                $values = array();
+                foreach ($key_title as $key => $name) {
+                    $values[$key] = $data['tp_value_' . $key][$index];
+                }
+                $arr[$index]['type_id'] = $type_id;
+                $arr[$index]['pvalue'] = $values['key'];
+                $arr[$index]['fields'] = serialize($values);
+                $arr[$index]['id'] = $id ? $id : '';
+            }
+
+            if($id){
+                Db::table('virtual_data')->strict(false)->update($arr);
+                $this->success('修改成功！',url('goods/virtual_data_list',['type_id'=>$type_id],false));
+            }else{
+                Db::table('virtual_data')->strict(false)->insertAll($arr);
+                $this->success('添加成功！',url('goods/virtual_data_list',['type_id'=>$type_id],false));
+            }
+        }
+
+        $info = Db::table('virtual_data')->where('id',$id)->find();
+        
+        return $this->fetch('',[
+            'meta_title'    =>  '添加数据',
+            'key_title'     =>  $key_title,
+            'info'          =>  $info,
+        ]);
+    }
+
+    /**
+     * 删除数据
+     */
+    public function virtual_data_del(){
+        if( request()->isAjax()){
+            $id = input('id');
+            if( Db::table('virtual_data')->where('id','=',$id)->delete()){
+                jason([],'删除数据成功！');
+            }else{
+                jason([],'删除数据成功！',0);
+            }
+        }
+    }
+
+    /**
+     * 虚拟分类列表
+     */
+    public function virtual_category_list(){
+
+        $where = [];
+        $pageParam = ['query' => []];
+
+        $name = input('name');
+        if( $name ){
+            $where["name"] = ['like', "%{$name}%"];
+            $pageParam['query']['name'] = ['like', "%{$name}%"];
+        }
+
+        $list = Db::table('virtual_category')->where($where)->paginate(10,false,$pageParam);
+
+        return $this->fetch('',[
+            'meta_title'    =>  '虚拟分类列表',
+            'list'          =>  $list,
+            'name'          =>  $name,
+        ]);
+    }
+
+    /**
+     * 添加|修改 虚拟分类
+     */
+    public function virtual_category_add(){
+
+        $id = input('id');
+        $info = Db::name('virtual_category')->where('id',$id)->find();
+
+        if( Request::instance()->isPost() ){
+            $data = input('post.');
+            if(!$data['name']){
+                $this->error('分类名称不能为空！');
+            }
+            if($data['id']){
+                Db::table('virtual_category')->update($data);
+                $this->success('修改成功！',url('virtual_category_list'));
+            }else{
+                Db::table('virtual_category')->insert($data);
+                $this->success('添加成功！',url('virtual_category_list'));
+            }
+        }
+
+        return $this->fetch('',[
+            'meta_title'    =>  '添加虚拟分类',
+            'info'          =>  $info,
+        ]);
+    }
+
+    /**
+     * 删除虚拟分类
+     */
+    public function virtual_category_del(){
+        if( request()->isAjax()){
+            $id = input('id');
+            if( Db::table('virtual_category')->where('id','=',$id)->delete()){
+                jason([],'删除虚拟分类成功！');
+            }else{
+                jason([],'删除虚拟分类成功！',0);
+            }
+        }
+    }
+
 }
