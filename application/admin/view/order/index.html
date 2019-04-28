@@ -12,28 +12,42 @@
     <div class="ibox-content">
             <div class="row">
                <form  method="get" action="{:url()}">
-                        <div class="col-sm-2">
+                        <!-- <div class="col-sm-2">
                                 <div class="form-group">
                                     <label class="control-label" for="status">支付方式</label>
-                                    <select name="type" class="form-control" style="width:180px;">
-                                            <option value="0">默认全部</option>
-                                            {foreach $type_list as $key => $vo}
-                                            <option value="{$key}" {$Think.get.type==$key?='selected' }>{$vo}</option>
+                                    <select name="pay_code" class="form-control" style="width:180px;">
+                                        {foreach $pay_type as $key => $vo}
+                                           <option value="{$key}" {$Think.get.type_code==$key?='selected' }>{$vo}</option>
+                                        {/foreach}
+                                            <option value="-1" {$pay_code== -1?='selected' }>默认全部</option>
+                                             
+                                        </select>
+                                </div>
+                            </div> -->
+                            <div class="col-sm-2">
+                                    <div class="form-group">
+                                        <label class="control-label" for="status">订单状态</label>
+                                        <select name="order_status" class="form-control" style="width:180px;">
+                                                <option value="-1" {$order_status== -1?='selected' }>默认全部</option>
+                                                {foreach $order_status as $key => $vo}
+                                                  <option value="{$key}" {$Think.get.order_status==$key?='selected' }>{$vo}</option>
+                                                {/foreach}
+                                            </select>
+                                    </div>
+                             </div>
+
+                             <div class="col-sm-2">
+                                <div class="form-group">
+                                    <label class="control-label" for="status">支付状态</label>
+                                    <select name="pay_status" class="form-control" style="width:180px;">
+                                            <option value="-1" {$pay_status== -1?='selected' }>默认全部</option>
+                                            {foreach $pay_status as $key => $vo}
+                                              <option value="{$key}" {$Think.get.pay_status==$key?='selected' }>{$vo}</option>
                                             {/foreach}
                                         </select>
                                 </div>
                             </div>
-                            <div class="col-sm-2">
-                                    <div class="form-group">
-                                        <label class="control-label" for="status">支付状态</label>
-                                        <select name="status" class="form-control" style="width:180px;">
-                                                <option value="0">默认全部</option>
-                                                {foreach $pay_status as $key => $vo}
-                                                <option value="{$key}" {$Think.get.status==$key?='selected' }>{$vo}</option>
-                                                {/foreach}
-                                            </select>
-                                    </div>
-                                    </div>
+                         
                             <div class="col-sm-2">
                                     <div class="form-group">
                                         <label class="control-label" for="order_id">订单号</label>
@@ -42,19 +56,19 @@
                              </div>
                             <div class="col-sm-2">
                                 <div class="form-group">
-                                    <label class="control-label" for="order_id">快递单号</label>
-                                    <input type="text" placeholder="快递单号" name="order_id" value="{$order_id}" class="form-control">
+                                    <label class="control-label" for="invoice_no">快递单号</label>
+                                    <input type="text" placeholder="快递单号" name="invoice_no" value="{$invoice_no}" class="form-control">
                                 </div>
                             </div>
                                
-                                <div class="col-sm-2">
+                                <div class="col-sm-1">
                                     <div class="form-group">
                                         <label class="control-label" for="kw">用户信息</label>
                                         <input type="text" placeholder="用户手机号/姓名/昵称" name="kw" value="{$kw}" class="form-control">
                                     </div>
                                 </div>
                         
-                            <div class="col-sm-2">
+                            <div class="col-sm-1">
                                     <div class="form-group">
                                         <label class="control-label" for="status">　</label>
                                         <div>
@@ -111,7 +125,7 @@
                                     <td>{$vo.mobile}</td>
                                     <td>{$vo.total_amount}</td>
                                     <td>{$vo.pay_name}</td>
-                                    <td>{$status_list[$vo.order_status]}</td>
+                                    <td>{$order_status[$vo.order_status]}</td>
                                     <td>{$pay_status[$vo.pay_status]}</td>
                                     <td>{$vo.add_time}</td>
                                     <td>
