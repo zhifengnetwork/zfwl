@@ -35,7 +35,6 @@ class Shop extends Common
     }
 
     public function editShop () {
-        return json(['code'=>1]);
             $id = request()->param('id');
             $page_name = request()->param('page_name');
             $data = request()->param('data');
