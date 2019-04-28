@@ -500,7 +500,6 @@ function excel_export($file_name,$title,$data){
 
 //二维数组排序
 function towArraySort ($data,$key,$order = SORT_ASC) {
-
     try{
         //        dump($data);
         $last_names = array_column($data,$key);
