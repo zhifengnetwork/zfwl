@@ -136,6 +136,31 @@
                                             <td class=""></td>
                                             
                                         </tr>
+
+                                        {if condition="isset($info.areas.citys)"}
+                                        {foreach name="$info.areas.citys" id="vo"}
+                                        <tr class="sss" style="display: table-row;">
+                                            <td style="word-break:break-all;overflow:hidden;width:auto;padding:10px;line-height:22px;">
+                                                <span class="cityshtml">{$info.areas.citys[$key]}</span>
+                                                <input type="hidden" name="random[]" value="sss">
+                                                <input type="hidden" class="citys" name="citys[]" value="{$info.areas.citys[$key]}">
+                                                <a href="javascript:;" onclick="editArea(this)" random="sss">编辑</a></td>
+                                            <td class="text-center">
+                                                <input type="number" value="{$info.areas.firstweight_qt[$key]}" class="form-control" name="firstweight_qt[]" style="width:100px;"></td>
+                                            <td class="text-center">
+                                                <input type="text" value="{$info.areas.firstprice_qt[$key]}" class="form-control" name="firstprice_qt[]" style="width:100px;"></td>
+                                            <td class="text-center">
+                                                <input type="number" value="{$info.areas.secondweight_qt[$key]}" class="form-control" name="secondweight_qt[]" style="width:100px;"></td>
+                                            <td class="text-center">
+                                                <input type="text" value="{$info.areas.secondprice_qt[$key]}" class="form-control" name="secondprice_qt[]" style="width:100px;"></td>
+                                            <td>
+                                                <a href="javascript:;" onclick="$(this).parent().parent().remove()">
+                                                    <i class="fa fa-remove"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        {/foreach}
+                                        {/if}
                                     </tbody>
                                 </table>
                                 <a class="btn btn-default" href="javascript:;" onclick="addArea(this)" data-original-title="" title=""><span class="fa fa-plus"></span> 新增配送区域</a>
@@ -181,12 +206,186 @@
         </div>
     </div>
 </div>
-
+<style type='text/css'>
+    .province { float:left; position:relative;width:150px; height:35px; line-height:35px;border:1px solid #fff;}
+    .province:hover { border:1px solid #f7e4a5;border-bottom:1px solid #fffec6; background:#fffec6;}
+    .province .cityall { margin-top:10px;}
+    .province ul { list-style: outside none none;position:absolute;padding:0;background:#fffec6;border:1px solid #f7e4a5;display:none;
+    width:auto; width:300px; z-index:999999;left:-1px;top:32px;}
+    .province ul li  { float:left;min-width:60px;margin-left:20px; height:30px;line-height:30px; }
+ </style>
+ <div id="modal-areas"  class="modal fade" tabindex="-1">
+    <div class="modal-dialog" style='width: 920px;'>
+        <div class="modal-content">
+            <div class="modal-header"><button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button><h3>选择区域</h3></div>
+            <div class="modal-body" style='height:280px;;' > 
+                
+                {foreach name="$areas['address']['province']" id="value"}
+				{if $value['@attributes']['name']=='请选择省份'}
+                <?php continue; ?>
+				{/if}
+                <div class='province'>
+                     <label class='checkbox-inline' style='margin-left:20px;'>
+                         <input type='checkbox' class='cityall' /> {$value['@attributes']['name']}
+                         <span class="citycount" style='color:#ff6600'></span>
+                     </label>
+                    {if count($value['city'])>0}
+                    <ul>
+                        {foreach name="$value['city']" id="c"}
+                        <li>
+                             <label class='checkbox-inline'>
+                                  <input type='checkbox' class='city' style='margin-top:8px;' city="{$c['@attributes']['name']}" /> {$c['@attributes']['name']}
+                            </label>
+                        </li>
+                        {/foreach}
+                    </ul>
+                    {/if}
+                </div>
+                {/foreach}
+            
+            </div>
+            <div class="modal-footer">
+                <a href="javascript:;" id='btnSubmitArea' class="btn btn-primary" data-dismiss="modal" aria-hidden="true">确定</a>
+                <a href="javascript:;" class="btn btn-default" data-dismiss="modal" aria-hidden="true">关闭</a>
+            </div>
+        </div>
+     </div>
+</div>
 {/block}
 
 {block name="script"}
 <script src="__STATIC__/layui/src/localResizeIMG2.js" type="text/javascript"></script>
 <script type="text/javascript">
+
+var current = '';
+function addArea(btn){
+    var html = "<tr class='sss'><td style=\"word-break:break-all;overflow:hidden;width:auto;padding:10px;line-height:22px;\"><span class='cityshtml'></span><input type=\"hidden\" name=\"random[]\" value=\"sss\" /><input type=\"hidden\" class='citys' name=\"citys[]\" value=\"\" /><a href='javascript:;' onclick='editArea(this)' random=\"sss\">编辑</a></td><td class=\"text-center\"><input type=\"number\" value=\"1000\" class=\"form-control\" name=\"firstweight_qt[]\" style=\"width:100px;\"></td><td class=\"text-center\"><input type=\"text\" value=\"\" class=\"form-control\" name=\"firstprice_qt[]\" style=\"width:100px;\"></td><td class=\"text-center\"><input type=\"number\" value=\"1000\" class=\"form-control\" name=\"secondweight_qt[]\" style=\"width:100px;\"></td><td class=\"text-center\"><input type=\"text\" value=\"\" class=\"form-control\" name=\"secondprice_qt[]\" style=\"width:100px;\"></td><td><a href='javascript:;' onclick='$(this).parent().parent().remove()'><i class='fa fa-remove'></i></td></tr>";
+    $('#tbody-areas').append(html);
+    $('#tbody-areas tr').last().hide();
+        clearSelects();
+    
+    $("#modal-areas").modal();
+    var currents = getCurrents();
+    currents = currents.split(';');
+    var citystrs = "";
+    $('.city').each(function(){
+        var parentdisabled =false;
+        for(var i in currents){
+            if(currents[i]!='' && currents[i]==$(this).attr('city')){
+                $(this).attr('disabled',true);
+                $(this).parent().parent().parent().parent().find('.cityall').attr('disabled',true);
+            }
+        }
+    });
+    $('#btnSubmitArea').unbind('click').click(function(){
+        $('.city:checked').each(function(){              
+            citystrs+= $(this).attr('city') +";";
+        });
+        $('#tbody-areas tr').last().find('.cityshtml').html(citystrs);
+        $('#tbody-areas tr').last().find('.citys').val(citystrs);
+        $('#tbody-areas tr').last().show(); 
+    })
+}
+
+function clearSelects(){
+    $('.city').attr('checked',false).removeAttr('disabled');
+    $('.cityall').attr('checked',false).removeAttr('disabled');
+    $('.citycount').html('');
+}
+function getCurrents(withOutRandom){
+    var citys = "";
+    $('.citys').each(function(){
+            var crandom = $(this).prev().val();
+            if(withOutRandom && crandom==withOutRandom){
+                return true;
+            }
+            citys+=$(this).val();
+    });
+    return citys;
+}
+
+$('.province').mouseover(function(){
+    $(this).find('ul').show();
+}).mouseout(function(){
+    $(this).find('ul').hide();
+});
+
+$('.cityall').click(function(){
+    var checked = $(this).get(0).checked;
+    var citys = $(this).parent().parent().find('.city');
+    citys.each(function(){
+        $(this).get(0).checked = checked;
+    });
+    var count = 0;
+    if(checked){
+        count =  $(this).parent().parent().find('.city:checked').length;
+    }
+    if(count>0){
+        $(this).next().html("(" + count + ")")    ;
+    }
+    else{
+        $(this).next().html("");
+    }
+});
+$('.city').click(function(){
+    var checked = $(this).get(0).checked;
+    var cityall = $(this).parent().parent().parent().parent().find('.cityall');
+    
+    if(checked){
+        cityall.get(0).checked = true;
+    }
+    var count = cityall.parent().parent().find('.city:checked').length;
+    if(count>0){
+        cityall.next().html("(" + count + ")")    ;
+    }
+    else{
+        cityall.next().html("");
+    }
+}); 
+
+
+function editArea(btn){
+    current = $(btn).attr('random');
+    clearSelects();
+    var old_citys = $(btn).prev().val().split(';');
+    
+    $('.city').each(function(){
+        var parentcheck = false;
+        for(var i in old_citys){
+            if(old_citys[i]==$(this).attr('city')){
+                parentcheck = true;
+                $(this).get(0).checked = true;
+                break;
+            }
+        }
+        if(parentcheck){
+            $(this).parent().parent().parent().parent().find('.cityall').get(0).checked=  true;
+        }
+    });
+    
+    $("#modal-areas").modal();
+    var citystrs = '';
+    $('#btnSubmitArea').unbind('click').click(function(){
+        $('.city:checked').each(function(){              
+            citystrs+= $(this).attr('city') +";";
+        });
+        $('.' + current + ' .cityshtml').html(citystrs);
+        $('.' + current + ' .citys').val(citystrs);
+    })
+    var currents = getCurrents(current);
+        currents = currents.split(';');
+        var citys = "";
+        $('.city').each(function(){
+            var parentdisabled =false;
+            for(var i in currents){
+                if(currents[i]!='' && currents[i]==$(this).attr('city')){
+                    $(this).attr('disabled',true);
+                    $(this).parent().parent().parent().parent().find('.cityall').attr('disabled',true);
+                }
+            }
+            
+        });
+}
 
     (function () {
         var viewImg = $("#imglist");

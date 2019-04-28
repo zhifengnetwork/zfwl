@@ -733,19 +733,35 @@ class Goods extends Common
                 $this->error( $validate->getError() );
             }
 
+            $data['areas'] = array();
+            if(isset($data['citys'])){
+                foreach($data['citys'] as $key=>$value){
+                    $data['areas']['citys'][$key]            = $data['citys'][$key];
+                    $data['areas']['firstweight_qt'][$key]   = $data['firstweight_qt'][$key];
+                    $data['areas']['firstprice_qt'][$key]    = $data['firstprice_qt'][$key];
+                    $data['areas']['secondweight_qt'][$key]  = $data['secondweight_qt'][$key];
+                    $data['areas']['secondprice_qt'][$key]   = $data['secondprice_qt'][$key];
+                }
+            }
+            $data['areas'] = serialize($data['areas']);
+
             if($data['is_default']){
                 Db::table('goods_delivery')->where('delivery_id','neq',0)->update(['is_default'=>0]);
             }
             
-            if ( Db::table('goods_delivery')->insert($data) ) {
+            if ( Db::table('goods_delivery')->strict(false)->insert($data) ) {
                 $this->success('添加成功', url('goods/goods_delivery_list','',false));
             } else {
                 $this->error('添加失败');
             }
         }
 
+        $areas = file_get_contents(ROOT_PATH . 'public/upload/areas');
+        $areas = unserialize($areas);
+
         return $this->fetch('',[
             'meta_title'    =>  '添加配送方式',
+            'areas'         =>  $areas,
         ]);
     }
 
@@ -767,20 +783,38 @@ class Goods extends Common
                 $this->error( $validate->getError() );
             }
 
+            $data['areas'] = array();
+            if(isset($data['citys'])){
+                foreach($data['citys'] as $key=>$value){
+                    $data['areas']['citys'][$key]            = $data['citys'][$key];
+                    $data['areas']['firstweight_qt'][$key]   = $data['firstweight_qt'][$key];
+                    $data['areas']['firstprice_qt'][$key]    = $data['firstprice_qt'][$key];
+                    $data['areas']['secondweight_qt'][$key]  = $data['secondweight_qt'][$key];
+                    $data['areas']['secondprice_qt'][$key]   = $data['secondprice_qt'][$key];
+                }
+            }
+            $data['areas'] = serialize($data['areas']);
+
             if($data['is_default']){
                 Db::table('goods_delivery')->where('delivery_id','neq',0)->update(['is_default'=>0]);
             }
             
-            if ( Db::table('goods_delivery')->update($data) ) {
+            if ( Db::table('goods_delivery')->strict(false)->update($data) ) {
                 $this->success('修改成功', url('goods/goods_delivery_list','',false));
             } else {
                 $this->error('修改失败');
             }
         }
 
+        $info['areas'] = unserialize($info['areas']);
+
+        $areas = file_get_contents(ROOT_PATH . 'public/upload/areas');
+        $areas = unserialize($areas);
+
         return $this->fetch('',[
             'meta_title'    =>  '修改配送方式',
             'info'          =>  $info,
+            'areas'         =>  $areas,
         ]);
     }
 
