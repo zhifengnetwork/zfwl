@@ -158,7 +158,7 @@ return [
             [
                 'id'    => 30300,
                 'title' => '商品分类',
-                'sort'  => 3,
+                'sort'  => 0,
                 'url'   => 'category/index',
                 'hide'  => 1,
                 'icon'  => 'fa-th-large',
