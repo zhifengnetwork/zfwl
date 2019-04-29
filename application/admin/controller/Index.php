@@ -21,7 +21,6 @@ class Index extends Common
     public function pay_set(){
         if( Request::instance()->isPost() ){
             $data = input('post.');
-            
             $path = ROOT_PATH . '/data/cert';
             if (!file_exists($path)){ 
                 mkdir($path,0777,true);
@@ -36,7 +35,7 @@ class Index extends Common
             if (!empty($_FILES['weixin_root_file']['name'])){
                 $sec['root'] = $this->upload_cert('weixin_root_file');
             }
-            $update['sets'] =   serialize($data);
+            $update['sets']    =   serialize($data);
             if(!empty($sec)){
                 $update['sec'] =   serialize($sec);
             }
@@ -46,7 +45,7 @@ class Index extends Common
             }
             $this->error('编辑失败');
         }
-        $sysset = Db::table('sysset')->field('*')->where(['uniacid' => 3])->find();
+        $sysset = Db::table('sysset')->field('*')->find();
       
         $set    = unserialize($sysset['sets']);
         $sec    = unserialize($sysset['sec']);
@@ -59,6 +58,17 @@ class Index extends Common
 
 
     public function pay_content(){
+        $sysset     = Db::table('sysset')->field('*')->find();
+        $set    = unserialize($sysset['sets']);
+        $payment    = unserialize($sysset['payment']);
+       
+        $set    = unserialize($sysset['sets']);
+        if( Request::instance()->isPost() ){
+            var_dump(input('post.'));
+            die;
+        }
+       
+        $this->assign('set', $set);
         $this->assign('meta_title', '支付参数');
         return $this->fetch();
     }
@@ -84,5 +94,9 @@ class Index extends Common
         }
         return "";
     }
+
+
+
+
 
 }

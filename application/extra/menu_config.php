@@ -52,7 +52,7 @@ return [
                         'id'    => 20202,
                         'title' => '支付参数',
                         'sort'  => 1,
-                        'url'   => '',
+                        'url'   => 'index/pay_content',
                         'hide'  => 1,
                     ],
                     [
