@@ -20,32 +20,46 @@ class Index extends Common
 
     public function pay_set(){
         if( Request::instance()->isPost() ){
+            $data = input('post.');
+            
             $path = ROOT_PATH . '/data/cert';
             if (!file_exists($path)){ 
                 mkdir($path,0777,true);
             }
-            if ($_FILES['weixin_cert_file']['name']){
+            $sec = '';
+            if (!empty($_FILES['weixin_cert_file']['name'])){
                 $sec['cert'] = $this->upload_cert('weixin_cert_file');
             }
-            if ($_FILES['weixin_key_file']['name']){
+            if (!empty($_FILES['weixin_key_file']['name'])){
                 $sec['key'] = $this->upload_cert('weixin_key_file');
             }
-            if ($_FILES['weixin_root_file']['name']){
+            if (!empty($_FILES['weixin_root_file']['name'])){
                 $sec['root'] = $this->upload_cert('weixin_root_file');
             }
-            var_dump(input('post.'));
-            //iserializer
-        
-            
-             exit;
-
+            $update['sets'] =   serialize($data);
+            if(!empty($sec)){
+                $update['sec'] =   serialize($sec);
+            }
+            $res = Db::table('sysset')->where(['uniacid' => 3])->update($update);
+            if($res){
+                $this->success('编辑成功', url('index/pay_set'));
+            }
+            $this->error('编辑失败');
         }
         $sysset = Db::table('sysset')->field('*')->where(['uniacid' => 3])->find();
+      
         $set    = unserialize($sysset['sets']);
         $sec    = unserialize($sysset['sec']);
+      
         $this->assign('sec', $sec);
         $this->assign('set', $set);
         $this->assign('meta_title', '支付方式');
+        return $this->fetch();
+    }
+
+
+    public function pay_content(){
+        $this->assign('meta_title', '支付参数');
         return $this->fetch();
     }
 

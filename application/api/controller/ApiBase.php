@@ -17,6 +17,9 @@ class ApiBase extends Controller
     protected $user_name;
 
     public function _initialize () {
+        header("Access-Control-Allow-Origin:*");
+        header("Access-Control-Allow-Methods:GET, POST, OPTIONS, DELETE");
+        header("Access-Control-Allow-Headers:*");
         config((new Config)->getConfig());
         if (session('admin_user_auth')) {
             $this->uid = session('admin_user_auth.uid');
@@ -38,8 +41,10 @@ class ApiBase extends Controller
     }
 
     public function ajaxReturn($data){
+      
         header('Access-Control-Allow-Origin:*');
         header('Access-Control-Allow-Headers:*');
+        header("Access-Control-Allow-Methods:GET, POST, OPTIONS, DELETE");
         header('Content-Type:application/json; charset=utf-8');
         exit(json_encode($data,JSON_UNESCAPED_UNICODE));
     }

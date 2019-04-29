@@ -17,15 +17,18 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">微信支付</label>
-                    <div class="col-sm-9 col-xs-12">
-                     
-                        <label class='radio-inline'><input type='radio' name='pay[weixin]' value='1' {if $set['pay']['weixin']==1}checked{/if}/> 开启</label>
-                        <label class='radio-inline'><input type='radio' name='pay[weixin]' value='0' {if $set['pay']['weixin']==0}checked{/if} /> 关闭</label>
-<!--                      
-                        <input type="hidden" name="pay[weixin]" value="{$set['pay']['weixin']}" />
-                        <div class='form-control-static'> {if $set['pay']['weixin']==1}开启{else}关闭{/if}</div> -->
-                      
+                    <label class="col-sm-2 control-label">微信支付</label>
+                    <div class="col-sm-9">
+                        <div class="radio radio-success radio-inline">
+                            <input type="radio" value="1" name="pay[weixin]" id="weixin1" {if $set['pay']['weixin']==1}checked{/if}  />
+                            <label for="weixin1">开启</label>
+                        </div>
+
+                        <div class="radio radio-danger radio-inline">
+                            <input type="radio" value="0" name="pay[weixin]" id="weixin2" {if $set['pay']['weixin']==0}checked{/if}  />
+                            <label for="weixin2">关闭</label>
+                        </div>
+
                     </div>
                 </div>
                 <div id='certs' {if empty($set['pay']['weixin'])}style="display:none"{/if}>
@@ -95,43 +98,55 @@
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">支付宝支付</label>
-                    <div class="col-sm-9 col-xs-12">
-                    
-                        <label class='radio-inline'><input type='radio' name='pay[alipay]' value='1' {if $set['pay']['alipay']==1}checked{/if}/> 开启</label>
-                        <label class='radio-inline'><input type='radio' name='pay[alipay]' value='0' {if $set['pay']['alipay']==0}checked{/if} /> 关闭</label>
-<!--                
-                        <input type="hidden" name="pay[alipay]" value="{$set['pay']['alipay']}"/>
-                        <div class='form-control-static'> {if $set['pay']['alipay']==1}开启{else}关闭{/if}</div> -->
                 
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">支付宝支付</label>
+                    <div class="col-sm-9">
+                        <div class="radio radio-success radio-inline">
+                            <input type="radio" value="1" name="pay[alipay]" id="alipay1" {if $set['pay']['alipay']==1}checked{/if} />
+                            <label for="alipay1">开启</label>
+                        </div>
+
+                        <div class="radio radio-danger radio-inline">
+                            <input type="radio" value="0" name="pay[alipay]" id="alipay2" {if $set['pay']['alipay']==0}checked{/if} />
+                            <label for="alipay2">关闭</label>
+                        </div>
+
                     </div>
                 </div>
 
+
                 <div class="form-group">
-                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">余额支付</label>
-                    <div class="col-sm-9 col-xs-12">
-                    
-                        <label class='radio-inline'><input type='radio' name='pay[credit]' value='1' {if $set['pay']['credit']==1}checked{/if}/> 开启</label>
-                        <label class='radio-inline'><input type='radio' name='pay[credit]' value='0' {if $set['pay']['credit']==0}checked{/if} /> 关闭</label>
-                   
-                        <!-- <input type="hidden" name="pay[credit]" value="{$set['pay']['credit']}"/>
-                        <div class='form-control-static'> {if $set['pay']['credit']==1}开启{else}关闭{/if}</div> -->
-                  
+                    <label class="col-sm-2 control-label">余额支付</label>
+                    <div class="col-sm-9">
+                        <div class="radio radio-success radio-inline">
+                            <input type="radio" value="1" name="pay[credit]" id="credit1" {if $set['pay']['credit']==1}checked{/if}  />
+                            <label for="credit1">开启</label>
+                        </div>
+
+                        <div class="radio radio-danger radio-inline">
+                            <input type="radio" value="0" name="pay[credit]" id="credit2" {if $set['pay']['credit']==0}checked{/if}  />
+                            <label for="credit2">关闭</label>
+                        </div>
+
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">货到付款</label>
-                    <div class="col-sm-9 col-xs-12">
-                 
-                        <label class='radio-inline'><input type='radio' name='pay[cash]' value='1' {if $set['pay']['cash']==1}checked{/if}/> 开启</label>
-                        <label class='radio-inline'><input type='radio' name='pay[cash]' value='0' {if $set['pay']['cash']==0}checked{/if} /> 关闭</label>
-               
-                        <!-- <input type="hidden" name="pay[cash]" value="{$set['pay']['cash']}"/>
-                        <div class='form-control-static'> {if $set['pay']['cash']==1}开启{else}关闭{/if}</div> -->
-                 
+                    <label class="col-sm-2 control-label">货到付款</label>
+                    <div class="col-sm-9">
+                        <div class="radio radio-success radio-inline">
+                            <input type="radio" value="1" name="pay[cash]" id="cash1" {if $set['pay']['cash']==1}checked{/if} />
+                            <label for="cash1">开启</label>
+                        </div>
+
+                        <div class="radio radio-danger radio-inline">
+                            <input type="radio" value="0" name="pay[cash]" id="cash2" {if $set['pay']['cash']==0}checked{/if} />
+                            <label for="cash2">关闭</label>
+                        </div>
+
                     </div>
                 </div>
+
                 
                        <div class="form-group"></div>
             <div class="form-group">
