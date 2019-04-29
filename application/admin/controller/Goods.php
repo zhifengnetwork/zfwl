@@ -847,11 +847,19 @@ class Goods extends Common
         }
 
         $list = Db::table('virtual_goods')->where($where)->paginate(10,false,$pageParam);
-
+        $page = $list->render();
+        $list = $list->toArray();
+        if($list['data']){
+            foreach($list['data'] as $key=>$value){
+                $list['data'][$key]['use'] = Db::table('virtual_data')->where('type_id',$value['id'])->where('user_id','>',0)->count();
+                $list['data'][$key]['count'] = Db::table('virtual_data')->where('type_id',$value['id'])->count();
+            }
+        }
         return $this->fetch('',[
             'meta_title'    =>  '虚拟物品模版列表',
             'list'          =>  $list,
             'title'         =>  $title,
+            'page'          =>  $page,
         ]);
     }
 
@@ -911,7 +919,7 @@ class Goods extends Common
         $type_id = input('type_id');
         if(!$type_id) $this->error('参数错误！');
 
-        $where['g.id'] = $type_id;
+        $where['d.type_id'] = $type_id;
         $pageParam['query']['type_id'] = $type_id;
 
         $pvalue = input('pvalue');
@@ -921,15 +929,15 @@ class Goods extends Common
         }
 
         $list = Db::table('virtual_data')->alias('d')
-                ->join('virtual_goods g','g.id=d.type_id','LEFT')
+                ->join('users u','u.user_id=d.user_id','LEFT')
+                ->join('order o','o.order_id=d.order_id','LEFT')
                 ->where($where)
-                ->field('g.fields,d.*')
+                ->field('d.*,u.realname,u.mobile,o.total_amount')
                 ->paginate(10,false,$pageParam);
         
         $key_title = Db::name('virtual_goods')->where('id',$type_id)->value('fields');
         $key_title = unserialize($key_title);
         
-
         return $this->fetch('',[
             'meta_title'    =>  '数据列表',
             'list'          =>  $list,
@@ -968,7 +976,7 @@ class Goods extends Common
             }
 
             if($id){
-                Db::table('virtual_data')->strict(false)->update($arr);
+                Db::table('virtual_data')->strict(false)->update($arr[0]);
                 $this->success('修改成功！',url('goods/virtual_data_list',['type_id'=>$type_id],false));
             }else{
                 Db::table('virtual_data')->strict(false)->insertAll($arr);
@@ -977,6 +985,7 @@ class Goods extends Common
         }
 
         $info = Db::table('virtual_data')->where('id',$id)->find();
+        if($info) $info['fields'] = unserialize($info['fields']);
         
         return $this->fetch('',[
             'meta_title'    =>  '添加数据',

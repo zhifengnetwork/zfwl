@@ -53,15 +53,14 @@
                             <tr>
                                 <td><input type="checkbox" class="i-checks ch_item" name="id[]"   value="{$vo.id}">{$vo.id}</td>
                                 <td>{$vo.pvalue}</td>
-                                <td>0 / 2 <a href="">详细</a></td>
-                                <td>0 / 2 <a href="">详细</a></td>
-                                <td>0 / 2 <a href="">详细</a></td>
-                                <td>0 / 2 <a href="">详细</a></td>
-                                <td>0 / 2 <a href="">详细</a></td>
-                                <td>0 / 2 <a href="">详细</a></td>
+                                <td>{if condition="$vo.mobile"}已使用{else /}未使用{/if}</td>
+                                <td>{$vo.realname}</td>
+                                <td>{$vo.mobile}</td>
+                                <td>{if condition="$vo.usetime"}{$vo.usetime|date='Y-m-d H:i:s',###}{/if}</td>
+                                <td>{$vo.order_sn}</td>
+                                <td>{$vo.total_amount}</td>
                                 <td>
-                                    <a href="{:url('Goods/virtual_data_list',['id'=>$vo.id],false)}">查看已有数据</a>
-                                    <a href="{:url('Goods/virtual_data_add',['id'=>$vo.id],false)}">编辑</a>
+                                    <a href="{:url('Goods/virtual_data_add',['id'=>$vo.id,'type_id'=>$Request.param.type_id],false)}">编辑</a>
                                     <a onclick="virtual_data_del(this,{$vo.id})" href="javascript:;">删除</a>
                                 </td>
                             </tr>
@@ -88,7 +87,7 @@
 {block name='script'}
 <script>
     function virtual_data_del(obj,id){
-        if(window.confirm('确认删除该商品类型吗？')){
+        if(window.confirm('确认删除商品数据吗？')){
             $.post("{:url('Goods/virtual_data_del')}",{'id':id},function(data){
                 alert(data.msg);
                 if(data.code){

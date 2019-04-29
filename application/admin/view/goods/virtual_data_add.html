@@ -94,7 +94,7 @@
                                         <tr>
                                         {foreach name="$key_title" id="vo"}
                                             <td>
-                                                <input type="text" name="tp_value_{$key}[]" class="form-control" value="" placeholder="请填写 {$vo}" />
+                                                <input type="text" name="tp_value_{$key}[]" class="form-control" value="{$info.fields[$key]}" placeholder="请填写 {$vo}" />
                                             </td>
                                         {/foreach}
 
@@ -105,13 +105,14 @@
                             </div>
                         </div>
 
+                        {if condition="!$info.id"}
                         <div class="form-group">
                             <label class="col-sm-1 control-label"></label>
                             <div class="col-sm-9">
                                 <a class="btn btn-default btn-add-type" href="javascript:;" onclick="add();" data-original-title="" title=""><i class="fa fa-plus" title=""></i> 增加一条</a>
                             </div>
                         </div>
-
+                        {/if}
 
                         <div class="form-group">
                             <div class="col-sm-4 col-sm-offset-2">

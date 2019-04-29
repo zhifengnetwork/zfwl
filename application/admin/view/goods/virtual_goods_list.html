@@ -44,11 +44,11 @@
                             </tr>
                             </thead>
                             <tbody>
-                            {volist name="list" id="vo"}
+                            {volist name="list.data" id="vo"}
                             <tr>
                                 <td><input type="checkbox" class="i-checks ch_item" name="id[]"   value="{$vo.id}">{$vo.id}</td>
                                 <td>{$vo.title}</td>
-                                <td>0 / 2 <a href="">详细</a></td>
+                                <td>{$vo.use} / {$vo.count} <a href="{:url('Goods/virtual_data_list',['type_id'=>$vo.id],false)}">详细</a></td>
                                 <td>
                                     <a href="{:url('Goods/virtual_data_list',['type_id'=>$vo.id],false)}">查看已有数据</a>
                                     <a href="{:url('Goods/virtual_goods_add',['id'=>$vo.id],false)}">编辑</a>
@@ -68,7 +68,7 @@
                         .pagination li a{float:left;width:42px;height:28px; text-align:center;line-height:30px;border-left:none;color:#3399d5;}
                     </style>
                     <ul class="pagination">
-                        {$list->render()}
+                        {$page}
                     </ul>
                 </div>
             </div>
