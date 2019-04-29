@@ -85,7 +85,7 @@ class Goods extends ApiBase
             $this->ajaxReturn(['status' => -2 , 'msg'=>'商品不存在！']);
         }
 
-        $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$goodsRes);
+        $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$goodsRes]);
 
     }
 
