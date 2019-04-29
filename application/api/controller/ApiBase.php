@@ -25,6 +25,11 @@ class ApiBase extends Controller
             $this->uid = session('admin_user_auth.uid');
             $this->user_name = session('admin_user_auth.user_name');
         } else {
+            $action = strtolower(Request::instance()->controller() . '/' . Request::instance()->action());
+            $action_array[] = strtolower('goods/categoryList');
+            if (in_array($action, $action_array)) {
+                return;
+            }
             exit(json_encode(['code'=>0,'msg'=>'您未登录，请登录！']));
         }
     }
