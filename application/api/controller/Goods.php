@@ -27,6 +27,7 @@ class Goods extends ApiBase
             $list[$key]['goods'] = Db::table('goods')->alias('g')
                                 ->join('goods_attr ga','FIND_IN_SET(ga.attr_id,g.goods_attr)','LEFT')
                                 ->where('cat_id1',$value['cat_id'])
+                                ->where('g.is_show',1)
                                 ->group('g.goods_id')
                                 ->field('goods_id,img,price,original_price,GROUP_CONCAT(ga.attr_name) attr_name,ga.attr_id comment')
                                 ->select();
