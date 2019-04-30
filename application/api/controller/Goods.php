@@ -29,11 +29,20 @@ class Goods extends ApiBase
                                 ->where('cat_id1',$value['cat_id'])
                                 ->where('g.is_show',1)
                                 ->group('g.goods_id')
+                                ->join('goods_img gi','gi.goods_id=g.goods_id','LEFT')
                                 ->order('g.goods_id DESC')
                                 ->limit(4)
-                                ->field('goods_id,img,price,original_price,GROUP_CONCAT(ga.attr_name) attr_name,g.cat_id1 comment')
+                                ->field('g.goods_id,goods_name,img,price,original_price,GROUP_CONCAT(ga.attr_name) attr_name,g.cat_id1 comment')
                                 ->select();
-            
+            if($list[$key]['goods']){
+                foreach($list[$key]['goods'] as $k=>$v){
+                    if($v['attr_name']){
+                        $list[$key]['goods'][$k]['attr_name'] = explode(',',$v['attr_name']);
+                    }else{
+                        $list[$key]['goods'][$k]['attr_name'] = array();
+                    }
+                }
+            }
         }
         
         $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$list]);
@@ -80,11 +89,21 @@ class Goods extends ApiBase
     {
         $goods_id = input('goods_id');
 
-        $goodsRes = Db::table('goods')->find($goods_id);
+        $goodsRes = Db::table('goods')->alias('g')
+                    ->join('goods_attr ga','FIND_IN_SET(ga.attr_id,g.goods_attr)','LEFT')
+                    ->join('goods_img gi','gi.goods_id=g.goods_id','LEFT')
+                    ->field('g.*,gi.picture img,GROUP_CONCAT(ga.attr_name) attr_name')
+                    ->find($goods_id);
         if (empty($goodsRes)) {
             $this->ajaxReturn(['status' => -2 , 'msg'=>'商品不存在！']);
         }
 
+        if($goodsRes['attr_name']){
+            $goodsRes['attr_name'] = explode(',',$goodsRes['attr_name']);
+        }else{
+            $goodsRes['attr_name'] = [];
+        }
+        
         $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$goodsRes]);
 
     }
