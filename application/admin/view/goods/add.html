@@ -168,7 +168,6 @@
                                     <dd class="upload_area clearfix" style="margin: 0 auto;">
                                         <ul id="imglist" class="post_imglist">
                                             
-                                            <li><img class="wh60" id="file0" src="__STATIC__/images/default.jpg"></li>
                                             
                                         </ul>
                                         <div class="upload_btn">
@@ -431,7 +430,18 @@
         </div>
     </div>
 </div>
-
+<style>
+.img_del{
+    position: absolute;
+    right: 0px;
+    top: -10px;
+    background: url(__STATIC__/icon_del.png) no-repeat 15px 0;
+    background-size: 20px auto;
+    width: 40px;
+    height: 20px;
+    display: inline-block;
+}
+</style>
 {/block}
 
 {block name="script"}
@@ -486,13 +496,13 @@
                     $(".upload_btn").hide();                    
                 }
                 if (status) {
-                    viewImg.html('<li><span class="pic_time"><span class="p_img"></span><em>50%</em></span></li>');
-                    viewImg.find("li:last-child").html('<img class="wh60" id="file'
+                    viewImg.append('<li><span class="pic_time"><span class="p_img"></span><em>50%</em></span></li>');
+                    viewImg.find("li:last-child").html('<span class="img_del"></span><img class="wh60" id="file'
                     + imgcount
-                    + '" src="' + result.base64 + '"/><input type="hidden" name="img" value="'
+                    + '" src="' + result.base64 + '"/><input type="hidden" name="img[]" value="'
                     + result.clearBase64 + '">');
 
-                    $(".del").on("click",function(){
+                    $(".img_del").on("click",function(){
                         $(this).parent('li').remove();
                         $("#upload_image").show();
                         $(".upload_btn").show();
@@ -503,7 +513,7 @@
         });
     })();
 
-    $(".del").on("click",function(){
+    $(".img_del").on("click",function(){
         $(this).parent('li').remove();
         $("#upload_image").show();
         $(".upload_btn").show();

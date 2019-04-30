@@ -14,8 +14,6 @@ class Total extends Common
         return $this->fetch();
         # code...
     }
-
-
      /**
      * 余额记录
      */

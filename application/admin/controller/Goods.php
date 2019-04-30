@@ -84,7 +84,7 @@ class Goods extends Common
             if(!$validate->scene('add')->check($data)){
                 $this->error( $validate->getError() );
             }
-            
+            // pred($data);
             //规格处理
             $sku_keys = array_keys($data['attr_td']);
             $sku = [];
@@ -108,25 +108,43 @@ class Goods extends Common
             
             $data['add_time'] = strtotime( $data['add_time'] );
 
-            if( isset($data['img']) ){
-                
-                $saveName = request()->time().rand(0,99999) . '.png';
-
-                $img=base64_decode($data['img']);
-                //生成文件夹
-                $names =  "goods" ;
-                $name  =  "goods/" .date('Ymd',time()) ;
-                if (!file_exists(ROOT_PATH .Config('c_pub.img').$names)){ 
-                    mkdir(ROOT_PATH .Config('c_pub.img').$names,0777,true);
-                } 
-                //保存图片到本地
-                file_put_contents(ROOT_PATH .Config('c_pub.img').$name.$saveName,$img);
-
-                $data['img'] = $name.$saveName;
-
-            }
             $goods_id = Db::table('goods')->strict(false)->insertGetId($data);
             if ( $goods_id ) {
+
+                //图片处理
+                if( isset($data['img']) && !empty($data['img'][0])){
+                    foreach ($data['img'] as $key => $value) {
+
+                        $saveName = request()->time().rand(0,99999) . '.png';
+
+                        $img=base64_decode($value);
+                        //生成文件夹
+                        $names = "goods" ;
+                        $name = "goods/" .date('Ymd',time()) ;
+                        if (!file_exists(ROOT_PATH .Config('c_pub.img').$names)){ 
+                            mkdir(ROOT_PATH .Config('c_pub.img').$names,0777,true);
+                        }
+                        //保存图片到本地
+                        file_put_contents(ROOT_PATH .Config('c_pub.img').$name.$saveName,$img);
+
+                        unset($data['img'][$key]);
+                        $data['img'][] = $name.$saveName;
+                    }
+                    $data['img'] = array_values($data['img']);
+                    
+                    foreach ($data['img'] as $key => $value) {
+                        if(!$key){
+                            $datas[$key]['main'] = 1;
+                        }else{
+                            $datas[$key]['main'] = 0;
+                        }
+                        $datas[$key]['picture'] = $value;
+                        $datas[$key]['goods_id'] = $goods_id;
+                    }
+
+                    Db::table('goods_img')->insertAll($datas);
+                }
+
                 //库存
                 foreach ($sku as $key => $value) {
                     $sku[$key]['goods_id'] = $goods_id;
@@ -173,7 +191,7 @@ class Goods extends Common
         
         if( Request::instance()->isPost() ){
             $data = input('post.');
-
+            // pred($data);
             //验证
             $validate = Loader::validate('Goods');
             if(!$validate->scene('edit')->check($data)){
@@ -223,26 +241,57 @@ class Goods extends Common
 
             $data['add_time'] = strtotime( $data['add_time'] );
 
-            if( isset($data['img']) ){
-                
-                $saveName = request()->time().rand(0,99999) . '.png';
 
-                $img=base64_decode($data['img']);
-                //生成文件夹
-                $names = "goods" ;
-                $name = "goods/" .date('Ymd',time()) ;
-                if (!file_exists(ROOT_PATH .Config('c_pub.img').$names)){ 
-                    mkdir(ROOT_PATH .Config('c_pub.img').$names,0777,true);
-                } 
-                //保存图片到本地
-                file_put_contents(ROOT_PATH .Config('c_pub.img').$name.$saveName,$img);
 
-                $data['img'] = $name.$saveName;
+            //图片处理
+            if( isset($data['img']) && !empty($data['img'][0])){
+                foreach ($data['img'] as $key => $value) {
 
-                if($info['img']){
-                    @unlink( ROOT_PATH .Config('c_pub.img') . $info['img'] );
+                    $saveName = request()->time().rand(0,99999) . '.png';
+
+                    $img=base64_decode($value);
+                    //生成文件夹
+                    $names = "goods" ;
+                    $name = "goods/" .date('Ymd',time()) ;
+                    if (!file_exists(ROOT_PATH .Config('c_pub.img').$names)){ 
+                        mkdir(ROOT_PATH .Config('c_pub.img').$names,0777,true);
+                    }
+                    //保存图片到本地
+                    file_put_contents(ROOT_PATH .Config('c_pub.img').$name.$saveName,$img);
+
+                    unset($data['img'][$key]);
+                    $data['img'][] = $name.$saveName;
                 }
+                $data['img'] = array_values($data['img']);
+                
+                foreach ($data['img'] as $key => $value) {
+                    
+                    $datas[$key]['picture'] = $value;
+                    $datas[$key]['goods_id'] = $data['goods_id'];
+                }
+
+                Db::table('goods_img')->insertAll($datas);
             }
+            // if( isset($data['img']) ){
+                
+            //     $saveName = request()->time().rand(0,99999) . '.png';
+
+            //     $img=base64_decode($data['img']);
+            //     //生成文件夹
+            //     $names = "goods" ;
+            //     $name = "goods/" .date('Ymd',time()) ;
+            //     if (!file_exists(ROOT_PATH .Config('c_pub.img').$names)){ 
+            //         mkdir(ROOT_PATH .Config('c_pub.img').$names,0777,true);
+            //     } 
+            //     //保存图片到本地
+            //     file_put_contents(ROOT_PATH .Config('c_pub.img').$name.$saveName,$img);
+
+            //     $data['img'] = $name.$saveName;
+
+            //     if($info['img']){
+            //         @unlink( ROOT_PATH .Config('c_pub.img') . $info['img'] );
+            //     }
+            // }
             
             if ( Db::table('goods')->strict(false)->update($data) !== false ) {
                 $this->success('修改成功', url('goods/index'));
@@ -274,6 +323,8 @@ class Goods extends Common
         $cat_id1 = Db::table('category')->where('level',1)->select();
         //商品二级分类
         $cat_id2 = Db::table('category')->where('level',2)->select();
+        //商品组图
+        $img = Db::table('goods_img')->where('goods_id','=',$goods_id)->select();
 
         return $this->fetch('goods/edit',[
             'meta_title'  =>  '编辑商品',
@@ -284,9 +335,47 @@ class Goods extends Common
             'goods_attr'  =>  $goods_attr,
             'cat_id1'     =>  $cat_id1,
             'cat_id2'     =>  $cat_id2,
+            'img'         =>  $img,
         ]);
     }
     
+    /**
+     * ajax设为主图
+     */
+    public function ImgMain(){
+        $id = input('id');
+        if(!$id){
+            return 0;
+        }
+
+        $res = Db::table('goods_img')->where('id','=',$id)->field('goods_id')->find();
+        if(!$res['goods_id']){
+            return 0;
+        }
+
+        Db::table('goods_img')->update(['id'=>$id,'main'=>1]);
+        
+        return Db::table('goods_img')->where('goods_id',$res['goods_id'])->where('id','neq',$id)->update(['main'=>0]);
+    }
+
+    /**
+     * ajax删除图片
+     */
+    public function del_img(){
+        if( request()->isAjax() ){
+            $data['id'] = input('id');
+            
+            $info = Db::table('goods_img')->find($data['id']);
+            if( !$info ){
+                return 0;
+            }
+
+            @unlink(ROOT_PATH .Config('c_pub.img') . $info['picture']);
+            
+            return Db::table('goods_img')->where('id','=',$data['id'])->delete();
+        }
+    }
+
     /*
      * ajax 删除商品
      */
