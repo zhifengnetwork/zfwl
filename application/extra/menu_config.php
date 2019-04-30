@@ -59,7 +59,7 @@ return [
                         'id'    => 20203,
                         'title' => '支付交易设置',
                         'sort'  => 1,
-                        'url'   => '',
+                        'url'   => 'index/pay_py',
                         'hide'  => 1,
                     ],
                 ],

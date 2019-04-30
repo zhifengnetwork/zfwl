@@ -65,11 +65,11 @@ p.head-bg{
       
     <div class=" col-xs-12 col-md-6 col-lg-4 lh">
         <div class="panel panel-default">
-            <div class="panel-heading">
+            <div class="panel-heading" >
                     <p class="head-bg"><span class="icon-wx-weixinPay"></span></p>
                     <div>设置微信支付开关</div> 
              </div>
-             <div class="form-group form-group-s" style="">
+             <div class="form-group form-group-s"  style="margin-top:15px;">
                 <label class="col-xs-12  control-label col-sm-3">微信支付</label>
                 <div class="col-sm-9">
                     <div class="radio radio-success radio-inline">
@@ -87,42 +87,39 @@ p.head-bg{
 
       
                 
-                
-                
                 <div class="form-group form-group-s">
                     <label class="col-xs-12 col-sm-3 control-label">支付账号</label>
                     <div class="col-sm-8 col-xs-12">
-                        <p class="form-control-static">支付账号值</p>
+                            <input type="text" name="wechat[account_name]" class="form-control" value="{$payment.wechat.account_name}" autocomplete="off"/>
                        <!-- <span class="help-block"><strong class="text-danger">微信支付要求公众号为“认证服务号”，该公众号没有微信支付的权限</strong></span>  -->
-                        <input type="hidden" name="wechat[account]" value=""/>
                     </div>
                 </div>
                 <div class="form-group form-group-s">
                     <label class="col-xs-12 col-sm-3 control-label">身份标识<br />
                         (appId)</label>
                     <div class="col-sm-8 col-xs-12">
-                        <input type="text" class="form-control" value="appid" readonly="readonly" autocomplete="off">
-                        <span class="help-block">公众号身份标识 <a href="{php echo url('account/post', array('uniacid' => 3))}">请通过修改公众号信息来保存</a></span> </div>
+                        <input type="text" class="form-control"  name = "wechat[appid]" value="{$payment.wechat.appid}"  autocomplete="off">
+                        <span class="help-block">公众号身份标识</div>
                 </div>
                 <div class="form-group form-group-s">
                     <label class="col-xs-12 col-sm-3 control-label">身份密钥<br />
                         (appSecret)</label>
                     <div class="col-sm-8 col-xs-12">
-                        <input type="text" class="form-control" value="secret" readonly="readonly" autocomplete="off"/>
-                        <span class="help-block">公众平台API(参考文档API 接口部分)的权限获取所需密钥Key <a href="{php echo url('account/post', array('uniacid' => 3))}">请通过修改公众号信息来保存</a></span> </div>
+                        <input type="text" class="form-control" name = "wechat[secret]"  value="{$payment.wechat.secret}"  autocomplete="off"/>
+                        <span class="help-block">公众平台API(参考文档API 接口部分)的权限获取所需密钥Key <a href="{:url('account/post', array('uniacid' => 3))}">请通过修改公众号信息来保存</a></span> </div>
                 </div>
            
             <div class="form-group form-group-s s"  >
             <label class="col-xs-12 col-sm-3 control-label">商户密钥<br />
                 (partnerKey)</label>
                 <div class="col-sm-8 col-xs-12">
-                <input type="text" name="wechat[key]" class="form-control" value="" autocomplete="off"/>
+                <input type="text" name="wechat[key]" class="form-control" value="{$payment.wechat.key}" autocomplete="off"/>
                </div>
             </div>
             <div class="form-group form-group-s" id="mchid"  style="" >
                 <label class="col-xs-12 col-sm-3 control-label">微信支付商户号<br>(MchId)</label>
                 <div class="col-sm-8 col-xs-12">
-                    <input type="text" name="wechat[mchid]" class="form-control" value="" autocomplete="off"/>
+                    <input type="text" name="wechat[mchid]" class="form-control" value="{$payment.wechat.mchid}" autocomplete="off"/>
                     <span class="help-block">公众号支付请求中用于加密的密钥Key</span> </div>
             </div>
            
@@ -130,7 +127,7 @@ p.head-bg{
                 <label class="col-xs-12 col-sm-3 control-label">商户支付密钥<br>(API密钥)</label>
             <div class="col-sm-8 col-xs-12">
     <div class="input-group">
-        <input type="text" name="wechat[apikey]" id="apikey" class="form-control" maxlength="32" value="" autocomplete="off"/>
+        <input type="text" name="wechat[apikey]" id="apikey" class="form-control" maxlength="32" value="{$payment.wechat.apikey}" autocomplete="off"/>
         <span onclick="tokenGen();" style="cursor:pointer" class="input-group-addon">生成新的</span> </div>
     <span class="help-block">此值需要手动在腾讯商户后台API密钥保持一致。<a href="http://bbs.we7.cc/thread-5788-1-1.html" target="_blank">查看设置教程</a></span> </div>
         </div>
@@ -151,39 +148,40 @@ p.head-bg{
                     <div class="alert-s alert-warning"> 您的支付宝账号必须支持手机网页即时到账接口, 才能使用手机支付功能,
                         <a href="https://b.alipay.com/order/productDetail.htm?productId=2013080604609688" target="_blank">申请及详情请查看这里</a>.
                     </div>
-                    <input type="hidden" name="alipay[t]" />
                 </div>
-                <div class="form-group form-group-s row">
-                    <label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
-                    <div class="col-xs-12 col-sm-9 col-md-6 col-lg-3">
-                        <label class="radio-inline">
-                            <input type="radio" name="alipay[switch]" ng-model="alipay.switch" value="true"/>
-                            开启 </label>
-                        <label class="radio-inline">
-                            <input type="radio" name="alipay[switch]" ng-model="alipay.switch" value="false"/>
-                            关闭 </label>
+                <div class="form-group form-group-s" >
+                    <label class="col-xs-12  control-label col-sm-3">支付宝支付</label>
+                    <div class="col-sm-9">
+                        <div class="radio radio-success radio-inline">
+                            <input type="radio" value="1" name="pay[alipay]" id="alipay1" {if $set['pay']['alipay']==1}checked{/if}  />
+                            <label for="alipay1">开启</label>
+                        </div>
+    
+                        <div class="radio radio-danger radio-inline">
+                            <input type="radio" value="0" name="pay[alipay]" id="alipay2" {if $set['pay']['alipay']==0}checked{/if}  />
+                            <label for="alipay2">关闭</label>
+                        </div>
                     </div>
-                  
                 </div>
             </div>
             <div ng-show="alipay.switch == 'true'">
                 <div class="form-group form-group-s">
                     <label class="col-xs-12 col-sm-3 col-md-2 control-label">收款支付宝账号</label>
                     <div class="col-sm-9 col-xs-12">
-                        <input type="text" name="alipay[account]" class="form-control" value="" autocomplete="off">
+                        <input type="text" name="alipay[account]" class="form-control" value="{$payment.alipay.account}" autocomplete="off">
                         <span class="help-block">如果开启兑换或交易功能，请填写真实有效的支付宝账号，用于收取用户以现金兑换交易积分的相关款项。如账号无效或安全码有误，将导致用户支付后无法正确对其积分账户自动充值，或进行正常的交易对其积分账户自动充值，或进行正常的交易。 如您没有支付宝帐号，<a href="https://memberprod.alipay.com/account/reg/enterpriseIndex.htm" target="_blank">请点击这里注册</a></span> </div>
                 </div>
                 <div class="form-group form-group-s">
                     <label class="col-xs-12 col-sm-3 col-md-2 control-label">合作者身份</label>
                     <div class="col-sm-9 col-xs-12">
-                        <input type="text" name="alipay[partner]" class="form-control" value="" autocomplete="off"/>
+                        <input type="text" name="alipay[partner]" class="form-control" value="{$payment.alipay.partner}" autocomplete="off"/>
               <span class="help-block">支付宝签约用户请在此处填写支付宝分配给您的合作者身份，签约用户的手续费按照您与支付宝官方的签约协议为准。<br>
               如果您还未签约，<a href="https://memberprod.alipay.com/account/reg/enterpriseIndex.htm" target="_blank">请点击这里签约</a>；如果已签约,<a href="https://b.alipay.com/order/pidKey.htm?pid=2088501719138773&amp;product=fastpay" target="_blank">请点击这里获取PID、Key</a>;如果在签约时出现合同模板冲突，请咨询0571-88158090</span> </div>
                 </div>
                 <div class="form-group form-group-s">
                     <label class="col-xs-12 col-sm-3 col-md-2 control-label">校验密钥</label>
                     <div class="col-sm-9 col-xs-12">
-                        <input type="text" name="alipay[secret]" class="form-control" value="" autocomplete="off"/>
+                        <input type="text" name="alipay[secret]" class="form-control" value="{$payment.alipay.secret}" autocomplete="off"/>
                         <span class="help-block">支付宝签约用户可以在此处填写支付宝分配给您的交易安全校验码，此校验码您可以到支付宝官方的商家服务功能处查看</span> </div>
                 </div>
                 <div class="form-group form-group-s">
@@ -194,52 +192,9 @@ p.head-bg{
         </div>
     </div>
 </div>
-<div class=" col-xs-12 col-md-6 col-lg-4">
-    <div class="panel panel-default">
-        <div class="panel-heading"> 
-            <p class="head-bg"><span class="icon-wx-Balance"></span></p>
-            <div>设置余额支付开关 </div>
-        </div>
-        <div class="panel-body">
-            <div class="form-group">
-                <label class="col-xs-12 col-sm-3 col-md-2 control-label">余额支付</label>
-                <div class="col-sm-8 col-xs-12">
-                    <label class="radio-inline">
-                        <input type="radio" name="credit[switch]" ng-model="credit.switch" value="true"/>
-                        开启 </label>
-                    <label class="radio-inline">
-                        <input type="radio" name="credit[switch]" ng-model="credit.switch" value="false"/>
-                        关闭 </label>
-                    <span class="help-block">是否使用粉丝中心的余额直接支付</span> </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class=" col-xs-12 col-md-6 col-lg-4">
-    <div class="panel panel-default">
-        <div class="panel-heading"> 
-            <p class="head-bg"><span class="icon-wx-Huodaofk"></span></p>
-            <div>设置货到支付开关 </div>
-        </div>
-        <div class="panel-body">
-            <div class="form-group">
-                <label class="col-xs-12 col-sm-3 col-md-2 control-label">货到支付</label>
-                <div class="col-sm-8 col-xs-12">
-                    <label class="radio-inline">
-                        <input type="radio" name="delivery[switch]" ng-model="delivery.switch" value="true"/>
-                        开启 </label>
-                    <label class="radio-inline">
-                        <input type="radio" name="delivery[switch]" ng-model="delivery.switch" value="false"/>
-                        关闭 </label>
-                    <span class="help-block">是否支持货到付款</span> </div>
-            </div>
-        </div>
-    </div>
-</div>
 
 <div class="form-group col-sm-12">
-    <button class="btn btn-primary ajax-post col-lg-1" target-form="form-horizontal" type="submit" style="margin-left:20px;">保存</button>
+    <button class="btn btn-primary ajax-post col-lg-2" target-form="form-horizontal" type="submit" style="margin-left:20px;">保存</button>
 </div>
 
   </form>
@@ -265,6 +220,9 @@ p.head-bg{
         $(':text[name="wechat[apikey]"]').val(token);
 
     }
+    
+        //支付宝和微信支付开启验证
+
     </script>
 {/block}
 

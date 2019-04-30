@@ -59,18 +59,82 @@ class Index extends Common
 
     public function pay_content(){
         $sysset     = Db::table('sysset')->field('*')->find();
-        $set    = unserialize($sysset['sets']);
+        $set        = unserialize($sysset['sets']);
         $payment    = unserialize($sysset['payment']);
        
         $set    = unserialize($sysset['sets']);
-        if( Request::instance()->isPost() ){
-            var_dump(input('post.'));
-            die;
+        if(Request::instance()->isPost()){
+            $patdata = input('post.');
+            if($patdata['pay']['alipay'] == 1){
+                if(empty($patdata['alipay']['account'])){
+                     $this->error('支付宝账号不能为空');
+                }
+                if(empty($patdata['alipay']['partner'])){
+                    $this->error('合作者身份不能为空');
+                }
+                if(empty($patdata['alipay']['secret'])){
+                    $this->error('支付宝校验密钥不能为空');
+                }
+            }
+            if($patdata['pay']['weixin'] == 1){
+                if(empty($patdata['wechat']['appid'])){
+                    $this->error('微信appid不能为空');
+                }
+                if(empty($patdata['wechat']['secret'])){
+                    $this->error('微信secret不能为空');
+                }
+                if(empty($patdata['wechat']['key'])){
+                    $this->error('商户密钥不能为空');
+                }
+                if(empty($patdata['wechat']['account_name'])){
+                    $this->error('微信账户名称不能为空');
+                }
+                if(empty($patdata['wechat']['mchid'])){
+                    $this->error('微信支付商户号不能为空');
+                }
+                if(empty($patdata['wechat']['apikey'])){
+                    $this->error('商户支付密钥不能为空');
+                }
+            }
+            $set['pay']['weixin'] = $patdata['pay']['weixin'];
+            $set['pay']['alipay'] = $patdata['pay']['alipay'];
+            $update['sets']    = serialize($set);
+            unset($patdata['pay']);
+            $update['payment']  = serialize($patdata);
+            $res = Db::table('sysset')->where(['uniacid' => 3])->update($update);
+            if($res !== false ){
+                $this->success('编辑成功', url('index/pay_content'));
+            }
+            $this->error('编辑失败');
         }
-       
         $this->assign('set', $set);
+        $this->assign('payment', $payment);
         $this->assign('meta_title', '支付参数');
         return $this->fetch();
+    }
+
+
+    public function pay_py(){
+            $sysset     = Db::table('sysset')->field('*')->find();
+            $set        = unserialize($sysset['sets']);
+        if(Request::instance()->isPost()){
+            $trade = input('post.');
+            
+            $set['trade']   = $trade['trade'];
+            
+            $sysset['sets'] = serialize($set);
+            
+            $res = Db::table('sysset')->where(['uniacid' => 3])->update($sysset);
+            if($res !== false ){
+                $this->success('编辑成功', url('index/pay_py'));
+            }
+            $this->error('编辑失败');
+        }
+    
+        $this->assign('set', $set);
+        $this->assign('meta_title', '支付交易设置');
+        return $this->fetch();
+
     }
 
     public function upload_cert($file_name){
