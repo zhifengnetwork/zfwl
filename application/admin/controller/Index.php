@@ -137,6 +137,30 @@ class Index extends Common
 
     }
 
+    public function notice(){
+        $sysset     = Db::table('sysset')->field('*')->find();
+        $set        = unserialize($sysset['sets']);
+        var_dump($set);
+        exit;
+        if(Request::instance()->isPost()){
+            $trade          = input('post.');
+            
+            $set['trade']   = $trade['trade'];
+            
+            $sysset['sets'] = serialize($set);
+            
+            $res = Db::table('sysset')->where(['uniacid' => 3])->update($sysset);
+            if($res !== false ){
+                $this->success('编辑成功', url('index/pay_py'));
+            }
+            $this->error('编辑失败');
+        }
+
+        $this->assign('set', $set);
+        $this->assign('meta_title', '支付交易设置');
+        return $this->fetch();
+    }
+
     public function upload_cert($file_name){
         $dephp_2 = $file_name . '_1.pem';
         $dephp_4 = $_FILES[$file_name]['name'];
