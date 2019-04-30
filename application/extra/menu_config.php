@@ -38,21 +38,21 @@ return [
                 'title' => '支付交易设置',
                 'sort'  => 2,
                 'icon'  => 'fa-th-large',
-                'url'   => '',
+                'url'   => 'index/pay_set',
                 'hide'  => 1,
                 'child' => [
                     [
                         'id'    => 20201,
                         'title' => '支付方式',
                         'sort'  => 1,
-                        'url'   => '',
+                        'url'   => 'index/pay_set',
                         'hide'  => 1,
                     ],
                     [
                         'id'    => 20202,
                         'title' => '支付参数',
                         'sort'  => 1,
-                        'url'   => '',
+                        'url'   => 'index/pay_content',
                         'hide'  => 1,
                     ],
                     [
@@ -104,18 +104,29 @@ return [
                 'icon'  => 'fa-th-large',
                 'child' => [
                     [
-                        'id'    => 30101,
-                        'title' => '添加商品',
-                        'sort'  => 1,
-                        'url'   => 'goods/add',
-                        'hide'  => 1,
-                    ],
-                    [
                         'id'    => 30102,
                         'title' => '商品列表',
                         'sort'  => 1,
                         'url'   => 'goods/index',
                         'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 30101,
+                        'title' => '添加商品',
+                        'sort'  => 2,
+                        'url'   => 'goods/add',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 30103,
+                        'title' => '配送方式',
+                        'sort'  => 3,
+                        'url'   => 'goods/goods_delivery_list',
+                        'hide'  => 1,
+                        'icon'  => 'fa-th-large',
+                        'child' => [
+                            
+                        ],
                     ],
                 ],
             ],
@@ -123,7 +134,7 @@ return [
             [
                 'id'    => 30200,
                 'title' => '商品规格管理',
-                'sort'  => 1,
+                'sort'  => 2,
                 'url'   => 'goods/goods_type_list',
                 'hide'  => 1,
                 'icon'  => 'fa-th-large',
@@ -142,22 +153,52 @@ return [
                         'url'   => 'goods/goods_type_add',
                         'hide'  => 1,
                     ],
-                    
                 ],
             ],
             [
                 'id'    => 30300,
-                'title' => '配送方式',
-                'sort'  => 1,
-                'url'   => 'goods/goods_delivery_list',
+                'title' => '商品分类',
+                'sort'  => 0,
+                'url'   => 'category/index',
                 'hide'  => 1,
                 'icon'  => 'fa-th-large',
                 'child' => [
                     [
                         'id'    => 30301,
-                        'title' => '新增配送',
+                        'title' => '分类列表',
                         'sort'  => 1,
-                        'url'   => 'goods/goods_delivery_add',
+                        'url'   => 'category/index',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 30302,
+                        'title' => '分类层级设置',
+                        'sort'  => 2,
+                        'url'   => 'category/category_set',
+                        'hide'  => 1,
+                    ],
+                ],
+            ],
+            [
+                'id'    => 30400,
+                'title' => '虚拟商品',
+                'sort'  => 4,
+                'url'   => 'goods/virtual_goods_list',
+                'hide'  => 1,
+                'icon'  => 'fa-th-large',
+                'child' => [
+                    [
+                        'id'    => 30401,
+                        'title' => '虚拟物品模版列表',
+                        'sort'  => 1,
+                        'url'   => 'goods/virtual_goods_list',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 30402,
+                        'title' => '虚拟分类列表',
+                        'sort'  => 2,
+                        'url'   => 'goods/virtual_category_list',
                         'hide'  => 1,
                     ],
                 ],
@@ -197,24 +238,6 @@ return [
                         'hide'  => 0,
                     ],
                    
-                ],
-
-            ],
-            [
-                'id'    => 40200,
-                'title' => '退款订单',
-                'sort'  => 2,
-                'url'   => '',
-                'hide'  => 1,
-                'icon'  => 'fa-th-large',
-                'child' => [
-                    [
-                        'id'    => 40201,
-                        'title' => '退款订单',
-                        'sort'  => 1,
-                        'url'   => '',
-                        'hide'  => 1,
-                    ],
                 ],
 
             ],
@@ -316,28 +339,14 @@ return [
             ],
             [
                 'id'    => 60200,
-                'title' => '余额体现',
+                'title' => '余额提现',
                 'sort'  => 2,
                 'url'   => 'total/finance',
                 'hide'  => 1,
                 'child' => [
                     [
                         'id'    => 60201,
-                        'title' => '待审核',
-                        'sort'  => 1,
-                        'url'   => '',
-                        'hide'  => 1,
-                    ],
-                    [
-                        'id'    => 60202,
-                        'title' => '通过审批',
-                        'sort'  => 1,
-                        'url'   => '',
-                        'hide'  => 1,
-                    ],
-                    [
-                        'id'    => 60203,
-                        'title' => '不通过审批',
+                        'title' => '余额提现列表',
                         'sort'  => 1,
                         'url'   => '',
                         'hide'  => 1,

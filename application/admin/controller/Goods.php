@@ -84,7 +84,7 @@ class Goods extends Common
             if(!$validate->scene('add')->check($data)){
                 $this->error( $validate->getError() );
             }
-            
+            // pred($data);
             //规格处理
             $sku_keys = array_keys($data['attr_td']);
             $sku = [];
@@ -108,25 +108,43 @@ class Goods extends Common
             
             $data['add_time'] = strtotime( $data['add_time'] );
 
-            if( isset($data['img']) ){
-                
-                $saveName = request()->time().rand(0,99999) . '.png';
-
-                $img=base64_decode($data['img']);
-                //生成文件夹
-                $names =  "goods" ;
-                $name  =  "goods/" .date('Ymd',time()) ;
-                if (!file_exists(ROOT_PATH .Config('c_pub.img').$names)){ 
-                    mkdir(ROOT_PATH .Config('c_pub.img').$names,0777,true);
-                } 
-                //保存图片到本地
-                file_put_contents(ROOT_PATH .Config('c_pub.img').$name.$saveName,$img);
-
-                $data['img'] = $name.$saveName;
-
-            }
             $goods_id = Db::table('goods')->strict(false)->insertGetId($data);
             if ( $goods_id ) {
+
+                //图片处理
+                if( isset($data['img']) && !empty($data['img'][0])){
+                    foreach ($data['img'] as $key => $value) {
+
+                        $saveName = request()->time().rand(0,99999) . '.png';
+
+                        $img=base64_decode($value);
+                        //生成文件夹
+                        $names = "goods" ;
+                        $name = "goods/" .date('Ymd',time()) ;
+                        if (!file_exists(ROOT_PATH .Config('c_pub.img').$names)){ 
+                            mkdir(ROOT_PATH .Config('c_pub.img').$names,0777,true);
+                        }
+                        //保存图片到本地
+                        file_put_contents(ROOT_PATH .Config('c_pub.img').$name.$saveName,$img);
+
+                        unset($data['img'][$key]);
+                        $data['img'][] = $name.$saveName;
+                    }
+                    $data['img'] = array_values($data['img']);
+                    
+                    foreach ($data['img'] as $key => $value) {
+                        if(!$key){
+                            $datas[$key]['main'] = 1;
+                        }else{
+                            $datas[$key]['main'] = 0;
+                        }
+                        $datas[$key]['picture'] = $value;
+                        $datas[$key]['goods_id'] = $goods_id;
+                    }
+
+                    Db::table('goods_img')->insertAll($datas);
+                }
+
                 //库存
                 foreach ($sku as $key => $value) {
                     $sku[$key]['goods_id'] = $goods_id;
@@ -173,7 +191,7 @@ class Goods extends Common
         
         if( Request::instance()->isPost() ){
             $data = input('post.');
-
+            // pred($data);
             //验证
             $validate = Loader::validate('Goods');
             if(!$validate->scene('edit')->check($data)){
@@ -223,26 +241,57 @@ class Goods extends Common
 
             $data['add_time'] = strtotime( $data['add_time'] );
 
-            if( isset($data['img']) ){
-                
-                $saveName = request()->time().rand(0,99999) . '.png';
 
-                $img=base64_decode($data['img']);
-                //生成文件夹
-                $names = "goods" ;
-                $name = "goods/" .date('Ymd',time()) ;
-                if (!file_exists(ROOT_PATH .Config('c_pub.img').$names)){ 
-                    mkdir(ROOT_PATH .Config('c_pub.img').$names,0777,true);
-                } 
-                //保存图片到本地
-                file_put_contents(ROOT_PATH .Config('c_pub.img').$name.$saveName,$img);
 
-                $data['img'] = $name.$saveName;
+            //图片处理
+            if( isset($data['img']) && !empty($data['img'][0])){
+                foreach ($data['img'] as $key => $value) {
 
-                if($info['img']){
-                    @unlink( ROOT_PATH .Config('c_pub.img') . $info['img'] );
+                    $saveName = request()->time().rand(0,99999) . '.png';
+
+                    $img=base64_decode($value);
+                    //生成文件夹
+                    $names = "goods" ;
+                    $name = "goods/" .date('Ymd',time()) ;
+                    if (!file_exists(ROOT_PATH .Config('c_pub.img').$names)){ 
+                        mkdir(ROOT_PATH .Config('c_pub.img').$names,0777,true);
+                    }
+                    //保存图片到本地
+                    file_put_contents(ROOT_PATH .Config('c_pub.img').$name.$saveName,$img);
+
+                    unset($data['img'][$key]);
+                    $data['img'][] = $name.$saveName;
                 }
+                $data['img'] = array_values($data['img']);
+                
+                foreach ($data['img'] as $key => $value) {
+                    
+                    $datas[$key]['picture'] = $value;
+                    $datas[$key]['goods_id'] = $data['goods_id'];
+                }
+
+                Db::table('goods_img')->insertAll($datas);
             }
+            // if( isset($data['img']) ){
+                
+            //     $saveName = request()->time().rand(0,99999) . '.png';
+
+            //     $img=base64_decode($data['img']);
+            //     //生成文件夹
+            //     $names = "goods" ;
+            //     $name = "goods/" .date('Ymd',time()) ;
+            //     if (!file_exists(ROOT_PATH .Config('c_pub.img').$names)){ 
+            //         mkdir(ROOT_PATH .Config('c_pub.img').$names,0777,true);
+            //     } 
+            //     //保存图片到本地
+            //     file_put_contents(ROOT_PATH .Config('c_pub.img').$name.$saveName,$img);
+
+            //     $data['img'] = $name.$saveName;
+
+            //     if($info['img']){
+            //         @unlink( ROOT_PATH .Config('c_pub.img') . $info['img'] );
+            //     }
+            // }
             
             if ( Db::table('goods')->strict(false)->update($data) !== false ) {
                 $this->success('修改成功', url('goods/index'));
@@ -274,6 +323,8 @@ class Goods extends Common
         $cat_id1 = Db::table('category')->where('level',1)->select();
         //商品二级分类
         $cat_id2 = Db::table('category')->where('level',2)->select();
+        //商品组图
+        $img = Db::table('goods_img')->where('goods_id','=',$goods_id)->select();
 
         return $this->fetch('goods/edit',[
             'meta_title'  =>  '编辑商品',
@@ -284,9 +335,47 @@ class Goods extends Common
             'goods_attr'  =>  $goods_attr,
             'cat_id1'     =>  $cat_id1,
             'cat_id2'     =>  $cat_id2,
+            'img'         =>  $img,
         ]);
     }
     
+    /**
+     * ajax设为主图
+     */
+    public function ImgMain(){
+        $id = input('id');
+        if(!$id){
+            return 0;
+        }
+
+        $res = Db::table('goods_img')->where('id','=',$id)->field('goods_id')->find();
+        if(!$res['goods_id']){
+            return 0;
+        }
+
+        Db::table('goods_img')->update(['id'=>$id,'main'=>1]);
+        
+        return Db::table('goods_img')->where('goods_id',$res['goods_id'])->where('id','neq',$id)->update(['main'=>0]);
+    }
+
+    /**
+     * ajax删除图片
+     */
+    public function del_img(){
+        if( request()->isAjax() ){
+            $data['id'] = input('id');
+            
+            $info = Db::table('goods_img')->find($data['id']);
+            if( !$info ){
+                return 0;
+            }
+
+            @unlink(ROOT_PATH .Config('c_pub.img') . $info['picture']);
+            
+            return Db::table('goods_img')->where('id','=',$data['id'])->delete();
+        }
+    }
+
     /*
      * ajax 删除商品
      */
@@ -733,19 +822,35 @@ class Goods extends Common
                 $this->error( $validate->getError() );
             }
 
+            $data['areas'] = array();
+            if(isset($data['citys'])){
+                foreach($data['citys'] as $key=>$value){
+                    $data['areas']['citys'][$key]            = $data['citys'][$key];
+                    $data['areas']['firstweight_qt'][$key]   = $data['firstweight_qt'][$key];
+                    $data['areas']['firstprice_qt'][$key]    = $data['firstprice_qt'][$key];
+                    $data['areas']['secondweight_qt'][$key]  = $data['secondweight_qt'][$key];
+                    $data['areas']['secondprice_qt'][$key]   = $data['secondprice_qt'][$key];
+                }
+            }
+            $data['areas'] = serialize($data['areas']);
+
             if($data['is_default']){
                 Db::table('goods_delivery')->where('delivery_id','neq',0)->update(['is_default'=>0]);
             }
             
-            if ( Db::table('goods_delivery')->insert($data) ) {
+            if ( Db::table('goods_delivery')->strict(false)->insert($data) ) {
                 $this->success('添加成功', url('goods/goods_delivery_list','',false));
             } else {
                 $this->error('添加失败');
             }
         }
 
+        $areas = file_get_contents(ROOT_PATH . 'public/upload/areas');
+        $areas = unserialize($areas);
+
         return $this->fetch('',[
             'meta_title'    =>  '添加配送方式',
+            'areas'         =>  $areas,
         ]);
     }
 
@@ -767,20 +872,38 @@ class Goods extends Common
                 $this->error( $validate->getError() );
             }
 
+            $data['areas'] = array();
+            if(isset($data['citys'])){
+                foreach($data['citys'] as $key=>$value){
+                    $data['areas']['citys'][$key]            = $data['citys'][$key];
+                    $data['areas']['firstweight_qt'][$key]   = $data['firstweight_qt'][$key];
+                    $data['areas']['firstprice_qt'][$key]    = $data['firstprice_qt'][$key];
+                    $data['areas']['secondweight_qt'][$key]  = $data['secondweight_qt'][$key];
+                    $data['areas']['secondprice_qt'][$key]   = $data['secondprice_qt'][$key];
+                }
+            }
+            $data['areas'] = serialize($data['areas']);
+
             if($data['is_default']){
                 Db::table('goods_delivery')->where('delivery_id','neq',0)->update(['is_default'=>0]);
             }
             
-            if ( Db::table('goods_delivery')->update($data) ) {
+            if ( Db::table('goods_delivery')->strict(false)->update($data) ) {
                 $this->success('修改成功', url('goods/goods_delivery_list','',false));
             } else {
                 $this->error('修改失败');
             }
         }
 
+        $info['areas'] = unserialize($info['areas']);
+
+        $areas = file_get_contents(ROOT_PATH . 'public/upload/areas');
+        $areas = unserialize($areas);
+
         return $this->fetch('',[
             'meta_title'    =>  '修改配送方式',
             'info'          =>  $info,
+            'areas'         =>  $areas,
         ]);
     }
 
@@ -797,4 +920,246 @@ class Goods extends Common
             }
         }
     }
+
+    /**
+     * 虚拟物品模版列表
+     */
+    public function virtual_goods_list(){
+
+        $where = [];
+        $pageParam = ['query' => []];
+
+        $title = input('title');
+        if( $title ){
+            $where["title"] = ['like', "%{$title}%"];
+            $pageParam['query']['title'] = ['like', "%{$title}%"];
+        }
+
+        $list = Db::table('virtual_goods')->where($where)->paginate(10,false,$pageParam);
+        $page = $list->render();
+        $list = $list->toArray();
+        if($list['data']){
+            foreach($list['data'] as $key=>$value){
+                $list['data'][$key]['use'] = Db::table('virtual_data')->where('type_id',$value['id'])->where('user_id','>',0)->count();
+                $list['data'][$key]['count'] = Db::table('virtual_data')->where('type_id',$value['id'])->count();
+            }
+        }
+        return $this->fetch('',[
+            'meta_title'    =>  '虚拟物品模版列表',
+            'list'          =>  $list,
+            'title'         =>  $title,
+            'page'          =>  $page,
+        ]);
+    }
+
+    /**
+     * 添加新模板
+     */
+    public function virtual_goods_add(){
+
+        $id = input('id');
+        
+        if( Request::instance()->isPost() ){
+            $data = input('post.');
+            $fields = array();
+            foreach($data['fields'] as $key=>$value){
+                $fields[$value] = $data['fields_name'][$key];
+            }
+            $data['fields'] = serialize($fields);
+            if($id){
+                Db::table('virtual_goods')->strict(false)->update($data);
+                $this->success('修改成功！',url('goods/virtual_goods_list'));
+            }else{
+                Db::table('virtual_goods')->strict(false)->insert($data);
+                $this->success('添加成功！',url('goods/virtual_goods_list'));
+            }
+        }
+
+        $info = Db::table('virtual_goods')->where('id',$id)->find();
+        if($info['fields']) $info['fields'] = unserialize($info['fields']);
+        
+        $cate = Db::table('virtual_category')->select();
+
+        return $this->fetch('',[
+            'meta_title'    =>  '添加新模板',
+            'cate'          =>  $cate,
+            'info'          =>  $info,
+        ]);
+    }
+
+    /**
+     * 删除虚拟商品
+     */
+    public function virtual_goods_del(){
+        if( request()->isAjax()){
+            $id = input('id');
+            if( Db::table('virtual_goods')->where('id','=',$id)->delete()){
+                jason([],'删除虚拟商品成功！');
+            }else{
+                jason([],'删除虚拟商品成功！',0);
+            }
+        }
+    }
+
+    /**
+     * 数据列表
+     */
+    public function virtual_data_list(){
+        $type_id = input('type_id');
+        if(!$type_id) $this->error('参数错误！');
+
+        $where['d.type_id'] = $type_id;
+        $pageParam['query']['type_id'] = $type_id;
+
+        $pvalue = input('pvalue');
+        if( $pvalue ){
+            $where["d.pvalue"] = ['like', "%{$pvalue}%"];
+            $pageParam['query']['pvalue'] = ['like', "%{$pvalue}%"];
+        }
+
+        $list = Db::table('virtual_data')->alias('d')
+                ->join('users u','u.user_id=d.user_id','LEFT')
+                ->join('order o','o.order_id=d.order_id','LEFT')
+                ->where($where)
+                ->field('d.*,u.realname,u.mobile,o.total_amount')
+                ->paginate(10,false,$pageParam);
+        
+        $key_title = Db::name('virtual_goods')->where('id',$type_id)->value('fields');
+        $key_title = unserialize($key_title);
+        
+        return $this->fetch('',[
+            'meta_title'    =>  '数据列表',
+            'list'          =>  $list,
+            'pvalue'        =>  $pvalue,
+            'key_title'     =>  $key_title,
+        ]);
+    }
+
+    /**
+     * 添加数据
+     */
+    public function virtual_data_add(){
+
+        $id = input('id');
+        $type_id = input('type_id');
+        
+        if(!$type_id) $this->error('参数错误！');
+
+        $key_title = Db::name('virtual_goods')->where('id',$type_id)->value('fields');
+        $key_title = unserialize($key_title);
+        
+        if( Request::instance()->isPost() ){
+            $data = input('post.');
+
+
+            $arr = [];
+            foreach ($data['tp_id'] as $index => $type_id) {
+                $values = array();
+                foreach ($key_title as $key => $name) {
+                    $values[$key] = $data['tp_value_' . $key][$index];
+                }
+                $arr[$index]['type_id'] = $type_id;
+                $arr[$index]['pvalue'] = $values['key'];
+                $arr[$index]['fields'] = serialize($values);
+                $arr[$index]['id'] = $id ? $id : '';
+            }
+
+            if($id){
+                Db::table('virtual_data')->strict(false)->update($arr[0]);
+                $this->success('修改成功！',url('goods/virtual_data_list',['type_id'=>$type_id],false));
+            }else{
+                Db::table('virtual_data')->strict(false)->insertAll($arr);
+                $this->success('添加成功！',url('goods/virtual_data_list',['type_id'=>$type_id],false));
+            }
+        }
+
+        $info = Db::table('virtual_data')->where('id',$id)->find();
+        if($info) $info['fields'] = unserialize($info['fields']);
+        
+        return $this->fetch('',[
+            'meta_title'    =>  '添加数据',
+            'key_title'     =>  $key_title,
+            'info'          =>  $info,
+        ]);
+    }
+
+    /**
+     * 删除数据
+     */
+    public function virtual_data_del(){
+        if( request()->isAjax()){
+            $id = input('id');
+            if( Db::table('virtual_data')->where('id','=',$id)->delete()){
+                jason([],'删除数据成功！');
+            }else{
+                jason([],'删除数据成功！',0);
+            }
+        }
+    }
+
+    /**
+     * 虚拟分类列表
+     */
+    public function virtual_category_list(){
+
+        $where = [];
+        $pageParam = ['query' => []];
+
+        $name = input('name');
+        if( $name ){
+            $where["name"] = ['like', "%{$name}%"];
+            $pageParam['query']['name'] = ['like', "%{$name}%"];
+        }
+
+        $list = Db::table('virtual_category')->where($where)->paginate(10,false,$pageParam);
+
+        return $this->fetch('',[
+            'meta_title'    =>  '虚拟分类列表',
+            'list'          =>  $list,
+            'name'          =>  $name,
+        ]);
+    }
+
+    /**
+     * 添加|修改 虚拟分类
+     */
+    public function virtual_category_add(){
+
+        $id = input('id');
+        $info = Db::name('virtual_category')->where('id',$id)->find();
+
+        if( Request::instance()->isPost() ){
+            $data = input('post.');
+            if(!$data['name']){
+                $this->error('分类名称不能为空！');
+            }
+            if($data['id']){
+                Db::table('virtual_category')->update($data);
+                $this->success('修改成功！',url('virtual_category_list'));
+            }else{
+                Db::table('virtual_category')->insert($data);
+                $this->success('添加成功！',url('virtual_category_list'));
+            }
+        }
+
+        return $this->fetch('',[
+            'meta_title'    =>  '添加虚拟分类',
+            'info'          =>  $info,
+        ]);
+    }
+
+    /**
+     * 删除虚拟分类
+     */
+    public function virtual_category_del(){
+        if( request()->isAjax()){
+            $id = input('id');
+            if( Db::table('virtual_category')->where('id','=',$id)->delete()){
+                jason([],'删除虚拟分类成功！');
+            }else{
+                jason([],'删除虚拟分类成功！',0);
+            }
+        }
+    }
+
 }

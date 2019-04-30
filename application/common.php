@@ -11,6 +11,22 @@ function pred($data){
     print_r($data);die;
 }
 
+//树结构
+function getTree1($items,$pid ="pid") {
+    $map  = [];
+    $tree = [];
+    foreach ($items as &$it){ $map[$it['cat_id']] = &$it; }  //数据的ID名生成新的引用索引树
+    foreach ($items as &$at){
+        $parent = &$map[$at[$pid]];
+        if($parent) {
+            $parent['children'][] = &$at;
+        }else{
+            $tree[] = &$at;
+        }
+    }
+    return $tree;
+}
+
 /**
  * 创建盐
  * @author tangtanglove <dai_hang_love@126.com>
@@ -500,7 +516,6 @@ function excel_export($file_name,$title,$data){
 
 //二维数组排序
 function towArraySort ($data,$key,$order = SORT_ASC) {
-
     try{
         //        dump($data);
         $last_names = array_column($data,$key);

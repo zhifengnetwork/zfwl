@@ -17,11 +17,19 @@ class ApiBase extends Controller
     protected $user_name;
 
     public function _initialize () {
+        header("Access-Control-Allow-Origin:*");
+        header("Access-Control-Allow-Methods:GET, POST, OPTIONS, DELETE");
+        header("Access-Control-Allow-Headers:*");
         config((new Config)->getConfig());
         if (session('admin_user_auth')) {
             $this->uid = session('admin_user_auth.uid');
             $this->user_name = session('admin_user_auth.user_name');
         } else {
+            $action = strtolower(Request::instance()->controller() . '/' . Request::instance()->action());
+            $action_array[] = strtolower('goods/categoryList');
+            if (in_array($action, $action_array)) {
+                return;
+            }
             exit(json_encode(['code'=>0,'msg'=>'您未登录，请登录！']));
         }
     }
@@ -38,8 +46,10 @@ class ApiBase extends Controller
     }
 
     public function ajaxReturn($data){
+      
         header('Access-Control-Allow-Origin:*');
         header('Access-Control-Allow-Headers:*');
+        header("Access-Control-Allow-Methods:GET, POST, OPTIONS, DELETE");
         header('Content-Type:application/json; charset=utf-8');
         exit(json_encode($data,JSON_UNESCAPED_UNICODE));
     }

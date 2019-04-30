@@ -19,24 +19,27 @@ class Order extends Common
      */
     public function index()
     {
-        $params_key       = ['status', 'pay_status',  'kw', 'order_id','invoice_no'];
+
+        $params_key       = ['order_status', 'pay_status', 'pay_code', 'kw', 'order_id','invoice_no'];
 
         //携带参数
         $where            = $this->get_where($params_key, $param_arr);
+
+       
         $list             = OrderModel::alias('uo')->field('uo.*,d.order_id as order_idd,d.invoice_no')
-            ->join("delivery_doc d",'uo.order_id=d.order_id','LEFT')
-            ->join("users a",'uo.user_id=a.user_id','LEFT')
-            ->where($where)
-            ->order('uo.order_id DESC')
-            ->paginate(10, false, ['query' => $where]);
+                ->join("delivery_doc d",'uo.order_id=d.order_id','LEFT')
+                ->join("users a",'uo.user_id=a.user_id','LEFT')
+                ->where($where)
+                ->order('uo.order_id DESC')
+                ->paginate(10, false, ['query' => $where]);
         // 导出设置
         $param_arr['tpl_type'] = 'export';
         // 模板变量赋值
         $this->assign('list', $list);
         //订单状态
-        $this->assign('status_list', config('ORDER_STATUS'));
+        $this->assign('order_status', config('ORDER_STATUS'));
         //支付方式
-        $this->assign('type_list',config('PAY_TYPE'));
+        $this->assign('pay_type',config('PAY_TYPE'));
         //支付状态
         $this->assign('pay_status',config('PAY_STATUS'));
         
@@ -77,6 +80,8 @@ class Order extends Common
         $this->assign('meta_title', '订单详情');
         return $this->fetch();
     }
+
+
 
     /**
      * 导出订单
@@ -158,10 +163,10 @@ class Order extends Common
         $end_time    = input('end_time', '');
         $order_id    = input('order_id', '');
         $invoice_no  = input('invoice_no', '');
-        $status      = input('status/d',0);
-        $kw          = input('kw', '');
-        $invoice_no  = input('invoice_no', '');
-        $type        = input('type/d', 0);
+        $order_status      = input('order_status/d',-1);
+        $kw              = input('kw', '');
+        $pay_code        = input('pay_code/d', -1);
+        $pay_status       = input('pay_status/d', -1);
         $where = [];
         if (!empty($order_id)) {
             $where['uo.order_id']    = $order_id;
@@ -169,13 +174,17 @@ class Order extends Common
         if (!empty($invoice_no)) {
             $where['d.invoice_no']   = $invoice_no;
         }
-        if($status > 0){
-            $where['uo.order_status'] = $status;
+        if($order_status >= 0){
+            $where['uo.order_status'] = $order_status;
+        }
+        if($pay_code >=0){
+            $where['uo.pay_code'] = $pay_code;
+        }
+        if($pay_status >=  0){
+            $where['uo.pay_status'] = $pay_status;
         }
 
-        if($type >  0){
-            $where['uo.pay_status'] = $type;
-        }
+
 
         if(!empty($kw)){
             is_numeric($kw)?$where['a.mobile'] = $kw:$where['a.realname'] = $kw;
@@ -195,8 +204,9 @@ class Order extends Common
         );
         $this->assign('kw', $kw);
         $this->assign('invoice_no', $invoice_no);
-        $this->assign('status', $status);
-        $this->assign('type', $type);
+        $this->assign('order_status', $order_status);
+        $this->assign('pay_status', $pay_status);
+        $this->assign('pay_code', $pay_code);
         $this->assign('order_id', $order_id);
         $this->assign('begin_time', empty($begin_time)?date('Y-m-d'):$begin_time);
         $this->assign('end_time', empty($end_time)?date('Y-m-d'):$end_time);
@@ -220,6 +230,10 @@ class Order extends Common
           return in_array($this->_loginRole,  ['super_manager', 'manager']) ? true : false;
       }
     }
+
+
+
+
 
    
      

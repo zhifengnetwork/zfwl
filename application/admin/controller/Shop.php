@@ -13,7 +13,14 @@ class Shop extends Common
 {
     public function _initialize () {
         parent::_initialize();
-      
+        header('Access-Control-Allow-Origin:*');
+        header('Access-Control-Allow-Methods:POST,GET,OPTIONS,DELETE');
+        header('Access-Control-Allow-Headers:*');
+        header('Content-Type:application/json; charset=utf-8');
+
+
+
+
         $info = session('admin_user_auth');
         $this->admin_id = $info['mgid'];
     }
@@ -27,12 +34,16 @@ class Shop extends Common
     }
 
     public function editShop () {
-        if (request()->isPost()){
-            $data = request()->param('data');
+            $id = request()->param('id');
+            $page_name = request()->param('page_name');
+            $data = request()->param('data/a');
+            if (empty($page_name)){
+                return json(['code'=>0,'msg'=>'请填写页面名称']);
+            }
             if (!empty($data)){
-                $res = model('DiyEweiShop')->edit($data,$this->admin_id);
+                $res = model('DiyEweiShop')->edit($data,$this->admin_id,$page_name,$id);
                 if ($res){
-                    return json(['code'=>1,'msg'=>'保存成功']);
+                    return json(['code'=>1,'msg'=>'保存成功','data'=>['id'=>$res]]);
                 }else{
                     return json(['code'=>0,'msg'=>'保存失败']);
                 }
@@ -40,12 +51,13 @@ class Shop extends Common
             }else{
                 return json(['code'=>0,'msg'=>'首页不能为空，请您添加组件']);
             }
-        }
+
     }
 
     public function getShopData () {
+        $id = request()->param('id');
 
-        $res = model('DiyEweiShop')->getShopData();
+        $res = model('DiyEweiShop')->getShopData($id);
         if (!empty($res)){
             return json(['code'=>1,'msg'=>'','data'=>$res]);
         }else{
@@ -88,7 +100,7 @@ class Shop extends Common
         $name  = "shops/" .date('Ymd',time());
         if (!file_exists(ROOT_PATH .Config('c_pub.img').$names)){ 
             mkdir(ROOT_PATH .Config('c_pub.img').$names,0777,true);
-        } 
+        }
         //保存图片到本地
         $r   = file_put_contents(ROOT_PATH .Config('c_pub.img').$name.$saveName,$imgs);
         $this->ajaxReturn(['code'=>1,'msg'=>'ok','data'=>SITE_URL.'/upload/images/'.$name.$saveName]);
@@ -97,6 +109,7 @@ class Shop extends Common
     public function ajaxReturn($data){
         header('Access-Control-Allow-Origin:*');
         header('Access-Control-Allow-Headers:*');
+        header("Access-Control-Allow-Methods:GET, POST, OPTIONS, DELETE");
         header('Content-Type:application/json; charset=utf-8');
         exit(json_encode($data,JSON_UNESCAPED_UNICODE));
     }

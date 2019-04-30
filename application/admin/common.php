@@ -31,22 +31,6 @@ function getTree($array, $pid =0, $level = 0){
     return $list;
 }
 
-//树结构
-function getTree1($items,$pid ="pid") {
-    $map  = [];
-    $tree = [];
-    foreach ($items as &$it){ $map[$it['cat_id']] = &$it; }  //数据的ID名生成新的引用索引树
-    foreach ($items as &$at){
-        $parent = &$map[$at[$pid]];
-        if($parent) {
-            $parent['children'][] = &$at;
-        }else{
-            $tree[] = &$at;
-        }
-    }
-    return $tree;
-}
-
 /**
  * 获取当前用户权限，控制菜单对某个用户是否显示
  */

@@ -1,6 +1,7 @@
 <?php
 namespace app\admin\controller;
-
+use think\Loader;
+use think\Request;
 use think\Db;
 
 /**
@@ -16,5 +17,86 @@ class Index extends Common
         $this->assign('meta_title', '首页');
         return $this->fetch();
     }
+
+    public function pay_set(){
+        if( Request::instance()->isPost() ){
+            $data = input('post.');
+            $path = ROOT_PATH . '/data/cert';
+            if (!file_exists($path)){ 
+                mkdir($path,0777,true);
+            }
+            $sec = '';
+            if (!empty($_FILES['weixin_cert_file']['name'])){
+                $sec['cert'] = $this->upload_cert('weixin_cert_file');
+            }
+            if (!empty($_FILES['weixin_key_file']['name'])){
+                $sec['key'] = $this->upload_cert('weixin_key_file');
+            }
+            if (!empty($_FILES['weixin_root_file']['name'])){
+                $sec['root'] = $this->upload_cert('weixin_root_file');
+            }
+            $update['sets']    =   serialize($data);
+            if(!empty($sec)){
+                $update['sec'] =   serialize($sec);
+            }
+            $res = Db::table('sysset')->where(['uniacid' => 3])->update($update);
+            if($res){
+                $this->success('编辑成功', url('index/pay_set'));
+            }
+            $this->error('编辑失败');
+        }
+        $sysset = Db::table('sysset')->field('*')->find();
+      
+        $set    = unserialize($sysset['sets']);
+        $sec    = unserialize($sysset['sec']);
+      
+        $this->assign('sec', $sec);
+        $this->assign('set', $set);
+        $this->assign('meta_title', '支付方式');
+        return $this->fetch();
+    }
+
+
+    public function pay_content(){
+        $sysset     = Db::table('sysset')->field('*')->find();
+        $set    = unserialize($sysset['sets']);
+        $payment    = unserialize($sysset['payment']);
+       
+        $set    = unserialize($sysset['sets']);
+        if( Request::instance()->isPost() ){
+            var_dump(input('post.'));
+            die;
+        }
+       
+        $this->assign('set', $set);
+        $this->assign('meta_title', '支付参数');
+        return $this->fetch();
+    }
+
+    public function upload_cert($file_name){
+        $dephp_2 = $file_name . '_1.pem';
+        $dephp_4 = $_FILES[$file_name]['name'];
+        $dephp_5 = $_FILES[$file_name]['tmp_name'];
+        if (!empty($dephp_4) && !empty($dephp_5)){
+            $dephp_6 = strtolower(substr($dephp_4, strrpos($dephp_4, '.')));
+            if ($dephp_6 != '.pem'){
+                $dephp_7 = "";
+                if ($file_name == 'weixin_cert_file'){
+                    $dephp_7 = 'CERT文件格式错误';
+                }else if ($file_name == 'weixin_key_file'){
+                    $dephp_7 = 'KEY文件格式错误';
+                }else if ($file_name == 'weixin_root_file'){
+                    $dephp_7 = 'ROOT文件格式错误';
+                }
+                $this->error($dephp_7);
+            }
+            return file_get_contents($dephp_5);
+        }
+        return "";
+    }
+
+
+
+
 
 }

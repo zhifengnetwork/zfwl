@@ -16,60 +16,116 @@ class Goods extends ApiBase
 {
 
    /**
-    * 分类接口
+    * 商品分类接口
     */
     public function categoryList()
     {
         
-        $data = Db::name('goods_category')->order('id')->select();
-        // dump($data);
-        $this->ajaxReturn(['status' => 0 , 'msg'=>'获取成功','data'=>$data]);
-    }
-    public function Products()
-    {
-        $cat_id = I('get.cat_id/d');
-        // dump($cat_id);exit;
-
-        // $data = Db::name('goods')->where('cat_id',$cat_id)->select();
-        $data = Db::name('goods')->where('cat_id',$cat_id)->field('goods_id,goods_name,original_img')->select();
-        //  dump($data);exit;
-
-        foreach($data as $k => $v){
-            $data[$k]['original_img'] = SITE_URL.$v['original_img'];
-        }
-
-        $this->ajaxReturn(['status' => 0 , 'msg'=>'获取成功','data'=>$data]);
-    }
-
-    /**
-    * 商品列表
-    */
-    public function goodsList(){
-        
-        $keywords = input('keywords');
-        $cat_id = input('cat_id');
-        
-        $where = [];
-
-        if ($keywords) $where['g.goods_name'] = array('like',"%{$keywords}%");
-        if ($cat_id){
-            $cat_id1 = Db::table('category')->where('cat_id',$cat_id)->value('pid');
-            if($pid){
-                $where['g.cat_id2'] = $cat_id;
-            }else{
-                $where['g.cat_id1'] = $cat_id;
+        $list = Db::name('category')->where('is_show',1)->order('sort DESC,cat_id ASC')->select();
+        $list  = getTree1($list);
+        foreach($list as $key=>$value){
+            $list[$key]['goods'] = Db::table('goods')->alias('g')
+                                ->join('goods_attr ga','FIND_IN_SET(ga.attr_id,g.goods_attr)','LEFT')
+                                ->where('cat_id1',$value['cat_id'])
+                                ->where('g.is_show',1)
+                                ->group('g.goods_id')
+                                ->join('goods_img gi','gi.goods_id=g.goods_id','LEFT')
+                                ->order('g.goods_id DESC')
+                                ->limit(4)
+                                ->field('g.goods_id,goods_name,img,price,original_price,GROUP_CONCAT(ga.attr_name) attr_name,g.cat_id1 comment')
+                                ->select();
+            if($list[$key]['goods']){
+                foreach($list[$key]['goods'] as $k=>$v){
+                    if($v['attr_name']){
+                        $list[$key]['goods'][$k]['attr_name'] = explode(',',$v['attr_name']);
+                    }else{
+                        $list[$key]['goods'][$k]['attr_name'] = array();
+                    }
+                }
             }
         }
         
-        $order['g.goods_id'] = 'desc';
-        $goodsM = model("Goods");
-        // 分页列表
-        $goodsRes = $goodsM->goodsList($where, $order);
-        $goodsRes = $goodsRes->toArray();
-        $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$goodsRes]);
+        $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$list]);
+    }
+
+    public function category(){
+        $cat_id = input('cat_id');
+        $cat_id2 = 'cat_id1';
+        $sort = input('sort');
+        $page = input('page',1);
+
+        $where = [];
+        $pageParam = ['query' => []];
+        if($cat_id){
+            $cate_list = Db::name('category')->where('is_show',1)->where('cat_id',$cat_id)->value('pid');
+            if($cate_list){
+                $cate_list = Db::name('category')->where('is_show',1)->where('pid',$cate_list)->select();
+                $cat_id2 = 'cat_id2';
+            }else{
+                $cate_list = Db::name('category')->where('is_show',1)->where('pid',$cat_id)->select();
+            }
+            $where[$cat_id2] = $cat_id;
+            $pageParam['query'][$cat_id2] = $cat_id;
+        }else{
+            $cate_list = Db::name('category')->where('is_show',1)->order('sort DESC,cat_id ASC')->select();
+        }
+        $cate_list  = getTree1($cate_list);
+
+        if($sort){
+            $order['order'] = ['price',$sort];
+        }else{
+            $order['order'] = ['goods_id','DESC'];
+        }
         
+        $goods_list = Db::name('goods')->where('is_show',1)->where($where)->field('goods_id,img,goods_name,desc,price,original_price,cat_id1 comment')->paginate(10,false,$pageParam)->toArray();
+        $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>['cate_list'=>$cate_list,'goods_list'=>$goods_list['data']]]);
 
     }
+
+    /**
+     * 商品详情
+     */
+    public function goodsDetail()
+    {
+        $goods_id = input('goods_id');
+
+        $goodsRes = Db::table('goods')->alias('g')
+                    ->join('goods_attr ga','FIND_IN_SET(ga.attr_id,g.goods_attr)','LEFT')
+                    ->join('goods_img gi','gi.goods_id=g.goods_id','LEFT')
+                    ->field('g.*,gi.picture img,GROUP_CONCAT(ga.attr_name) attr_name')
+                    ->find($goods_id);
+        if (empty($goodsRes)) {
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'商品不存在！']);
+        }
+
+        if($goodsRes['attr_name']){
+            $goodsRes['attr_name'] = explode(',',$goodsRes['attr_name']);
+        }else{
+            $goodsRes['attr_name'] = [];
+        }
+        
+        $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$goodsRes]);
+
+    }
+
+
+    // public function Products()
+    // {
+    //     $cat_id = I('get.cat_id/d');
+    //     // dump($cat_id);exit;
+
+    //     // $data = Db::name('goods')->where('cat_id',$cat_id)->select();
+    //     $data = Db::name('goods')->where('cat_id',$cat_id)->field('goods_id,goods_name,original_img')->select();
+    //     //  dump($data);exit;
+
+    //     foreach($data as $k => $v){
+    //         $data[$k]['original_img'] = SITE_URL.$v['original_img'];
+    //     }
+
+    //     $this->ajaxReturn(['status' => 0 , 'msg'=>'获取成功','data'=>$data]);
+    // }
+
+    
 
 
     //获取商品sku字符串
