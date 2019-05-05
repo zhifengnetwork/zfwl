@@ -2,14 +2,12 @@
 {extend name="common:base" /}
 {block name="style"}
 <style>
-
-
 </style>
 <link rel="stylesheet" href="__PAGE__/css/pc/public/public.css" />
 <link rel="stylesheet" href="__PAGE__/css/pc/edit_index.css" />
 {/block}
 {block name="content"}
-<div class="row">
+<div class="row" >
     <div class="col-lg-12">
        <div class="ibox">
             <div class="ibox-content">
@@ -1890,24 +1888,6 @@
             this.pageState['hide_var'] = true;
         },
 
-    });
-
-      // 删除
-      $('.delete').click(function(e) {
-        var id = this.id;
-        layer.confirm('是否确定删除', { icon: 3, title: '提示' }, function(index) {
-
-            $.post("{:url('delUserIntervene')}", { id: id }, function(res) {
-                if (res.code) {
-                    layer.msg(res.msg, { icon: 6 });
-                    setTimeout(function() {
-                        location.reload();
-                    }, 1000);
-                } else {
-                    layer.msg(res.msg, { icon: 5 });
-                }
-            });
-        });
     });
 </script>
 {/block}

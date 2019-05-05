@@ -18,7 +18,7 @@
     <div class="col-lg-12">
         <div class="ibox">
             <div class="ibox-title">
-                <div style=" position:absolute; right:30px; top:14px;">
+                <div style=" position:absolute; left:30px;; top:14px;">
                     <a class="btn btn-sm btn-info" style="margin-left: 0px;" href="{:url('index/page_edit')}">
                         添加一个新页面 <i class="fa fa-edit"></i>
                     </a>
@@ -40,24 +40,33 @@
                         </tr>
                     </thead> 
                     <tbody>
-                      
+                        {notempty name="list"}
+                        {volist name="list" id="vo"}
                         <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
+                            <td>{$vo.id}</td>
+                            <td>{$vo.page_name}</td>
+                            <td><p class="pType">
+                                <span>店铺首页</span>
+                            </p></td>
+                            <td>{$vo.add_time|date="Y-m-d H:i:s",###}</td>
+                            <td>{$vo.update_time|date="Y-m-d H:i:s",###}</td>
+                            <td>{eq name="$vo.status" value="1"}
+                                    <button data-toggle="button" class="btn btn-primary active qi" type="button" aria-pressed="true" status="{$vo.status}" page_id="{$vo.id}">启用</button>
+                                 {else/}
+                                    <button data-toggle="button" class="btn btn-primary active qi" type="button" aria-pressed="true" status="{$vo.status}" page_id="{$vo.id}">禁止</button>
+                                 {/eq}
+                                </td>
                             <td>
-                                <p class="operation">
-                                    <span @click="preview">预览</span> -
-                                    <span>编辑</span> -
-                                    <span>删除</span>
-                                </p>
+                                <a class="btn btn-default" @click="preview" page_id="{$vo.id}"><i class="fa fa-list"></i> 预览</a>
+                                <a class="btn btn-default editxz" href="{:url('index/page_edit',['id'=>$vo.id])}">编辑 <i class="fa fa-edit"></i></a>
+                                <a class="btn btn-default delete" id="{$vo.id}" >删除 <i class="fa fa-trash-o"></i></a>
                             </td>
                         </tr>
+                        {/volist}
+                        {/notempty}
                     </tbody>
                 </table>
+                {$list->render()}
             </div>
         </div>
       </div>  
@@ -275,6 +284,9 @@
         }
         return newMemory;
     }
+
+
+
     var newVue = new Vue({
         el: "#enable_page_wrap",
         data() {
@@ -298,11 +310,13 @@
                 phone_box:false,
                 // 是否启用
                 using:true,
+                page_id:12,
             }
         },
         methods:{
             preview(){
-                this.phone_box = !this.phone_box;	
+                this.phone_box = !this.phone_box;
+                this.page_id   = 80;	
             },
             pUsing(){
                 this.using = !this.using;
@@ -314,8 +328,8 @@
             var that = this;
             /*axios=>请求-页面数据*/
             axios.post('http://zfwl.zhifengwangluo.c3w.cc/admin/shop/getShopData', {
-                id: 12,
-            })
+                id: that.page_id,
+             })
                 .then(function (response) {
                     console.log(response['data']);
                     if (response['data']['code'] == 1) {
@@ -342,6 +356,47 @@
         },
         
     })
+
+    
+      // 删除
+      $('.delete').click(function(e) {
+        var id = this.id;
+        layer.confirm('是否确定删除', { icon: 3, title: '提示' }, function(index) {
+
+            $.post("{:url('del')}", { id: id }, function(res) {
+                if (res.code) {
+                    layer.msg(res.msg, { icon: 6 });
+                    setTimeout(function() {
+                        location.reload();
+                    }, 1000);
+                } else {
+                    layer.msg(res.msg, { icon: 5 });
+                }
+            });
+        });
+    });
+      // 删除
+      $('.qi').click(function(e) {
+        var id     = $(this).attr('page_id');
+        var status = $(this).attr('status');
+        if(status == 1){
+            var stat = '确定禁止';
+        }else{
+            var stat = '确定启用';
+        }
+        layer.confirm(stat, { icon: 3, title: '提示' }, function(index) {
+            $.post("{:url('status')}", { id: id }, function(res) {
+                if (res.code) {
+                    layer.msg(res.msg, { icon: 6 });
+                    setTimeout(function() {
+                        location.reload();
+                    }, 1000);
+                } else {
+                    layer.msg(res.msg, { icon: 5 });
+                }
+            });
+        });
+    });
 
 </script>
 

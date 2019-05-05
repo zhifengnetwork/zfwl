@@ -11,12 +11,20 @@ class Index extends Common
 {
     public function index()
     { 
+        $where      = array();
+        $list       = Db::table('diy_ewei_shop')->field('*')
+                    ->where($where)
+                    ->order('id')
+                    ->paginate(10, false, ['query' => $where]);
+        $this->assign('list', $list);
         $this->assign('meta_title', '店铺装修');
         return $this->fetch();
     }
 
 
     public function page_edit(){
+        $id  = input('id');
+        $res = model('DiyEweiShop')->getShopData($id);
         $this->assign('meta_title', '页面编辑');
         return $this->fetch();
     }
