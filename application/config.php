@@ -145,6 +145,8 @@ return [
         '__MOBILE__'   => '/static/mobile',
         '__IMAGES__'   => '/upload/images',
         '__PLIST__'    =>  '/plist',
+        '__PAGE__'    =>  '/static/page',
+
     ],
     // 默认跳转页面对应的模板文件
     'dispatch_success_tmpl'  => THINK_PATH . 'tpl' . DS . 'dispatch_jump.tpl',

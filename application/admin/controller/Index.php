@@ -11,7 +11,19 @@ class Index extends Common
 {
     public function index()
     { 
-        $this->assign('meta_title', '首页');
+        $this->assign('meta_title', '店铺装修');
+        return $this->fetch();
+    }
+
+
+    public function page_edit(){
+        $this->assign('meta_title', '页面编辑');
+        return $this->fetch();
+    }
+
+
+    public function page_add(){
+        $this->assign('meta_title', '页面新增');
         return $this->fetch();
     }
     /***
@@ -163,6 +175,9 @@ class Index extends Common
         $this->assign('meta_title', '支付交易设置');
         return $this->fetch();
     }
+
+
+
 
     public function upload_cert($file_name){
         $dephp_2 = $file_name . '_1.pem';
