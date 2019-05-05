@@ -69,14 +69,14 @@ return [
                 'title' => '消息提醒模板',
                 'sort'  => 3,
                 'icon'  => 'fa-th-large',
-                'url'   => '',
+                'url'   => 'index/notice',
                 'hide'  => 1,
                 'child' => [
                     [
                         'id'    => 20301,
                         'title' => '商城提醒',
                         'sort'  => 1,
-                        'url'   => '',
+                        'url'   => 'index/notice',
                         'hide'  => 1,
                     ],
                 ],

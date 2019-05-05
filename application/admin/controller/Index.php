@@ -140,8 +140,7 @@ class Index extends Common
     public function notice(){
         $sysset     = Db::table('sysset')->field('*')->find();
         $set        = unserialize($sysset['sets']);
-        var_dump($set);
-        exit;
+       
         if(Request::instance()->isPost()){
             $trade          = input('post.');
             
@@ -155,7 +154,8 @@ class Index extends Common
             }
             $this->error('编辑失败');
         }
-
+        
+        $this->assign('newtype', [0,1]);
         $this->assign('set', $set);
         $this->assign('meta_title', '支付交易设置');
         return $this->fetch();
