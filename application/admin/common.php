@@ -31,6 +31,124 @@ function getTree($array, $pid =0, $level = 0){
     return $list;
 }
 
+function setSukMore($goods_id, $data_spec)
+{   
+    $all_spec = Db::name('goods_spec')->column('spec_name', 'spec_id');
+    foreach ($data_spec as $key => $val) {
+        $sku_data = array();
+        $sku_attr = '';
+        $map = [];
+        foreach ($val as $k => $v) {
+            if ($v['key'] != '库存' && $v['key'] != 'pri' && $v['key'] != 'tiered_pri') {
+                $goods_spec_data = array();
+                $spec_id = array_keys($all_spec, $v['key'])[0];
+                $goods_spec_data['spec_id'] = $spec_id;
+                $goods_spec_data['attr_name'] = $v['value'];
+                $goods_spec_data['goods_id'] = $goods_id;
+                // 判断此商品的spec_attr是否存在，不存在才添加（去重操作）
+                $map['goods_id'] = $goods_id;
+                $map['attr_name'] = $v['value'];
+                $find_data = Db::name('goods_spec_attr')->where($map)->find();
+                if ($find_data === null) {
+                    $attr_id = Db::name('goods_spec_attr')->insertGetId($goods_spec_data);
+                } else {
+                    $attr_id = $find_data['attr_id'];
+                }
+                $sku_attr .= "$spec_id:$attr_id,";
+            } else if ($v['key'] == '库存') {
+                $sku_data['inventory'] = $v['value'];
+            } else if ($v['key'] == 'pri') {
+                $sku_data['price'] = $v['value'];
+            }
+        }
+
+        $sku_attr = trim($sku_attr, ',');
+        $sku_data['sku_attr'] = '{' . $sku_attr . '}';
+        $sku_data['goods_id'] = $goods_id;
+        $sku_data['sales'] = 0;
+        $sku_data['virtual_sales'] = rand(223, 576);
+        $res2 = Db::table('goods_sku')->insert($sku_data);
+        if (!$res2) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+function setSukMore2($goods_id, $data_spec)
+{
+    $all_spec = Db::name('goods_spec')->column('spec_name', 'spec_id');
+    $sku_all_id = Db::name('goods_sku')->where('goods_id', $goods_id)->column('sku_id');// 旧的
+    $spec_attr_all = Db::name('goods_spec_attr')->where('goods_id', $goods_id)->column('attr_name', 'attr_id');
+    foreach ($data_spec as $key => $val) {
+        $sku_data = array();
+        $sku_attr = '';
+        $map = [];
+        foreach ($val as $k => $v) {
+            if ($k !== 'sku_id') {
+                if ($v['key'] != '库存' && $v['key'] != 'pri' && $v['key'] != 'tiered_pri') {
+                    $goods_spec_data = array();
+                    $spec_id = array_keys($all_spec, $v['key'])[0];
+                    $goods_spec_data['spec_id'] = $spec_id;
+                    $goods_spec_data['attr_name'] = $v['value'];
+                    $goods_spec_data['goods_id'] = $goods_id;
+                    // 判断此商品的spec_attr是否存在，不存在才添加（去重操作）
+                    $map['goods_id'] = $goods_id;
+                    $map['attr_name'] = $v['value'];
+                    $find_data = Db::name('goods_spec_attr')->where($map)->find();
+                    if ($find_data === null) {
+                        $attr_id = Db::name('goods_spec_attr')->insertGetId($goods_spec_data);
+                    } else {
+                        $attr_id = $find_data['attr_id'];
+                    }
+                    $new_spec_all[] = $attr_id;
+                    $sku_attr .= "$spec_id:$attr_id,";
+                } else if ($v['key'] == '库存') {
+                    $sku_data['inventory'] = $v['value'];
+                } else if ($v['key'] == 'pri') {
+                    $sku_data['price'] = $v['value'];
+                }
+            } else {
+                $sku_data['sku_id'] = $v;
+            }
+        }
+        $sku_attr = trim($sku_attr, ',');
+        $sku_data['sku_attr'] = '{' . $sku_attr . '}';
+        $sku_data['goods_id'] = $goods_id;
+        $sku_data['sales'] = 0;
+        $new_skuid_all[] = $val['sku_id'];
+        if (!in_array($sku_data['sku_id'], $sku_all_id) && $sku_data['sku_id'] == '') {
+            $sku_data['virtual_sales'] = rand(223, 576);
+            $res2 = Db::name('goods_sku')->insertGetId($sku_data);
+        } else {
+            $res2 = Db::name('goods_sku')->where('sku_id', $sku_data['sku_id'])->update($sku_data);
+        }
+
+        if (!$res2) {
+            return 0;
+        }
+    }
+    // 删除多余的spec_attr
+    foreach ($spec_attr_all as $key => $val) {
+        if (!in_array($key, $new_spec_all)) {
+            $res2 = Db::name('goods_spec_attr')->where('attr_id', $key)->delete();
+            if (!$res2) {
+                return 0;
+            }
+        }
+    }
+    // 删除多余的sku
+    foreach ($sku_all_id as $key => $val) {
+        if (!in_array($val, $new_skuid_all)) {
+            $res2 = Db::name('goods_sku')->where('sku_id', $val)->delete();
+            if (!$res2) {
+                return 0;
+            }
+        }
+    }
+    return 1;
+}
+
 /**
  * 获取当前用户权限，控制菜单对某个用户是否显示
  */

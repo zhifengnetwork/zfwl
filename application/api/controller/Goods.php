@@ -28,11 +28,12 @@ class Goods extends ApiBase
                                 ->join('goods_attr ga','FIND_IN_SET(ga.attr_id,g.goods_attr)','LEFT')
                                 ->where('cat_id1',$value['cat_id'])
                                 ->where('g.is_show',1)
+                                ->where('gi.main',1)
                                 ->group('g.goods_id')
                                 ->join('goods_img gi','gi.goods_id=g.goods_id','LEFT')
                                 ->order('g.goods_id DESC')
                                 ->limit(4)
-                                ->field('g.goods_id,goods_name,img,price,original_price,GROUP_CONCAT(ga.attr_name) attr_name,g.cat_id1 comment')
+                                ->field('g.goods_id,goods_name,gi.picture img,price,original_price,GROUP_CONCAT(ga.attr_name) attr_name,g.cat_id1 comment')
                                 ->select();
             if($list[$key]['goods']){
                 foreach($list[$key]['goods'] as $k=>$v){
@@ -52,9 +53,11 @@ class Goods extends ApiBase
         $cat_id = input('cat_id');
         $cat_id2 = 'cat_id1';
         $sort = input('sort');
+        $goods_attr = input('goods_attr');
         $page = input('page',1);
 
         $where = [];
+        $whereRaw = [];
         $pageParam = ['query' => []];
         if($cat_id){
             $cate_list = Db::name('category')->where('is_show',1)->where('cat_id',$cat_id)->value('pid');
@@ -71,13 +74,28 @@ class Goods extends ApiBase
         }
         $cate_list  = getTree1($cate_list);
 
+        if($goods_attr){
+            $whereRaw = "FIND_IN_SET($goods_attr,goods_attr)";
+            $pageParam['query']['goods_attr'] = $goods_attr;
+        }
+
         if($sort){
-            $order['order'] = ['price',$sort];
+            $order['price'] = $sort;
         }else{
-            $order['order'] = ['goods_id','DESC'];
+            $order['goods_id'] = 'DESC';
         }
         
-        $goods_list = Db::name('goods')->where('is_show',1)->where($where)->field('goods_id,img,goods_name,desc,price,original_price,cat_id1 comment')->paginate(10,false,$pageParam)->toArray();
+        
+        $goods_list = Db::name('goods')->alias('g')
+                        ->join('goods_img gi','gi.goods_id=g.goods_id','LEFT')
+                        ->where('gi.main',1)
+                        ->where('is_show',1)
+                        ->where($where)
+                        ->where($whereRaw)
+                        ->order($order)
+                        ->field('g.goods_id,gi.picture img,goods_name,desc,price,original_price,cat_id1 comment')
+                        ->paginate(10,false,$pageParam)
+                        ->toArray();
         $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>['cate_list'=>$cate_list,'goods_list'=>$goods_list['data']]]);
 
     }
@@ -91,8 +109,7 @@ class Goods extends ApiBase
 
         $goodsRes = Db::table('goods')->alias('g')
                     ->join('goods_attr ga','FIND_IN_SET(ga.attr_id,g.goods_attr)','LEFT')
-                    ->join('goods_img gi','gi.goods_id=g.goods_id','LEFT')
-                    ->field('g.*,gi.picture img,GROUP_CONCAT(ga.attr_name) attr_name')
+                    ->field('g.*,GROUP_CONCAT(ga.attr_name) attr_name')
                     ->find($goods_id);
         if (empty($goodsRes)) {
             $this->ajaxReturn(['status' => -2 , 'msg'=>'商品不存在！']);
@@ -103,11 +120,51 @@ class Goods extends ApiBase
         }else{
             $goodsRes['attr_name'] = [];
         }
-        
+
+        $goodsRes['spec'] = $this->getGoodsSpec($goods_id);
+
+        $goodsRes['img'] = Db::table('goods_img')->where('goods_id',$goods_id)->field('picture')->order('main DESC')->select();
+
         $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$goodsRes]);
 
     }
 
+
+    public function getGoodsSpec($goods_id){
+
+        //从规格-属性表中查到所有规格id
+        $spec = Db::name('goods_spec_attr')->field('spec_id')->where('goods_id',$goods_id)->select();
+
+        $specArray = array();
+        foreach ($spec as $spec_k => $spec_v){
+            array_push($specArray,$spec_v['spec_id']);
+        }
+
+        $specArray = array_unique($specArray);
+        $specStr = implode(',',$specArray);
+
+        $specRes = Db::name('goods_spec')->field('spec_id,spec_name')->where('spec_id','in',$specStr)->select();
+
+        $data = array();
+        $data['goods_id'] = $goods_id;
+        foreach ($specRes as $key=>$value) {
+            //商品规格下的属性
+            $data['spec_id'] = $value['spec_id'];
+            $specRes[$key]['res'] = Db::name('goods_spec_attr')->field('attr_id,attr_name')->where($data)->select();
+        }
+
+        //sku信息
+        $skuRes = Db::name('goods_sku')->where('goods_id',$goods_id)->select();
+        foreach ($skuRes as $sku_k=>$sku_v){
+//            dump($sku_v['sku_attr']);die;
+            $sku_v['sku_attr'] = json_decode($sku_v['sku_attr']);
+        }
+        $specData = array();
+        $specData['spec_attr'] = $specRes;
+        $specData['goods_sku'] = $skuRes;
+
+        return $specData;
+    }
 
     // public function Products()
     // {

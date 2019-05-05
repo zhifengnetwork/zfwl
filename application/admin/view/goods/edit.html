@@ -36,6 +36,13 @@
         height: 20px;
         display: inline-block;
     }
+    .del_td {
+        background: url(__STATIC__/layui/src/images/icon_del.png) no-repeat 10px 0;
+        background-size: 20px auto;
+        width: 40px;
+        height: 20px;
+        display: inline-block;
+    }
     .upload_area .upload_btn input {
         opacity: 0;
         position: absolute;
@@ -71,7 +78,7 @@
                     <h5>{$meta_title}</h5>
                 </div>
                 <div class="ibox-content">
-                    <form method="post" class="form-horizontal" action="">
+                    <form method="post" class="form-horizontal" onsubmit="return check()" action="">
                         <div class="form-group">
                             <label class="col-sm-2 control-label"><span style="color:red;">*</span>商品名称</label>
                             <div class="col-sm-9">
@@ -79,63 +86,60 @@
                             </div>
                         </div>
 
-                        <div class="form-group">
-                            <label class="col-sm-2 control-label"><span style="color:red;">*</span>商品类型</label>
+
+                        <div class="row cl">
+                            <label class="col-sm-2 control-label">{:lang(\'规格\')}:</label>
                             <div class="col-sm-9">
-                                <div style="line-height:34px;float:left;margin:0 10px 0 0;">
-                                    <select class="form-control" name="type_id">
-                                        <option value="" >请选择类型</option>
-                                        {volist name="goods_type" id="vo"}
-                                        <option {if condition="$info.type_id eq $vo.type_id"} selected="" {/if} value="{$vo.type_id}">{$vo.type_name}</option>
-                                        {/volist}
-                                    </select>
+                                <div class="check-box" style="padding-left: 10px;padding-bottom: 5px;">
+                                    <input type="checkbox" checked id="checkbox-1">
+                                    <label for="checkbox-1" >规格</label>
+                                  </div>
+                                <button  class="btn btn-primary radius" type="button" style="margin-bottom: 10px;" onclick="addCol();">{:lang(\'其他属性\')}</button>
+                                <button  class="btn btn-primary radius" type="button" style="margin-bottom: 10px; float: right;" onclick="addRow();">{:lang(\'添加行\')}</button>
+                                <div>
+                                    <table id="goods_table" class="table table-border table-bordered table-striped">
+                                        <thead>
+                                         <tr>
+                                             <th>规格ID</th>
+                                             <th class="th_1"><input type="text" readonly="readonly" style="border: 0px;" name="goods_th[1][]" value="规格"></th>
+                                             {volist name='rsts.th' id='data_th'}
+                                             {if condition="($data_th neq '价格') and ($data_th neq '库存') and ($data_th neq '规格') and ($data_th neq '长度') and ($data_th neq '宽度') and ($data_th neq '高度') and ($data_th neq '体积') and ($data_th neq '重量') and ($data_th neq '温藏')"}
+                                                 <th class="th_{$key + 1}"><input type="text" readonly="readonly" style="border: 0px;width: 85%;" name="goods_th[{$key+1}][]" value="{$data_th}"><i class="Hui-iconfont Hui-iconfont-close th_close" style="color: #778899;display:none;"></i></th>
+                                             {/if}	
+                                             {/volist}
+                                             <th><input type="text" readonly="readonly" style="border: 0px;" name="pri_th[pri][]" value="本店售价(元)"></th>
+                                             <th><input type="text" readonly="readonly" style="border: 0px;" name="goods_th[num][]" value="库存"></th>
+                                             <th style="width: 25px;">操作</th>
+                                         </tr>
+                                         </thead>
+                                         <tbody>
+                                             {volist name='rsts.td' id='data_td'}
+                                             <tr {if condition="$key === 0"}class="tr_1"{/if}>
+                                                 {volist name='data_td' id='vo'}
+                                                     {if condition="($key !== 'com_price') and ($key !== 'inventory') and ($key !== 'l') and ($key !== 'w') and ($key !== 'h') and ($key !== 'v') and ($key !== 'wg') and ($key !== 'refrigerate') and ($key !== 'sku_id')"}
+                                                     <td class="td_{$key+1}"><input class="input-text" type="text" name="goods_td[{$key+1}][]" value="{$vo}"></td>
+                                                     {/if}
+                                                     {if condition="($key === 'inventory')"}
+                                                     <td><input class="input-text" type="text" name="goods_td[num][]" value="{$vo}"></td>
+                                                     {/if}
+                                                     {if condition="($key === 'com_price')"}
+                                                     <td>
+                                                         <input type="text" class="pri_id" value="{$vo}" name="pri_td[pri][]">
+                                                     </td>
+                                                     {/if}
+                                                     {if condition="($key === 'sku_id')"}
+                                                         <td><input type="text" readonly class="input-text" name="sku_id[]" value="{$vo}"></td>
+                                                     {/if}
+                                                 {/volist}
+                                                 <td onclick="delTr(this)"><i class="Hui-iconfont del_td"></i></td>
+                                             </tr>
+                                             {/volist}
+                                         </tbody>
+                
+                                    </table>
                                 </div>
                             </div>
                         </div>
-
-                        <div class="row cl">
-                            <label class="form-label col-sm-2 control-label"><span style="color:red;">*</span>{:lang(\'商品规格\')}:</label>
-                            <div class="formControls col-sm-9">
-                              <div class="addd"><input class="btn btn-secondary radius add" type="button" title="{:lang(\'添加一行\')}" value="{:lang(\'添加一行\')}&nbsp;&nbsp;"></div>
-                              <table class="table table-border table-bordered table-bg table-sort">
-                                <thead>
-                                  <tr class="text-c gg">
-                                    {volist name="spec" id="vo"}
-                                    <th width="">{:lang($vo.spec_name)}</th>
-                                    {/volist}
-                                    <th width="100">{:lang(\'市场售价\')}</th>
-                                    <th width="100">{:lang(\'库存\')}</th>
-                                    <th width="">{:lang(\'操作\')}</th>
-                                  </tr>
-                                </thead>
-                                <tbody id="tbd">
-                                
-                                  {volist name="sku" id="vog" key="sku_k"}
-                                  <input type="hidden" name="sku_id[]" value="{$vog.sku_id}">
-                                  <tr class="text-c vv">
-                                    {volist name="spec" id="sp" key="sp_k"}
-                                    <td class="bian">
-                                    <select name="attr_td[{$sp.spec_id}][]" style="width: 100px;" class="input-text validate">
-                                      <option value="">请选择</option>
-                                      {volist name="sp.spec_value" id="sp_val" key="sp_val_k"}
-                                      <option {if condition="isset( $vog['sku_attr'][$sp.spec_id] ) and $vog['sku_attr'][$sp.spec_id] eq $sp_val.val_id"} selected="" {/if} {$vog['sku_attr'][$sp.spec_id]}  {$sp_val.val_id} value="{$sp_val.val_id}">{$sp_val.val_name}</option>
-                                      {/volist}
-                                    </select>
-                                    </td>
-                                    {/volist}
-                      
-                                    <td><input type="text" class="input-text" value="{$vog.market_price}" name="market_price[]" /></td>
-                                    <td><input type="text" class="input-text read" value="{$vog.stock}" name="stocks[]" /></td>
-                                    <td>
-                                        <input class="btn btn-danger radius dels" sku_id="{$vog.sku_id}" style="display: inline-block;" type="button" value="{:lang(\'删除\')}">
-                                    </td>
-                                  </tr>
-                                 {/volist}
-                                </tbody>
-                              </table>
-                            </div>
-                            <div class="col-4"> </div>
-                          </div>
 
                         <div class="form-group">
                             <label class="col-sm-2 control-label">商品简介</label>
@@ -487,6 +491,81 @@
       }
       .mask_img img{position: relative;top: 30%;left: 50%;}
   </style>
+<script type="text/javascript">
+
+    var rowCount = $("#goods_table tbody").find("tr").length - 1; //行数
+    var colCount = $("#goods_table thead").find("tr").find("th").length - 4; //列数
+    
+    // 添加行
+    function addRow(){
+
+        var tr = $("#goods_table tbody").find("tr").eq(0).clone().find('input').val("").parents('tr').find('input').eq(0).attr('type','hidden').parents('tr');
+
+        console.log(tr);
+        $("#goods_table tbody").append(tr);
+        // rowCount++;
+    
+        // var base_row = $("#goods_table tbody .tr_1").html();
+        // if (typeof(base_row) == 'undefined') {
+            // var add_td;
+            // var add_td_len = $("#goods_table thead tr th").length - 11;
+            // for (var i = 0; i < add_td_len; i++) {
+            //     add_td += '<td class="td_'+(i+2)+'"><input class="input-text" type="text" name="goods_td['+(i+2)+'][]"></td>'
+            // }
+            // var base_row ='<td><input type="hidden" name="sku_id[]" value></td><td class="td_1"><input class="input-text" type="text" name="goods_td[1][]"></td>'+add_td+'<td><input class="input-text" type="text" name="attr_td[l][]"></td><td><input type="text" class="pri_id" name="pri_td[pri][]"></td><td><input class="input-text" type="text" name="goods_td[num][]"></td><td onclick="delTr(this)"><i class="Hui-iconfont del_td"></i></td>';
+        // }
+    
+        // var html = '<tr class = "tr_'+rowCount+'">'+base_row+'</tr>';
+    
+        // $("#goods_table tbody").append(html);
+        // var tr_num = "tr_"+rowCount;
+        // $("#goods_table tbody tr:last td input").attr('value', '');
+        // $("#goods_table tbody input[name='attr_td[v][]']").attr('value', 'nonentity');
+    }
+    
+    // 添加列
+    function addCol(){
+        colCount++;
+        var table_th;
+        table_th = prompt("请输入名称");
+        if (table_th == null) {
+            return false;
+        }
+        if (!table_th) {
+            alert('名称不能为空');
+            return false;
+        }
+        var th = '<th class="th_'+colCount+'"><input type="text" readonly="readonly" style="border: 0px;width:85%;" name="goods_th['+colCount+'][]" value="'+table_th+'"><i class="Hui-iconfont del_td th_close" style="color: #778899;display:none;"></i></th>';
+        var th_num = colCount - 1;
+        $("#goods_table thead tr .th_"+th_num).after(th);
+    
+        var trHtml = '<td class="td_'+colCount+'"><input class="input-text" type="text" name="goods_td['+colCount+'][]"></td>';
+        $("#goods_table tbody tr .td_"+th_num).after(trHtml);
+    }
+    
+    function delTr(this_td){
+        // console.log($(this_td).parent());
+        var len = $("#goods_table tbody tr").length;
+        if (len > 1) {
+            $(this_td).parent().remove();
+        }
+    }
+
+    // 表单提交前验证
+    function check(){
+        var v = 1;
+        $("#goods_table input[type='text']").each(function(){
+            var val = $(this).val();
+            if (val === '') {
+                
+                v = 0;
+            }
+        });
+        if (v == 0) {alert('规格不能为空');return false}
+    }
+</script>
+
+
 <script type="text/javascript">
 
     //限时卖
