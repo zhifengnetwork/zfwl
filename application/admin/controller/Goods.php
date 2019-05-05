@@ -84,19 +84,58 @@ class Goods extends Common
             if(!$validate->scene('add')->check($data)){
                 $this->error( $validate->getError() );
             }
-            // pred($data);
-            //规格处理
-            $sku_keys = array_keys($data['attr_td']);
-            $sku = [];
-            foreach ($data['attr_td'][$sku_keys[0]] as $key => $value) {
-                $sku[$key]['sku_attr'] = '{';
-                foreach ($sku_keys as $k => $v) {
-                    $sku[$key]['sku_attr'] .= '"' . $v . '"' . ':' . $data['attr_td'][$v][$key] . ',';
-                }
-                $sku[$key]['sku_attr'] = rtrim($sku[$key]['sku_attr'],',') . '}';
-                $sku[$key]['market_price']    = $data['market_price'][$key];
-                $sku[$key]['stock']           = $data['stocks'][$key];
+
+            // 本店售价
+            $pri = $data['pri_td']['pri'];
+            $pri_count = count($pri);
+            for ($m = 0; $m < $pri_count; $m++) {
+                $pri_arr = $pri[$m];
+                $data_spec[$m]['pri'] = ['key' => 'pri', 'value' => $pri_arr];
             }
+            // 初始化规格数据格式
+            $count = count($data['goods_td'][1]);
+            for ($i = 0; $i < $count; $i++) {
+                foreach ($data['goods_th'] as $key => $val) {
+                    $value = $data['goods_td'][$key][$i];
+                    if (isset($value) && $value !== '') {
+                        if ($key == 'pri' || $key == 'num') {
+                            if (!is_numeric($value)) {
+                                $this->error( $val[0] . '不能为非数字' );
+                            }
+                        }
+                        $data_spec[$i][] = ['key' => $val[0], 'value' => $value];
+                    }
+                }
+            }
+            if (is_string($data_spec)) {
+                $this->error('规格错误！');
+            }
+            
+            foreach ($data['goods_th'] as $key => $val) {
+                if ($key !== 'num' && $key !== 'pri') {
+                    if (!empty($data['goods_td'][$key])) {
+                        $spec_str = implode(';', array_unique($data['goods_td'][$key]));
+                    } else {
+                        $spec_str = '';
+                    }
+                    $default_spec[] = json_encode(['key'=>$val[0], 'value'=>$spec_str], JSON_UNESCAPED_UNICODE);
+                }
+            }
+            $default_spec_str = implode(',', $default_spec);
+            $current_spec = $data['goods_th'];
+            unset($current_spec['num'],$current_spec['pri']);
+            
+            $all_spec = Db::name('goods_spec')->column('spec_name','spec_id');
+            foreach ($current_spec as $key => $val) {
+                if (!in_array(trim($val[0]), $all_spec)) {
+                    $new_spec['spec_name'] = $val[0];
+                    $rst = Db::table('goods_spec')->insert($new_spec);
+                    if (!$rst) {
+                        $this->error('添加新商品规格类型出错!');
+                    }
+                }
+            }
+            $data['goods_spec'] = '[' . $default_spec_str . ']';
 
             if( isset( $data['goods_attr'] ) ){
                 if( in_array( 6 , $data['goods_attr']  ) ){
@@ -145,20 +184,18 @@ class Goods extends Common
                     Db::table('goods_img')->insertAll($datas);
                 }
 
-                //库存
-                foreach ($sku as $key => $value) {
-                    $sku[$key]['goods_id'] = $goods_id;
-                    Db::name('goods_sku')->insert($sku[$key]);
+                $skuRes = setSukMore($goods_id, $data_spec);
+                if ($skuRes) {
+                    $this->success('添加商品成功',url('goods/add'));
+                }else{
+                    $this->error('添加商品失败');
                 }
-                $this->success('添加成功', url('goods/add'));
             } else {
                 $this->error('添加失败');
             }
 
         }
 
-        //商品类型
-        $goods_type = Db::table('goods_type')->select();
         //商品属性
         $goods_attr = Db::table('goods_attr')->select();
         //商品一级分类
@@ -168,7 +205,6 @@ class Goods extends Common
 
         return $this->fetch('goods/add',[
             'meta_title'    =>  '添加商品',
-            'goods_type'    =>  $goods_type,
             'goods_attr'    =>  $goods_attr,
             'cat_id1'       =>  $cat_id1,
             'cat_id2'       =>  $cat_id2,
@@ -191,45 +227,75 @@ class Goods extends Common
         
         if( Request::instance()->isPost() ){
             $data = input('post.');
-            // pred($data);
+            
             //验证
             $validate = Loader::validate('Goods');
             if(!$validate->scene('edit')->check($data)){
                 $this->error( $validate->getError() );
             }
 
-            //规格处理
-            $sku_keys = array_keys($data['attr_td']);
-            $sku = [];
-            $new_sku = [];
-            foreach ($data['attr_td'][$sku_keys[0]] as $key => $value) {
-                if(isset($data['sku_id'][$key])){
+            // 规格id
+            $sku_id_arr = $data['sku_id'];
+            for ($n = 0; $n < count($sku_id_arr); $n++) {
+                $data_spec[$n]['sku_id'] = $data['sku_id'][$n];
+            }
 
-                    $sku[$key]['sku_attr'] = '{';
-                    foreach ($sku_keys as $k => $v) {
-                        $sku[$key]['sku_attr'] .= '"' . $v . '"' . ':' . $data['attr_td'][$v][$key] . ',';
+            // 本店售价
+            $pri = $data['pri_td']['pri'];
+            $pri_count = count($pri);
+            for ($m = 0; $m < $pri_count; $m++) {
+                $pri_arr = $pri[$m];
+                $data_spec[$m]['pri'] = ['key' => 'pri', 'value' => $pri_arr];
+            }
+            // 初始化规格数据格式
+            $count = count($data['goods_td'][1]);
+            for ($i = 0; $i < $count; $i++) {
+                foreach ($data['goods_th'] as $key => $val) {
+                    $value = $data['goods_td'][$key][$i];
+                    if (isset($value) && $value !== '') {
+                        if ($key == 'pri' || $key == 'num') {
+                            if (!is_numeric($value)) {
+                                $this->error( $val[0] . '不能为非数字' );
+                            }
+                        }
+                        $data_spec[$i][] = ['key' => $val[0], 'value' => $value];
                     }
-                    $sku[$key]['sku_attr'] = rtrim($sku[$key]['sku_attr'],',') . '}';
-
-                    $sku[$key]['sku_id']          = $data['sku_id'][$key];
-                    $sku[$key]['market_price']    = $data['market_price'][$key];
-                    $sku[$key]['stock']           = $data['stocks'][$key];
-
-                    Db::table('goods_sku')->update($sku[$key]);
-                }else{
-                    $new_sku[$key]['sku_attr'] = '{';
-                    foreach ($sku_keys as $k => $v) {
-                        $new_sku[$key]['sku_attr'] .= '"' . $v . '"' . ':' . $data['attr_td'][$v][$key] . ',';
-                    }
-                    $new_sku[$key]['sku_attr'] = rtrim($new_sku[$key]['sku_attr'],',') . '}';
-
-                    $new_sku[$key]['goods_id']        = $data['goods_id'];
-                    $new_sku[$key]['market_price']    = $data['market_price'][$key];
-                    $new_sku[$key]['stock']           = $data['stocks'][$key];
-
-                    Db::table('goods_sku')->insert($new_sku[$key]);
                 }
             }
+            if (is_string($data_spec)) {
+                $this->error('规格错误！');
+            }
+
+            foreach ($data['goods_th'] as $key => $val) {
+                if ($key !== 'num' && $key !== 'pri') {
+                    if (!empty($data['goods_td'][$key])) {
+                        $spec_str = implode(';', array_unique($data['goods_td'][$key]));
+                    } else {
+                        $spec_str = '';
+                    }
+                    $default_spec[] = json_encode(['key'=>$val[0], 'value'=>$spec_str], JSON_UNESCAPED_UNICODE);
+                }
+            }
+            $default_spec_str = implode(',', $default_spec);
+
+            // 判断是否新的规格名称gl_goods_spec
+            $current_spec = $data['goods_th'];
+            unset($current_spec['num'],$current_spec['pri']);
+            $all_spec = Db::name('goods_spec')->column('spec_name','spec_id');
+            
+            foreach ($current_spec as $key => $val) {
+                if (!in_array($val[0],$all_spec)) {
+                    $new_spec['spec_name'] = $val[0];
+                    $rst = Db::name('goods_spec')->insert($new_spec);
+                    if (!$rst) {
+                        $this->error('添加新商品规格类型出错!');
+                    }
+                }
+            }
+    
+            $data['goods_spec'] = '[' . $default_spec_str . ']';
+            
+            $skuRes = setSukMore2($goods_id, $data_spec);
 
             if( isset( $data['goods_attr'] ) ){
                 if( in_array( 6 , $data['goods_attr']  ) ){
@@ -238,10 +304,6 @@ class Goods extends Common
                 }
                 $data['goods_attr'] = implode( ',' , $data['goods_attr'] );
             }
-
-            $data['add_time'] = strtotime( $data['add_time'] );
-
-
 
             //图片处理
             if( isset($data['img']) && !empty($data['img'][0])){
@@ -272,26 +334,6 @@ class Goods extends Common
 
                 Db::table('goods_img')->insertAll($datas);
             }
-            // if( isset($data['img']) ){
-                
-            //     $saveName = request()->time().rand(0,99999) . '.png';
-
-            //     $img=base64_decode($data['img']);
-            //     //生成文件夹
-            //     $names = "goods" ;
-            //     $name = "goods/" .date('Ymd',time()) ;
-            //     if (!file_exists(ROOT_PATH .Config('c_pub.img').$names)){ 
-            //         mkdir(ROOT_PATH .Config('c_pub.img').$names,0777,true);
-            //     } 
-            //     //保存图片到本地
-            //     file_put_contents(ROOT_PATH .Config('c_pub.img').$name.$saveName,$img);
-
-            //     $data['img'] = $name.$saveName;
-
-            //     if($info['img']){
-            //         @unlink( ROOT_PATH .Config('c_pub.img') . $info['img'] );
-            //     }
-            // }
             
             if ( Db::table('goods')->strict(false)->update($data) !== false ) {
                 $this->success('修改成功', url('goods/index'));
@@ -300,23 +342,8 @@ class Goods extends Common
             }
         }
 
-        //sku
-        $sku = Db::table('goods_sku')->where('goods_id','=',$info['goods_id'])->select();
-        if($sku){
-            foreach ($sku as $key => $value) {
-                $sku[$key]['sku_attr'] = json_decode( $value['sku_attr'] ,true );
-            }
-        }
-
-        $spec = Db::table('goods_spec')->where('type_id','=',$info['type_id'])->select();
-        if( $spec ){
-            foreach ($spec as $key => $value) {
-                $spec[$key]['spec_value'] = Db::table('goods_spec_val')->where('spec_id','=',$value['spec_id'])->select();
-            }
-        }
+        $rsts = $this->get_spec_info($goods_id);
         
-        //商品类型
-        $goods_type = Db::table('goods_type')->select();
         //商品属性
         $goods_attr = Db::table('goods_attr')->select();
         //商品一级分类
@@ -329,16 +356,47 @@ class Goods extends Common
         return $this->fetch('goods/edit',[
             'meta_title'  =>  '编辑商品',
             'info'        =>  $info,
-            'sku'         =>  $sku,
-            'spec'        =>  $spec,
-            'goods_type'  =>  $goods_type,
             'goods_attr'  =>  $goods_attr,
             'cat_id1'     =>  $cat_id1,
             'cat_id2'     =>  $cat_id2,
             'img'         =>  $img,
+            'rsts'        =>  $rsts,
         ]);
     }
     
+    // 获取规格详细信息(不要改变添加数组值的位置)
+    public function get_spec_info($goods_id){
+        $sku_info = Db::table('goods_sku')->where('goods_id',$goods_id)->select();
+        $spec_arr = Db::table('goods_spec')->column('spec_name', 'spec_id');
+        $spec_attr_arr = Db::name('goods_spec_attr')->where('goods_id', $goods_id)->column('attr_name', 'attr_id');
+
+        $spec_info = [];
+        $spec_th = [];
+        foreach ($sku_info as $key => $val) {
+            $sku_attr = explode(',', trim(trim($val['sku_attr'], '{'), '}'));
+            $spec_info[$key]['sku_id'] = $val['sku_id'];
+            
+            foreach ($sku_attr as $k => $v) {
+                $sku_attr_arr = explode(':', $v);
+                $spec_th[$k] = $spec_arr[$sku_attr_arr[0]];
+                $spec_info[$key][] = $spec_attr_arr[$sku_attr_arr[1]];
+            }
+            
+            if ($sku_info[$key]['price'] !== '') {
+                // $spec_info[$key]['com_price'] = '1|'.$val['price'];
+                $spec_info[$key]['com_price'] = $val['price'];
+            }
+            
+            $spec_info[$key]['inventory'] = $val['inventory'];
+        }
+        
+        $spec_th[] = '价格';
+        $spec_th[] = '库存';
+        $info['th'] = $spec_th;
+        $info['td'] = $spec_info;
+        return $info;
+    }
+
     /**
      * ajax设为主图
      */

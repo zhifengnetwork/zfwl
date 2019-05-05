@@ -27,6 +27,8 @@ class ApiBase extends Controller
         } else {
             $action = strtolower(Request::instance()->controller() . '/' . Request::instance()->action());
             $action_array[] = strtolower('goods/categoryList');
+            $action_array[] = strtolower('goods/category');
+            $action_array[] = strtolower('goods/goodsDetail');
             if (in_array($action, $action_array)) {
                 return;
             }

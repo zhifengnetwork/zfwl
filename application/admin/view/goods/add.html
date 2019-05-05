@@ -36,6 +36,13 @@
         height: 20px;
         display: inline-block;
     }
+    .del_td {
+        background: url(__STATIC__/layui/src/images/icon_del.png) no-repeat 10px 0;
+        background-size: 20px auto;
+        width: 40px;
+        height: 20px;
+        display: inline-block;
+    }
     .upload_area .upload_btn input {
         opacity: 0;
         position: absolute;
@@ -79,44 +86,39 @@
                             </div>
                         </div>
 
-                        <div class="form-group">
-                            <label class="col-sm-2 control-label"><span style="color:red;">*</span>商品类型</label>
-                            <div class="col-sm-9">
-                                <div style="line-height:34px;float:left;margin:0 10px 0 0;">
-                                    <select class="form-control" name="type_id">
-                                        <option value="" >请选择类型</option>
-                                        {volist name="goods_type" id="vo"}
-                                        <option value="{$vo.type_id}">{$vo.type_name}</option>
-                                        {/volist}
-                                    </select>
+                        <div class="row cl">
+                            <label class="col-sm-2 control-label"><span style="color:red;">*</span>{:lang(\'规格\')}:</label>
+                            <div class="col-sm-10">
+                                <div class="check-box" style="padding-left: 10px;padding-bottom: 5px;">
+                                    <input type="checkbox" checked id="checkbox-1" disabled>
+                                    <label for="checkbox-1" >{:lang(\'规格\')}</label>
+                                  </div>
+                                <button  class="btn btn-primary radius" type="button" style="margin-bottom: 10px;" onclick="addCol();">{:lang(\'其他属性\')}</button>
+                                <button  class="btn btn-primary radius" type="button" style="margin-bottom: 10px; float: right;" onclick="addRow();">{:lang(\'添加行\')}</button>
+                                <div>
+                                    <table id="goods_table" class="table table-border table-bordered table-striped">
+                                        <thead>
+                                         <tr>
+                                             <th class="th_1"><input type="text" readonly="readonly" style="border: 0px;" name="goods_th[1][]" value="{:lang(\'规格\')}"></th>
+                                             <th><input type="text" readonly="readonly" style="border: 0px;" name="pri_th[pri][]" value="{:lang(\'本店售价(元)\')}"></th>
+                                             <th><input type="text" readonly="readonly" style="border: 0px;" name="goods_th[num][]" value="{:lang(\'库存\')}"></th>
+                                             <th style="width: 25px;">操作</th>
+                                         </tr>
+                                         </thead>
+                                         <tbody>
+                                             <tr class="tr_1">
+                                                 <td class="td_1"><input class="input-text" type="text" name="goods_td[1][]"></td>
+                                                 <td>
+                                                     <input type="text" class="pri_id" value="" name="pri_td[pri][]">
+                                                 </td>
+                                                 <td><input class="input-text" type="text" name="goods_td[num][]"></td>
+                                                 <td onclick="delTr(this)"><i class="Hui-iconfont del_td"></i></td>
+                                             </tr>
+                                         </tbody>
+                
+                                    </table>
                                 </div>
                             </div>
-                        </div>
-
-                        <div class="row cl">
-                            <label class="form-label col-sm-2 control-label"><span style="color:red;">*</span>{:lang(\'商品规格\')}:</label>
-                            <div class="formControls col-sm-9">
-                              <div class="addd"><input class="btn btn-secondary radius add" type="button" title="{:lang(\'添加一行\')}" value="{:lang(\'添加一行\')}&nbsp;&nbsp;"></div>
-                              <table class="table table-border table-bordered table-bg table-sort">
-                                <thead>
-                                  <tr class="text-c gg">
-                                    <th width="100">{:lang(\'市场售价\')}</th>
-                                    <th width="100">{:lang(\'库存\')}</th>
-                                    <th width="50">{:lang(\'操作\')}</th>
-                                  </tr>
-                                </thead>
-                                <tbody id="tbd">
-                                
-                                  <tr class="text-c vv">
-                                    <td><input type="text" class="input-text validate" name="market_price[]" /></td>
-                                    <td><input type="text" class="input-text validate" name="stocks[]" /></td>
-                                    <td><input class="btn btn-danger radius dels" type="button" value="{:lang(\'删除\')}"></td>
-                                  </tr>
-                               
-                                </tbody>
-                              </table>
-                            </div>
-                            <div class="col-4"> </div>
                         </div>
 
                         <div class="form-group">
@@ -451,6 +453,67 @@
 <script src="__STATIC__/layui/src/localResizeIMG2.js" type="text/javascript"></script>
 
 <script type="text/javascript">
+var rowCount = $("#goods_table tbody").find("tr").length - 1; //行数
+var colCount = $("#goods_table thead").find("tr").find("th").length - 3; //列数
+var col_id = 0;
+// 添加行
+function addRow(){
+	rowCount++;
+	var base_row = $("#goods_table tbody .tr_1").html();
+	if (typeof(base_row) == 'undefined') {
+		var add_td;
+		var add_td_len = $("#goods_table thead tr th").length - 10;
+		for (var i = 0; i < add_td_len; i++) {
+			add_td += '<td class="td_'+(i+2)+'"><input class="input-text" type="text" name="goods_td[1][]"></td>'
+		}
+		var base_row ='<td class="td_1"><input class="input-text" type="text" name="goods_td[1][]"></td>'+add_td+'<td><input class="input-text" type="text" name="attr_td[l][]"></td><td><input class="input-text" type="text" name="attr_td[w][]"></td><td><input class="input-text" type="text" name="attr_td[h][]"></td><td style="display: none;"><input class="input-text" type="text" name="attr_td[v][]" value="nonentity"></td><td><input class="input-text" type="text" name="attr_td[wg][]"></td><td><select style="height:25px" name="ref_td[ref][]"><option value="">--选择温藏--</option><option value="-18℃">-18℃</option><option value="-25℃ ~ -4℃">-25℃ ~ -4℃</option><option value="-4℃ ~ 10℃">-4℃ ~ 10℃</option><option value="0℃ ~ 8℃">0℃ ~ 8℃</option><option value="4℃ ~ 10℃">4℃ ~ 10℃</option></select></td><td><input type="hidden" class="pri_id" value="" name="pri_td[pri][]"><button  class="btn btn-primary radius pri_button" type="button">{:lang(\'本店售价\')}</button></td><td><input class="input-text" type="text" name="goods_td[num][]"></td><td onclick="delTr(this)"><i class="Hui-iconfont del_td"></i></td>';
+	}
+
+
+	var html = '<tr class = "tr_'+rowCount+'">'+base_row+'</tr>';
+
+	$("#goods_table tbody").append(html);
+}
+// 添加列
+function addCol(){
+    colCount++;
+    col_id ++;
+    var table_th;
+    table_th = prompt("{:lang(\'请输入名称\')}");
+    if (table_th == null) {
+        return false;
+    }
+    if (!table_th) {
+        alert('{:lang(\'名称不能为空\')}');
+        return false;
+    }
+
+    var th = '<th class="th_'+colCount+'"><input type="text" readonly="readonly" style="border: 0px;width:85%" name="goods_th['+colCount+'][]" value="'+table_th+'"><i class="Hui-iconfont del_td th_close" style="color: #778899;display:none;"></i></th>';
+    var th_num = colCount - 1;
+    $("#goods_table thead tr .th_"+th_num).after(th);
+
+    var trHtml = '<td class="td_'+colCount+'"><input class="input-text" type="text" name="goods_td['+colCount+'][]"></td>';
+    $("#goods_table tbody tr .td_"+th_num).after(trHtml);
+}
+
+function delTr(this_td){
+	var len = $("#goods_table tbody tr").length;
+	if (len > 1) {
+		$(this_td).parent().remove();
+	}
+}
+
+// 删除新增列
+$('#goods_table thead tr').on('mouseover', 'th', function(){
+	$(this).find('.th_close').css("display", "inline");
+})
+$('#goods_table thead tr').on('mouseout', 'th', function(){
+	$(this).find('.th_close').css("display", "none");
+})
+
+
+
+
 
     //限时卖
     $('.goods_attr').on('click',function(){
