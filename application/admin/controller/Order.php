@@ -82,6 +82,53 @@ class Order extends Common
     }
 
 
+    /***
+     * 发货单信息管理
+     */
+    public function senduser(){
+        $where      = array();
+        $list       = Db::table('exhelper_senduser')->field('*')
+                    ->where($where)
+                    ->order('id')
+                    ->paginate(10, false, ['query' => $where]);
+        $this->assign('list', $list);
+        $this->assign('meta_title', '发货单信息管理');
+        return $this->fetch();
+    }
+
+
+
+
+    /***
+     * 发货单打印
+     */
+    public function doprint(){
+        $this->assign('meta_title', '发货单打印');
+        return $this->fetch();
+    }
+
+    /***
+     * 快递单和发货单模板管理
+     */
+    public function express(){
+        $this->assign('meta_title', '模板管理');
+        return $this->fetch();
+    }
+
+    /***
+     * 打印设置
+     */
+    public function printset(){
+        $printset = Db::table('exhelper_sys')->find();
+        $this->assign('printset',$printset);
+        $this->assign('meta_title', '打印设置');
+        return $this->fetch();
+    }
+
+
+
+
+
 
     /**
      * 导出订单
