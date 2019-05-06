@@ -939,6 +939,8 @@
                 },
                 /* 页面渲染data || 传个后台-data ，对象形式*/
                 backData: {
+                	/*页面id*/
+                	page_id: null,
                     /*新增-页面名字*/
                     page_name: '',
                     data: [
@@ -1370,9 +1372,9 @@
             comTremFun(_id) {
                 var that = this;
                 /*(初始页面时，编辑模板box:v-show='false')*/
-                if(!that.pageState['hide_edit_box']) {
+                /*if(!that.pageState['hide_edit_box']) {
                     that.pageState['hide_edit_box'] = true;
-                }
+                }*/
                 /*轮播图*/
                 if(_id === 'rotationId') {
                     /*赋值对应的模块=>页面位置key_num*/
@@ -1461,6 +1463,8 @@
                     key_num: _key
                 }
                 console.log('对应的模板：', this.puStateObj);
+                /*出现对应-编辑模板*/
+                this.pageState['hide_edit_box'] = true;
 
             },
             /*遮罩层-tab切换*/
@@ -1859,6 +1863,8 @@
                 that.axios_state = false;
                 /*ajax*/
                 axios.post('http://zfwl.zhifengwangluo.c3w.cc/admin/shop/editShop', {
+                		/*页面id*/
+                		id: that.backData['page_id'],
                         /*页面名*/
                         page_name: that.backData['page_name'],
                         /*页面数据*/
@@ -1885,8 +1891,37 @@
         },
         /*挂载结束*/
         mounted: function() {
+        	var that = this;
             /*防止页面未渲染完成--vue的{{变量名}},v-cloak不管用*/
             this.pageState['hide_var'] = true;
+            /*赋值对应的id，用来=>保存对应-页面模板*/
+            that.backData['page_id'] = {$id};
+            console.log('编辑id:',that.backData['page_id']);
+            /*axios=>请求-页面数据*/
+			axios.post('http://zfwl.zhifengwangluo.c3w.cc/admin/shop/getShopData', {
+				id: that.backData['page_id'],
+			})
+			.then(function (response) {
+				console.log(response['data']);
+				if (response['data']['code'] == 1) {
+					/*alert(response['data']['msg']);*/
+					/*页面名字*/
+					that.backData['page_name'] = response['data']['data']['page_name'];
+					/*清除-页面渲染data的第一条绑定数据(无数据，用来绑定)，初始化*/
+					/*that.backData['data'].splice(0,1);*/
+					that.backData['data'] = [];
+					/*页面渲染数据*/
+					that.backData['data'] = clones(response['data']['data']['data']);
+				} else {
+					/*保存失败*/
+					alert(response['data']['msg']);
+				}
+			})
+			.catch(function (error) {
+				alert(error);
+				console.log(error);
+			});
+            
         },
 
     });

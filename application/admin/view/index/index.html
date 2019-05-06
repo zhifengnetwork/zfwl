@@ -6,6 +6,7 @@
     text-align: center;
 }
 </style>
+<link rel="stylesheet" href="__PAGE__/css/pc/public/swiper.min.css">
 <link rel="stylesheet" href="__PAGE__/css/pc/public/public.css" />
 <link rel="stylesheet" href="__PAGE__/css/pc/enable_page.css" />
 {/block}
@@ -51,13 +52,13 @@
                             <td>{$vo.add_time|date="Y-m-d H:i:s",###}</td>
                             <td>{$vo.update_time|date="Y-m-d H:i:s",###}</td>
                             <td>{eq name="$vo.status" value="1"}
-                                    <button data-toggle="button" class="btn btn-primary active qi" type="button" aria-pressed="true" status="{$vo.status}" page_id="{$vo.id}">启用</button>
+                                    <button data-toggle="button" class="btn btn-primary active qi" attr_url="{:url('index/page_enable',['id'=>$vo.id,'status'=>0])}" type="button" aria-pressed="true" status="{$vo.status}" page_id="{$vo.id}">启用</button>
                                  {else/}
-                                    <button data-toggle="button" class="btn btn-primary active qi" type="button" aria-pressed="true" status="{$vo.status}" page_id="{$vo.id}">禁止</button>
+                                    <button data-toggle="button" class="btn btn-primary active qi" attr_url="{:url('index/page_enable',['id'=>$vo.id,'status'=>1])}" type="button" aria-pressed="true" status="{$vo.status}" page_id="{$vo.id}">禁止</button>
                                  {/eq}
                                 </td>
                             <td>
-                                <a class="btn btn-default" @click="preview" page_id="{$vo.id}"><i class="fa fa-list"></i> 预览</a>
+                                <a class="btn btn-default" @click="preview(),send($event)" page_id="{$vo.id}"><i class="fa fa-list"></i> 预览</a>
                                 <a class="btn btn-default editxz" href="{:url('index/page_edit',['id'=>$vo.id])}">编辑 <i class="fa fa-edit"></i></a>
                                 <a class="btn btn-default delete" id="{$vo.id}" >删除 <i class="fa fa-trash-o"></i></a>
                             </td>
@@ -94,19 +95,15 @@
 								<!--div 循环-->
 								<div class="drag_box" v-for="(v,i) in backData['data']">
 									<!--轮播图 box-->
-									<div class="modle_box" v-if="v.id == 'rotationId'? true:''" :key="v.id">
-										<div class="slide_wrap">
-											<div id="slide_box">
-												<div class="slide_item_box">
-													<img class="slide_item_image" :src="v.data.images[0].imgUrl" alt="" />
-												</div>
-											</div>
-											<div class="slide_but" :class="v.params.butPosition">
-												<span v-for="(val,index) in v.data.images" :class="v.params.butStyle"
-													:style="{'background':index == 0?v.params.clickColor:v.params.butColor}"></span>
+									<div class="modle_box swiper-container" v-if="v.id == 'rotationId'? true:''" :key="v.id">
+										<div class="slide swiper-wrapper">
+											<div class="slide_item swiper-slide" v-for="(val,index) in v.data.images">
+												<img :src="val.imgUrl" alt="" />
 											</div>
 										</div>
-
+										<div class="slide_but swiper-pagination" :class="[v.params.butPosition,v.params.butStart]">
+											<span v-for="(val,index) in v.data.images" :class="v.params.butStyle" :style="{'background':index == 0?v.params.clickColor:v.params.butColor}"></span>
+										</div>
 									</div>
 
 									<!--搜索模块 box-->
@@ -261,6 +258,7 @@
 {block name="script"}
 <script src="__PAGE__/js/pc/public/vue.js"></script>
 <script src="__PAGE__/js/pc/public/axios.js"></script>
+<script src="__PAGE__/js/pc/public/swiper.min.js"></script>
 <script>
     // 深克隆，把引用数据类型的，分解成基础类型（克隆）
     // 第一个参数是数据，第二参数是数组或对象(想转换的类型)
@@ -310,44 +308,93 @@
                 phone_box:false,
                 // 是否启用
                 using:true,
-                page_id:12,
+                /*预览页面id*/
+                page_id: null,
             }
         },
         methods:{
+        	/*预览-显示隐藏*/
             preview(){
                 this.phone_box = !this.phone_box;
-                this.page_id   = 80;	
+//              this.page_id   = 80;	
             },
+            /*是否启用*/
             pUsing(){
                 this.using = !this.using;
                 return value=true;	
-            }
+            },
+            /* 预览-页面数据-请求*/
+			send(event){
+				var that = this;
+				that.page_id = Number(event.target.getAttribute("page_id"));
+				console.log('预览id:',that.page_id);
+				/*axios=>请求-页面数据*/
+				axios.post('http://zfwl.zhifengwangluo.c3w.cc/admin/shop/getShopData', {
+					id: that.page_id,
+				})
+				.then(function (response) {
+					console.log(response['data']);
+					if (response['data']['code'] == 1) {
+						/*alert(response['data']['msg']);*/
+						/*页面名字*/
+						that.backData['page_name'] = response['data']['data']['page_name'];
+						/*页面渲染数据*/
+						that.backData['data'] = clones(response['data']['data']['data']);
+						/*获取轮播图数据*/ 
+						for(let i=0;i<response.data.data.data.length;i++){
+							if(response.data.data.data[i].id=="rotationId"){
+								/*轮播图设置*/
+								let res=response.data.data.data[i];
+								console.log(res)
+								that.$nextTick(function(){
+									that.carousel(res);
+								});
+							}
+						}
+					} else {
+						/*保存失败*/
+						alert(response['data']['msg']);
+					}
+				})
+				.catch(function (error) {
+					alert(error);
+					console.log(error);
+				});
+			},
+			/*调用轮播插件*/
+			carousel(res){
+				var swiper = new Swiper('.swiper-container', {
+					autoplay: {
+						//自动播放
+						delay: 3000,
+						//用户操作swiper之后，是否禁止autoplay。默认为true：停止。
+						disableOnInteraction: false,
+					},
+					loop: true, // 循环模式选项
+					pagination:{
+							el: '.swiper-pagination',
+							// 自定义分页器，必须的type类型
+							type: 'custom',
+							renderCustom: function(swiper,current, total){
+								var paginationHtml = "";
+								for(var i= 0; i<total; i++) {
+									// 判断是不是激活焦点
+									if(i === (current-1)){
+											paginationHtml += '<span class="'+res.params.butStyle+'" style="background:'+res.params.clickColor+'"></span>';
+										}else{
+											paginationHtml += '<span class="'+res.params.butStyle+'" style="background:'+res.params.butColor+'"></span>';
+										}
+								}
+								return paginationHtml;
+						}
+					}
+				});       
+			},
+				
         },
         /*组件实例创建完成，属性已绑定，但DOM还未生成*/
         created: function () {
-            var that = this;
-            /*axios=>请求-页面数据*/
-            axios.post('http://zfwl.zhifengwangluo.c3w.cc/admin/shop/getShopData', {
-                id: that.page_id,
-             })
-                .then(function (response) {
-                    console.log(response['data']);
-                    if (response['data']['code'] == 1) {
-                        /*alert(response['data']['msg']);*/
-                        /*页面名字*/
-                        that.backData['page_name'] = response['data']['data']['page_name'];
-                        /*页面渲染数据*/
-                        that.backData['data'] = clones(response['data']['data']['data']);
-
-                    } else {
-                        /*保存失败*/
-                        alert(response['data']['msg']);
-                    }
-                })
-                .catch(function (error) {
-                    alert(error);
-                    console.log(error);
-                });
+        	
         },
         /*挂载结束*/
         mounted: function () {
@@ -358,8 +405,8 @@
     })
 
     
-      // 删除
-      $('.delete').click(function(e) {
+    // 删除
+    $('.delete').click(function(e) {
         var id = this.id;
         layer.confirm('是否确定删除', { icon: 3, title: '提示' }, function(index) {
 
@@ -375,8 +422,8 @@
             });
         });
     });
-      // 删除
-      $('.qi').click(function(e) {
+    // 启用
+    $('.qi').click(function(e) {
         var id     = $(this).attr('page_id');
         var status = $(this).attr('status');
         if(status == 1){

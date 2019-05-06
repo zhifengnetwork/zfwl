@@ -11,11 +11,12 @@ class Index extends Common
 {
     public function index()
     { 
-        $where      = array();
-        $list       = Db::table('diy_ewei_shop')->field('*')
+        $where= [];
+        $where['status'] = ['>=',0];
+        $list       = Db::table('diy_ewei_shop')
                     ->where($where)
                     ->order('id')
-                    ->paginate(10, false, ['query' => $where]);
+                    ->paginate(10, false, ['page' => request()->param('page')]);
         $this->assign('list', $list);
         $this->assign('meta_title', '店铺装修');
         return $this->fetch();
@@ -23,8 +24,8 @@ class Index extends Common
 
 
     public function page_edit(){
-        $id  = input('id');
-        $res = model('DiyEweiShop')->getShopData($id);
+        $id  = request()->param('id',0,'intval');
+        $this->assign('id',$id);
         $this->assign('meta_title', '页面编辑');
         return $this->fetch();
     }
@@ -34,6 +35,41 @@ class Index extends Common
         $this->assign('meta_title', '页面新增');
         return $this->fetch();
     }
+
+    public function page_enable () {
+        $id = request()->param('id',0,'intval');
+        $status = request()->param('id',0,'status');
+        if (!empty($id)){
+            $getPage = model('DiyEweiShop')->where(['id'=>$id])->find();
+            if (!empty($getPage)){
+                if ($getPage['status'] == $status){
+                    if ($status == 0){
+                        return json(['code'=>0, 'msg'=>'该页面已经是禁用了','data'=>[]]);
+                    }else{
+                        return json(['code'=>0, 'msg'=>'该页面已经是启用了','data'=>[]]);
+                    }
+                }else{
+                    if ($status == 1){
+                        $getThisEnablePage = model('DiyEweiShop')->where(['status'=>1])->find();
+                        if (!empty($getThisEnablePage)){
+                            model('DiyEweiShop')->where(['id'=>$getThisEnablePage['id']])->update(['status'=>0]);
+                        }
+                    }
+                    $updateThisPage = model('DiyEweiShop')->where(['id'=>$id])->update(['status'=>$status]);
+                    if ($updateThisPage){
+                        return json(['code'=>1, 'msg'=>'操作成功','data'=>[]]);
+                    }else{
+                        return json(['code'=>0, 'msg'=>'操作失败','data'=>[]]);
+                    }
+                }
+            }else{
+                return json(['code'=>0, 'msg'=>'页面不存在！','data'=>[]]);
+            }
+        }else{
+            return json(['code'=>0, 'msg'=>'id不存在','data'=>[]]);
+        }
+    }
+
     /***
      * 支付方式
      */
