@@ -329,7 +329,7 @@
 				that.page_id = Number(event.target.getAttribute("page_id"));
 				console.log('预览id:',that.page_id);
 				/*axios=>请求-页面数据*/
-				axios.post('http://zfwl.zhifengwangluo.c3w.cc/shop/getShopData', {
+				axios.post("{:url('shop/getShopData')}", {
 					id: that.page_id,
 				})
 				.then(function (response) {
