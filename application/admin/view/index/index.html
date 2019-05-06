@@ -60,7 +60,7 @@
                             <td>
                                 <a class="btn btn-default" @click="preview(),send($event)" page_id="{$vo.id}"><i class="fa fa-list"></i> 预览</a>
                                 <a class="btn btn-default editxz" href="{:url('index/page_edit',['id'=>$vo.id])}">编辑 <i class="fa fa-edit"></i></a>
-                                <a class="btn btn-default delete" id="{$vo.id}" >删除 <i class="fa fa-trash-o"></i></a>
+                                <a class="btn btn-default delete" attr_url="{:url('index/page_delete',['id'=>$vo.id])}" id="{$vo.id}" >删除 <i class="fa fa-trash-o"></i></a>
                             </td>
                         </tr>
                         {/volist}

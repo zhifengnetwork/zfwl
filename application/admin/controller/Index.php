@@ -70,6 +70,25 @@ class Index extends Common
         }
     }
 
+    public function page_delete () {
+        $id = request()->param('id',0,'intval');
+        if (!empty($id)) {
+            $getPage = model('DiyEweiShop')->where(['id' => $id])->find();
+            if (!empty($getPage)){
+                $delete = model('DiyEweiShop')->where(['id'=>$id])->update(['status'=>-1]);
+                if ($delete){
+                    return json(['code'=>1, 'msg'=>'操作成功','data'=>[]]);
+                }else{
+                    return json(['code'=>0, 'msg'=>'操作失败','data'=>[]]);
+                }
+            }else{
+                return json(['code'=>0, 'msg'=>'页面不存在！','data'=>[]]);
+            }
+        }else{
+                return json(['code'=>0, 'msg'=>'id不存在','data'=>[]]);
+            }
+    }
+
     /***
      * 支付方式
      */
