@@ -1502,7 +1502,7 @@
                 }
                 that.axios_state = false;
                 /*ajax*/
-                axios.post('http://zfwl.zhifengwangluo.c3w.cc/admin/shop/shop_img', {
+                axios.post('http://zfwl.zhifengwangluo.c3w.cc/shop/shop_img', {
                         img: that.upImages['baseUrl'],
                     })
                     .then(function(response) {
@@ -1759,7 +1759,7 @@
                 }
                 that.axios_state = false;
                 console.log('关键字:', that.search_data['key_word']);
-                axios.post('http://zfwl.zhifengwangluo.c3w.cc/admin/shop/gooodsList', {
+                axios.post('http://zfwl.zhifengwangluo.c3w.cc/shop/gooodsList', {
                         keyword: that.search_data['key_word'],
                     })
                     .then(function(response) {
@@ -1857,7 +1857,7 @@
                 }
                 that.axios_state = false;
                 /*ajax*/
-                axios.post('http://zfwl.zhifengwangluo.c3w.cc/admin/shop/editShop', {
+                axios.post('http://zfwl.zhifengwangluo.c3w.cc/shop/editShop', {
                         /*页面名*/
                         page_name: that.backData['page_name'],
                         /*页面数据*/

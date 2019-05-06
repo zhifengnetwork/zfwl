@@ -412,14 +412,6 @@ return [
                 ],
             ],
             [
-                'id'    => 50200,
-                'title' => '配送方式',
-                'sort'  => 2,
-                'url'   => 'delivery/index',
-                'icon'  => 'fa-th-large',
-                'hide'  => 1,
-            ],
-            [
                 'id'    => 50300,
                 'title' => '客服设置',
                 'sort'  => 3,
