@@ -52,15 +52,15 @@
                             <td>{$vo.add_time|date="Y-m-d H:i:s",###}</td>
                             <td>{$vo.update_time|date="Y-m-d H:i:s",###}</td>
                             <td>{eq name="$vo.status" value="1"}
-                                    <button data-toggle="button" class="btn btn-primary active qi" attr_url="{:url('index/page_enable',['id'=>$vo.id,'status'=>0])}" type="button" aria-pressed="true" status="{$vo.status}" page_id="{$vo.id}">启用</button>
+                                    <button data-toggle="button" class="btn btn-primary active qi" @click.stop="prohibition($event)" attr_url="{:url('index/page_enable',['id'=>$vo.id,'status'=>0])}" type="button" aria-pressed="true" status="{$vo.status}" page_id="{$vo.id}">启用</button>
                                  {else/}
-                                    <button data-toggle="button" class="btn btn-primary active qi" attr_url="{:url('index/page_enable',['id'=>$vo.id,'status'=>1])}" type="button" aria-pressed="true" status="{$vo.status}" page_id="{$vo.id}">禁止</button>
+                                    <button data-toggle="button" class="btn btn-primary active qi" @click.stop="prohibition($event)" attr_url="{:url('index/page_enable',['id'=>$vo.id,'status'=>1])}" type="button" aria-pressed="true" status="{$vo.status}" page_id="{$vo.id}">禁止</button>
                                  {/eq}
                                 </td>
                             <td>
                                 <a class="btn btn-default" @click="preview(),send($event)" page_id="{$vo.id}"><i class="fa fa-list"></i> 预览</a>
                                 <a class="btn btn-default editxz" href="{:url('index/page_edit',['id'=>$vo.id])}">编辑 <i class="fa fa-edit"></i></a>
-                                <a class="btn btn-default delete" attr_url="{:url('index/page_delete',['id'=>$vo.id])}" id="{$vo.id}" >删除 <i class="fa fa-trash-o"></i></a>
+                                <a class="btn btn-default delete" @click.stop="del_data($event)" attr_url="{:url('index/page_delete',['id'=>$vo.id])}" id="{$vo.id}" >删除 <i class="fa fa-trash-o"></i></a>
                             </td>
                         </tr>
                         {/volist}
@@ -390,6 +390,70 @@
 					}
 				});       
 			},
+			/*删除，对应-页面data*/
+			del_data(_event){
+				var that = this;
+				/*确认-弹框*/
+				layer.confirm("是否确定删除", { icon: 3, title: '提示'},function(){
+					var del_url = _event.target.getAttribute('attr_url');
+					console.log('删除的ajax-url',del_url);
+					/*axios=>请求-页面数据*/
+					axios.get(del_url, {
+						
+					})
+					.then(function (response) {
+						console.log(response['data']);
+						if (response['data']['code'] == 1) {
+							/*删除成功-防止请求慢，页面刷新*/
+							layer.confirm(response['data']['msg'], {
+					            btn: ["确定"] //按钮
+					        }, function(){
+					        	/*刷新-当前页面*/
+					        	location.reload();
+					        });
+							
+						} else {
+							/*删除失败*/
+							layer.msg(response['data']['msg'], { icon: 5 });
+						}
+					})
+					.catch(function (error) {
+						alert(error);
+						console.log(error);
+					});
+				}, function(){
+					/*取消-操作*/
+		        });
+			},
+			/*禁用 || 启用*/
+			prohibition(_eve){
+				var page_state = _eve.target.getAttribute('attr_url');
+				console.log('启用||禁用',page_state);
+				/*axios=>请求-页面数据*/
+				axios.get(page_state, {
+					
+				})
+				.then(function (response) {
+					console.log(response['data']);
+					if (response['data']['code'] == 1) {
+						/*成功-防止请求慢，页面刷新*/
+						layer.confirm(response['data']['msg'], {
+				            btn: ["确定"] //按钮
+				        }, function(){
+				        	/*刷新-当前页面*/
+				        	location.reload();
+				        });
+						
+					} else {
+						/*失败*/
+						layer.msg(response['data']['msg'], { icon: 5 });
+					}
+				})
+				.catch(function (error) {
+					alert(error);
+					console.log(error);
+				});
+			},
 				
         },
         /*组件实例创建完成，属性已绑定，但DOM还未生成*/
@@ -406,44 +470,44 @@
 
     
     // 删除
-    $('.delete').click(function(e) {
-        var id = this.id;
-        layer.confirm('是否确定删除', { icon: 3, title: '提示' }, function(index) {
-
-            $.post("{:url('del')}", { id: id }, function(res) {
-                if (res.code) {
-                    layer.msg(res.msg, { icon: 6 });
-                    setTimeout(function() {
-                        location.reload();
-                    }, 1000);
-                } else {
-                    layer.msg(res.msg, { icon: 5 });
-                }
-            });
-        });
-    });
+//  $('.delete').click(function(e) {
+//      var id = this.id;
+//      layer.confirm('是否确定删除', { icon: 3, title: '提示' }, function(index) {
+//
+//          $.post("{:url('del')}", { id: id }, function(res) {
+//              if (res.code) {
+//                  layer.msg(res.msg, { icon: 6 });
+//                  setTimeout(function() {
+//                      location.reload();
+//                  }, 1000);
+//              } else {
+//                  layer.msg(res.msg, { icon: 5 });
+//              }
+//          });
+//      });
+//  });
     // 启用
-    $('.qi').click(function(e) {
-        var id     = $(this).attr('page_id');
-        var status = $(this).attr('status');
-        if(status == 1){
-            var stat = '确定禁止';
-        }else{
-            var stat = '确定启用';
-        }
-        layer.confirm(stat, { icon: 3, title: '提示' }, function(index) {
-            $.post("{:url('status')}", { id: id }, function(res) {
-                if (res.code) {
-                    layer.msg(res.msg, { icon: 6 });
-                    setTimeout(function() {
-                        location.reload();
-                    }, 1000);
-                } else {
-                    layer.msg(res.msg, { icon: 5 });
-                }
-            });
-        });
-    });
+//  $('.qi').click(function(e) {
+//      var id     = $(this).attr('page_id');
+//      var status = $(this).attr('status');
+//      if(status == 1){
+//          var stat = '确定禁止';
+//      }else{
+//          var stat = '确定启用';
+//      }
+//      layer.confirm(stat, { icon: 3, title: '提示' }, function(index) {
+//          $.post("{:url('status')}", { id: id }, function(res) {
+//              if (res.code) {
+//                  layer.msg(res.msg, { icon: 6 });
+//                  setTimeout(function() {
+//                      location.reload();
+//                  }, 1000);
+//              } else {
+//                  layer.msg(res.msg, { icon: 5 });
+//              }
+//          });
+//      });
+//  });
 
 </script>
 

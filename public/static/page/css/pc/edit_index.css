@@ -558,7 +558,7 @@
 }
 
 .form-control {
-	width: 94%;
+	width: 94% !important;
 	height: 30px;
 	outline: none;
 	border: 1px solid #a9a9a9;
@@ -1301,7 +1301,12 @@
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 }
-
+.edit_link_button {
+	height: 30px;
+	line-height: 30px;
+	color: #999;
+	font-size: 14px;
+}
 .edit_del {
 	position: absolute;
 	top: 3px;
