@@ -24,7 +24,6 @@ if (preg_match("/(.*)\.(.*)\.c3w\.cc/i", HTTP_HOST, $matches)) {
     define('BIND_MODULE', $module);
 } else {
     $terrace = [
-        //'zfwl.zhifengwangluo.c3w.cc' => 'admin',
         '127.0.0.1:10059' => 'agent',
         '127.0.0.1:10058' => 'home',
         '127.0.0.1:10057' => 'sapi',
