@@ -1507,7 +1507,7 @@
                 }
                 that.axios_state = false;
                 /*ajax*/
-                axios.post('http://zfwl.zhifengwangluo.c3w.cc/shop/shop_img', {
+                axios.post("{:url('shop/shop_img')}" , {
                         img: that.upImages['baseUrl'],
                     })
                     .then(function(response) {
@@ -1764,7 +1764,7 @@
                 }
                 that.axios_state = false;
                 console.log('关键字:', that.search_data['key_word']);
-                axios.post('http://zfwl.zhifengwangluo.c3w.cc/shop/gooodsList', {
+                axios.post("{:url('shop/gooodsList')}", {
                         keyword: that.search_data['key_word'],
                     })
                     .then(function(response) {
@@ -1862,7 +1862,7 @@
                 }
                 that.axios_state = false;
                 /*ajax*/
-                axios.post('http://zfwl.zhifengwangluo.c3w.cc/shop/editShop', {
+                axios.post("{:url('shop/editShop')}", {
                 		/*页面id*/
                 		id: that.backData['page_id'],
                         /*页面名*/
@@ -1898,7 +1898,7 @@
             that.backData['page_id'] = {$id};
             console.log('编辑id:',that.backData['page_id']);
             /*axios=>请求-页面数据*/
-			axios.post('http://zfwl.zhifengwangluo.c3w.cc/shop/getShopData', {
+			axios.post("{:url('shop/getShopData')}", {
 				id: that.backData['page_id'],
 			})
 			.then(function (response) {

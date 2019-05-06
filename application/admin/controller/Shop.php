@@ -34,7 +34,7 @@ class Shop extends Common
     }
 
     public function editShop () {
-            $id = request()->param('id');
+            $id = input('id');
             $page_name = request()->param('page_name');
             $data = request()->param('data/a');
             if (empty($page_name)){

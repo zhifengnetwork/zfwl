@@ -36,6 +36,10 @@ class Index extends Common
         return $this->fetch();
     }
 
+    public function status(){
+        
+    }
+
     public function page_enable () {
         $id = request()->param('id',0,'intval');
         $status = request()->param('id',0,'status');
