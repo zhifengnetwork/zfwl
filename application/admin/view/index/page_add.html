@@ -11,7 +11,7 @@
     <div class="col-lg-12">
        <div class="ibox">
             <div class="ibox-content">
-                <div class="wrapper" id="edit_app_wrap">
+                <div class="wrapper_page" id="edit_app_wrap">
                     <!--首页编辑-->
                     <div class="content clearfloat">
                         <!--left wrap-->
@@ -501,8 +501,11 @@
                                         <div class="edit_content">
                                             <div class="edit_content_title">更多链接</div>
                                             <label class="edit_content_label edit_content_label_s">
-                                                <input class="editor_input1" placeholder="请手动输入链接(请以http://开头)" v-model="backData['data'][puStateObj['key_num']].data.moreUrl">
-                                            </label><button class="button_box"  @click.stop="close_system_box()">系统连接</button>
+                                                <input class="editor_input1" style="margin: 0 ;" placeholder="请手动输入链接(请以http://开头)" v-model="backData['data'][puStateObj['key_num']].data.moreUrl">
+                                            </label>
+                                            <div class="button_wrap">
+                                            	<p class="button_box" @click.stop="close_system_box()">系统连接</p>
+                                            </div>
                                         </div>
 
                                         <div class="edit_content">
