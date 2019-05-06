@@ -558,6 +558,9 @@
 }
 
 .form-control {
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
 	width: 94% !important;
 	height: 30px;
 	outline: none;
@@ -570,6 +573,9 @@
 	top: 0;
 	right: 0;
 	z-index: 1;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
 	width: 6%;
 	height: 30px;
 	text-align: center;
@@ -583,8 +589,7 @@
 
 
 /*loading 图标*/
-
-.btn .btn_icon {
+.search_btn .btn_icon {
 	width: 14px;
 	height: 14px;
 }
