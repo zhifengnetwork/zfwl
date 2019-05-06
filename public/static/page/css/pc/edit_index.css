@@ -565,7 +565,7 @@
 	text-indent: 5px;
 }
 
-.btn {
+.search_btn {
 	position: absolute;
 	top: 0;
 	right: 0;
@@ -1088,8 +1088,11 @@
 }
 
 .color {
+	display: inline-block;
+	width: 48px;
+	height: 24px;
+	padding: 2px 8px;
 	border: 0;
-	padding: 3px 10px;
 	border-radius: 4px;
 }
 
@@ -1106,16 +1109,19 @@
 /*更多链接*/
 .edit_content_title .edit_content_label {
 	font-size: 12px;
+	font-weight: normal;
 }
 
 .edit_tit .edit_content_label {
-	margin-right: 5px;
+	margin:0 5px 0 0;
 	font-size: 12px;
+	font-weight: normal;
 }
 
 .edit_content_label {
-	margin-right: 15px;
+	margin:0 15px 0 0;
 	font-size: 12px;
+	font-weight: normal;
 }
 /*清除上面class样式*/
 .edit_content_label_s {
@@ -1138,7 +1144,7 @@
 }
 
 .edit_content_label input {
-	margin-right: 5px;
+	margin:0 5px 0 0;
 	vertical-align: middle;
 }
 
@@ -1261,7 +1267,8 @@
 }
 
 .edit_link>label {
-	margin-left: 10px;
+	margin:0 0 0 10px;
+	font-weight: normal;
 }
 
 .edit_link input {
@@ -1283,7 +1290,7 @@
 .edit_link>button {
 	vertical-align: bottom;
 	width: 70px;
-	height: 32px;
+	height: 30px;
 	color: #aaaaaa;
 	background: #ffffff;
 	border: 1px solid #ddd;

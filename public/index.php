@@ -15,18 +15,15 @@ define('HTTP_HOST', $_SERVER['HTTP_HOST']);
 if (preg_match("/(.*)\.(.*)\.c3w\.cc/i", HTTP_HOST, $matches)) {
     $partner = $matches[1];
     $key     = $matches[2];
-    var_dump($partner,$key);
-    die;
     $modules = [
-        'zhifengwangluo'   => 'admin',
+        'zfwl'             => 'admin',
         'pay'              => 'pay',
         'api'              => 'api',
     ];
-    $module = isset($modules[$key]) ? $modules[$key] : 'home';
+    $module = isset($modules[$partner]) ? $modules[$partner] : 'home';
     define('BIND_MODULE', $module);
 } else {
     $terrace = [
-        //'zfwl.zhifengwangluo.c3w.cc' => 'admin',
         '127.0.0.1:10059' => 'agent',
         '127.0.0.1:10058' => 'home',
         '127.0.0.1:10057' => 'sapi',
