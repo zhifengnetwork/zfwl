@@ -99,7 +99,7 @@ class Common extends Controller
         //!$url && $url = strtolower(request()->controller() . '/' . request()->action());
         !$url && $url = request()->path();
         if($url == '/'){
-           $url = 'admin/index/index';
+           $url = 'index/index';
         }
         // $url = str_replace('admin/', '', $url);
         $array = array();
