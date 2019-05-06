@@ -98,10 +98,10 @@ class Common extends Controller
         static $url;
         //!$url && $url = strtolower(request()->controller() . '/' . request()->action());
         !$url && $url = request()->path();
-        if($url == '/'){
-           $url = 'admin/index/index';
-        }
-        $url = str_replace('admin/', '', $url);
+        // if($url == '/'){
+        //    $url = 'admin/index/index';
+        // }
+        // $url = str_replace('admin/', '', $url);
         $array = array();
         foreach ($left_menu as $key => &$val) {
             if($url == $val['url']){
