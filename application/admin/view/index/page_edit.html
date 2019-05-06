@@ -826,7 +826,6 @@
         el: "#edit_app_wrap",
         data() {
             return {
-
                 /*组件-选项*/
                 componentTerm: [{
                         name: "轮播",
@@ -1892,22 +1891,5 @@
 
     });
 
-      // 删除
-      $('.delete').click(function(e) {
-        var id = this.id;
-        layer.confirm('是否确定删除', { icon: 3, title: '提示' }, function(index) {
-
-            $.post("{:url('delUserIntervene')}", { id: id }, function(res) {
-                if (res.code) {
-                    layer.msg(res.msg, { icon: 6 });
-                    setTimeout(function() {
-                        location.reload();
-                    }, 1000);
-                } else {
-                    layer.msg(res.msg, { icon: 5 });
-                }
-            });
-        });
-    });
 </script>
 {/block}
