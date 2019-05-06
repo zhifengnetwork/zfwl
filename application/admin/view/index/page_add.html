@@ -271,7 +271,7 @@
                                                 <img class="image_up" :src="v.imgUrl" alt="">
                                             </div>
                                             <div class="edit_link">
-                                                <label>选择链接<input type="text" placeholder="请手动输入链接(请以http://开头)" v-model="v.url"></label><button @click.stop="close_system_box()">系统连接</button>
+                                                <label>选择链接<input type="text" placeholder="请手动输入链接(请以http://开头)" v-model="v.url"></label><p class="edit_link_button" @click.stop="close_system_box()">系统连接</p>
                                             </div>
                                             <!--删除按钮-->
                                             <div class="edit_del" @click="delItem(i)">

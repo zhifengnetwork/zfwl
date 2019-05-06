@@ -558,7 +558,10 @@
 }
 
 .form-control {
-	width: 94%;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	width: 94% !important;
 	height: 30px;
 	outline: none;
 	border: 1px solid #a9a9a9;
@@ -570,6 +573,9 @@
 	top: 0;
 	right: 0;
 	z-index: 1;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
 	width: 6%;
 	height: 30px;
 	text-align: center;
@@ -583,8 +589,7 @@
 
 
 /*loading 图标*/
-
-.btn .btn_icon {
+.search_btn .btn_icon {
 	width: 14px;
 	height: 14px;
 }
@@ -1301,7 +1306,12 @@
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 }
-
+.edit_link_button {
+	height: 30px;
+	line-height: 30px;
+	color: #999;
+	font-size: 14px;
+}
 .edit_del {
 	position: absolute;
 	top: 3px;

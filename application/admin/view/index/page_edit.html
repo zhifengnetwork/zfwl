@@ -712,8 +712,8 @@
                                 <div class="modal-body">
                                     <div class="input-group">
                                         <input type="text" class="form-control" v-model="search_data['key_word']" placeholder="请输入商品名称进行查询筛选">
-                                        <p class="btn" @click="comDataRe()">
-                                            <span :class="axios_state == true ? 'show_box':'hide_box'">搜索</span>
+                                        <p class="search_btn">
+                                            <span @click="comDataRe()" :class="axios_state == true ? 'show_box':'hide_box'">搜索</span>
                                             <!--axios时的loading-->
                                             <img class="vertical_centering btn_icon"  :class="axios_state == false ? 'show_box':'hide_box'"  src="__PAGE__/img/pc/search_loading.png" alt="" />
                                         </p>

@@ -42,7 +42,7 @@ class Index extends Common
 
     public function page_enable () {
         $id = request()->param('id',0,'intval');
-        $status = request()->param('id',0,'status');
+        $status = request()->param('status',0,'intval');
         if (!empty($id)){
             $getPage = model('DiyEweiShop')->where(['id'=>$id])->find();
             if (!empty($getPage)){
@@ -89,8 +89,8 @@ class Index extends Common
                 return json(['code'=>0, 'msg'=>'页面不存在！','data'=>[]]);
             }
         }else{
-                return json(['code'=>0, 'msg'=>'id不存在','data'=>[]]);
-            }
+            return json(['code'=>0, 'msg'=>'id不存在','data'=>[]]);
+        }
     }
 
     /***
