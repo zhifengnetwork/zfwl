@@ -23,9 +23,8 @@ class Index extends Common
 
 
     public function page_edit(){
-        $id  = input('id');
-        $res = model('DiyEweiShop')->getShopData($id);
-        $this->assign('data',$res);
+        $id  = request()->param('id',0,'intval');
+        $this->assign('id',$id);
         $this->assign('meta_title', '页面编辑');
         return $this->fetch();
     }
