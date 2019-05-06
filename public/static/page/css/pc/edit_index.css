@@ -1303,10 +1303,11 @@
 	box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1) inset;
 }
 
-.edit_link>button {
+.edit_link button{
 	vertical-align: bottom;
 	width: 70px;
 	height: 30px;
+	line-height: 28px;
 	color: #aaaaaa;
 	background: #ffffff;
 	border: 1px solid #ddd;
