@@ -26,7 +26,6 @@ class Goods extends Model
                 $query->where('cat_id1', $cat_id)->whereor('cat_id2', $cat_id);})
                 ->field($field)->paginate(6,false,['page'=>$page]);
         }else{
-            $page  = 1;
             $limit = 6;
             $start = ($page - 1) * $limit;
             $end   =  $page * $limit;
