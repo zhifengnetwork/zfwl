@@ -70,9 +70,11 @@ class Shop extends Common
         $page    = request()->param('page');
         $list    = model('Goods')->getGoodsList($keyword,0,$page);
         if (!empty($list)){
-            return json(['code'=>1,'msg'=>'','data'=>$list]);
+            $page = $list['page'];
+            unset($list['page']);
+            return json(['code'=>1,'msg'=>'','page' => $page,'data'=>$list]);
         }else{
-            return json(['code'=>0,'msg'=>'还没有商品哦','data'=>$list]);
+            return json(['code'=>0,'msg'=>'还没有商品哦','page' => 0,'data'=>$list]);
         }
     }
 

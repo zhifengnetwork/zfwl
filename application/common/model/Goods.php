@@ -22,11 +22,18 @@ class Goods extends Model
             $where['goods_name'] = ['like','%'.str_replace(" ",'',$keyword).'%'];
         }
         if (!empty($cat_id)){
-            $list  = $this->where($where)->where(function ($query) use ($cat_id) {
+            $list = $this->where($where)->where(function ($query) use ($cat_id) {
                 $query->where('cat_id1', $cat_id)->whereor('cat_id2', $cat_id);})
                 ->field($field)->paginate(6,false,['page'=>$page]);
         }else{
-            $list  = $this->where($where)->field($field)->paginate(6,false,['page'=>$page]);
+            $page  = 1;
+            $limit = 6;
+            $start = ($page - 1) * $limit;
+            $end   =  $page * $limit;
+            $total = $this->where($where)->field($field)->count();
+            $list  = $this->where($where)->field($field)->limit($start,$end)->select();
+            $pages = ceil($total/$limit);
+            $list['page'] = $pages;
         }
         return $list;
     }
