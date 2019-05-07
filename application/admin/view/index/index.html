@@ -316,7 +316,6 @@
         	/*预览-显示隐藏*/
             preview(){
                 this.phone_box = !this.phone_box;
-//              this.page_id   = 80;	
             },
             /*是否启用*/
             pUsing(){
@@ -324,9 +323,9 @@
                 return value=true;	
             },
             /* 预览-页面数据-请求*/
-			send(event){
+			send(_event){
 				var that = this;
-				that.page_id = Number(event.target.getAttribute("page_id"));
+				that.page_id = Number(_event.target.getAttribute("page_id"));
 				console.log('预览id:',that.page_id);
 				/*axios=>请求-页面数据*/
 				axios.post("{:url('shop/getShopData')}", {
@@ -463,51 +462,11 @@
         /*挂载结束*/
         mounted: function () {
             /*防止页面未渲染完成--vue的{{变量名}},v-cloak不管用*/
-            this.hide_var = true;
+            this.hide_var = true;         
+			
         },
         
-    })
-
-    
-    // 删除
-//  $('.delete').click(function(e) {
-//      var id = this.id;
-//      layer.confirm('是否确定删除', { icon: 3, title: '提示' }, function(index) {
-//
-//          $.post("{:url('del')}", { id: id }, function(res) {
-//              if (res.code) {
-//                  layer.msg(res.msg, { icon: 6 });
-//                  setTimeout(function() {
-//                      location.reload();
-//                  }, 1000);
-//              } else {
-//                  layer.msg(res.msg, { icon: 5 });
-//              }
-//          });
-//      });
-//  });
-    // 启用
-//  $('.qi').click(function(e) {
-//      var id     = $(this).attr('page_id');
-//      var status = $(this).attr('status');
-//      if(status == 1){
-//          var stat = '确定禁止';
-//      }else{
-//          var stat = '确定启用';
-//      }
-//      layer.confirm(stat, { icon: 3, title: '提示' }, function(index) {
-//          $.post("{:url('status')}", { id: id }, function(res) {
-//              if (res.code) {
-//                  layer.msg(res.msg, { icon: 6 });
-//                  setTimeout(function() {
-//                      location.reload();
-//                  }, 1000);
-//              } else {
-//                  layer.msg(res.msg, { icon: 5 });
-//              }
-//          });
-//      });
-//  });
+   })
 
 </script>
 

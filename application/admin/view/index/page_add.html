@@ -11,7 +11,7 @@
     <div class="col-lg-12">
        <div class="ibox">
             <div class="ibox-content">
-                <div class="wrapper" id="edit_app_wrap">
+                <div class="wrapper_page" id="edit_app_wrap">
                     <!--首页编辑-->
                     <div class="content clearfloat">
                         <!--left wrap-->
@@ -271,7 +271,7 @@
                                                 <img class="image_up" :src="v.imgUrl" alt="">
                                             </div>
                                             <div class="edit_link">
-                                                <label>选择链接<input type="text" placeholder="请手动输入链接(请以http://开头)" v-model="v.url"></label><p class="edit_link_button" @click.stop="close_system_box()">系统连接</p>
+                                                <label>选择链接<input type="text" placeholder="请手动输入链接(请以http://开头)" v-model="v.url"></label><button class="edit_link_button" @click.stop="close_system_box()">系统连接</button>
                                             </div>
                                             <!--删除按钮-->
                                             <div class="edit_del" @click="delItem(i)">
@@ -501,8 +501,11 @@
                                         <div class="edit_content">
                                             <div class="edit_content_title">更多链接</div>
                                             <label class="edit_content_label edit_content_label_s">
-                                                <input class="editor_input1" placeholder="请手动输入链接(请以http://开头)" v-model="backData['data'][puStateObj['key_num']].data.moreUrl">
-                                            </label><button class="button_box"  @click.stop="close_system_box()">系统连接</button>
+                                                <input class="editor_input1" style="margin: 0 ;" placeholder="请手动输入链接(请以http://开头)" v-model="backData['data'][puStateObj['key_num']].data.moreUrl">
+                                            </label>
+                                            <div class="button_wrap">
+                                            	<p class="button_box" @click.stop="close_system_box()">系统连接</p>
+                                            </div>
                                         </div>
 
                                         <div class="edit_content">
@@ -781,8 +784,8 @@
                                 <input name="pagename" type="text" placeholder="页面名称：快来给你的页面起一个响亮的名字" v-model="backData['page_name']">
                             </p>
                             <p class="bottom_wrap_preview">保存并预览</p>
-                            <p class="bottom_wrap_deposit hover_box" @click.stop="depositFun()">
-                                <span :class="axios_state == true ? 'show_box':'hide_box'">保存</span>
+                            <p class="bottom_wrap_deposit hover_box" >
+                                <span @click.stop="depositFun()" :class="axios_state == true ? 'show_box':'hide_box'">保存</span>
                                 <span class="axios_in" :class="axios_state == false ? 'show_box':'hide_box'">保存中</span>
                             </p>
                             </div>
@@ -1867,6 +1870,7 @@
                         console.log(response['data']);
                         if(response['data']['code'] == 1){
                             alert(response['data']['msg']);
+                            window.location.href = "{:url('index/page_edit')}"+"?id="+ response['data']['data']['id'];
                         }else {
                             /*保存失败*/
                             alert(response['data']['msg']);

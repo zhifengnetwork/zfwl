@@ -229,8 +229,25 @@ class Distribution extends Common
      */
     public function distribution_notify(){
 
+        $shop_id = session('admin_user_auth.mgid');
+        $info = Db::table('distribution_set')->field('id,tm')->where('shop_id',$shop_id)->find();
+
+        if( request()->isPost() ){
+            $data = input('post.');
+            $data['tm'] = serialize($data['tm']);
+            if($data['id']){
+                Db::table('distribution_set')->update($data);
+            }else{
+                Db::table('distribution_set')->insert($data);
+            }
+            $this->success('成功！');
+        }
+
+        if($info['tm']) $info['tm'] = unserialize($info['tm']);
+
         return $this->fetch('',[
             'meta_title'    =>  '通知设置',
+            'info'          =>  $info,
         ]);
     }
 

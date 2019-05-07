@@ -144,31 +144,6 @@ return [
                     ],
                 ],
             ],
-
-            [
-                'id'    => 30200,
-                'title' => '商品规格管理',
-                'sort'  => 2,
-                'url'   => 'goods/goods_type_list',
-                'hide'  => 1,
-                'icon'  => 'fa-th-large',
-                'child' => [
-                    [
-                        'id'    => 30202,
-                        'title' => '商品规格列表',
-                        'sort'  => 1,
-                        'url'   => 'goods/goods_type_list',
-                        'hide'  => 1,
-                    ],
-                    [
-                        'id'    => 30203,
-                        'title' => '添加商品类型',
-                        'sort'  => 3,
-                        'url'   => 'goods/goods_type_add',
-                        'hide'  => 1,
-                    ],
-                ],
-            ],
             [
                 'id'    => 30300,
                 'title' => '商品分类',
@@ -318,7 +293,7 @@ return [
         'id'    => 60000,
         'title' => '财务管理',
         'sort'  => 2,
-        'url'   => 'total/index',
+        'url'   => 'total/balance_logs',
         'hide'  => 1,
         'icon'  => 'glyphicon glyphicon-file',
         'child' => [
@@ -326,7 +301,11 @@ return [
                 'id'    => 60100,
                 'title' => '财务管理',
                 'sort'  => 1,
+<<<<<<< HEAD
                 'url'   => 'total/index',
+=======
+                'url'   => 'total/balance_logs',
+>>>>>>> c5933dc93471534481f74e28deb09326f9cf8ca8
                 'hide'  => 1,
                 'child' => [
                     [

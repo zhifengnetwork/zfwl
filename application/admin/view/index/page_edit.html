@@ -13,7 +13,7 @@
     <div class="col-lg-12">
        <div class="ibox">
             <div class="ibox-content">
-                <div class="wrapper" id="edit_app_wrap">
+                <div class="wrapper_page" id="edit_app_wrap">
                     <!--首页编辑-->
                     <div class="content clearfloat">
                         <!--left wrap-->
@@ -1874,6 +1874,8 @@
                         console.log(response['data']);
                         if(response['data']['code'] == 1){
                             alert(response['data']['msg']);
+                            /*页面跳转*/
+                            window.location.href = "index/page_edit?id="+ response['data']['data']['id'];
                         }else {
                             /*保存失败*/
                             alert(response['data']['msg']);
@@ -1894,7 +1896,9 @@
         	var that = this;
             /*防止页面未渲染完成--vue的{{变量名}},v-cloak不管用*/
             this.pageState['hide_var'] = true;
-            /*赋值对应的id，用来=>保存对应-页面模板*/
+            /**赋值对应的id，用来=>保存对应-页面模板
+             * id=> 后台获取绑定。
+             * **/
             that.backData['page_id'] = {$id};
             console.log('编辑id:',that.backData['page_id']);
             /*axios=>请求-页面数据*/
