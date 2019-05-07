@@ -453,7 +453,7 @@
                                         </div>
                                         <!--商品组-对应商品 -->
                                         <div class="edit_addimg clearfloat" v-for="(v,i) in backData['data'][puStateObj['key_num']]['data']['msg']">
-                                            <div class="edit_img edit_shop_img hover_box" @click="two_way_button(i)">
+                                            <div class="edit_img_com edit_shop_img hover_box" @click="two_way_button(i)">
                                                 <img :src="v.imgUrl" alt="">
                                             </div>
                                             <div class="edit_link">
@@ -739,15 +739,15 @@
 
                                 </div>
 
-                                <div class="modal-footer">
+                                <div class="comm_modal_footer">
                                     <div class="paging">
                                         <p class="btns">上一页</p>
-                                        <p>1</p>
+                                        <!--<p>1</p>
                                         <p>2</p>
                                         <p>3</p>
                                         <p>4</p>
                                         <p>5</p>
-                                        <p>6</p>
+                                        <p>6</p>-->
                                         <p class="btns">下一页</p>
                                     </div>
                                     <div class="shut" @click.stop="two_way_button()">关闭</div>

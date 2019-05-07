@@ -58,9 +58,9 @@
                                  {/eq}
                                 </td>
                             <td>
-                                <a class="btn btn-default" @click="preview(),send($event)" page_id="{$vo.id}"><i class="fa fa-list"></i> 预览</a>
+                                <a class="btn btn-default" @click.stop="preview(),send($event)" page_id="{$vo.id}"><i class="fa fa-list" page_id="{$vo.id}"></i> 预览</a>
                                 <a class="btn btn-default editxz" href="{:url('index/page_edit',['id'=>$vo.id])}">编辑 <i class="fa fa-edit"></i></a>
-                                <a class="btn btn-default delete" @click.stop="del_data($event)" attr_url="{:url('index/page_delete',['id'=>$vo.id])}" id="{$vo.id}" >删除 <i class="fa fa-trash-o"></i></a>
+                                <a class="btn btn-default delete" @click.stop="del_data($event)" attr_url="{:url('index/page_delete',['id'=>$vo.id])}" id="{$vo.id}" >删除 <i class="fa fa-trash-o" attr_url="{:url('index/page_delete',['id'=>$vo.id])}"></i></a>
                             </td>
                         </tr>
                         {/volist}
@@ -310,6 +310,8 @@
                 using:true,
                 /*预览页面id*/
                 page_id: null,
+                /*存轮播数据*/
+                res: [],
             }
         },
         methods:{
@@ -325,10 +327,10 @@
             /* 预览-页面数据-请求*/
 			send(_event){
 				var that = this;
-				/*存轮播数据*/
-				var res = [];
+				
+				that.res = [];
 				that.page_id = Number(_event.target.getAttribute("page_id"));
-				console.log('预览id:',that.page_id);
+				console.log('预览id:',that.page_id,_event.target);
 				/*axios=>请求-页面数据*/
 				axios.post("{:url('shop/getShopData')}", {
 					id: that.page_id,
@@ -345,10 +347,10 @@
 						for(let i=0;i<response.data.data.data.length;i++){
 							if(response.data.data.data[i].id=="rotationId"){
 								/*轮播图设置*/
-								res.push({'data':response.data.data.data[i],'key':response.data.data.data[i].key_num});
-								console.log(res)
+								that.res.push({'data':response.data.data.data[i],'key':response.data.data.data[i].key_num});
+								console.log(that.res)
 								that.$nextTick(function(){
-									that.carousel(res);
+									that.carousel(that.res);
 								});
 							}
 						}
@@ -363,11 +365,11 @@
 				});
 			},
 			/*调用轮播插件*/
-			carousel(res){
-		      for(let l=0;l<res.length;l++){
-		      	console.log(res[l].data.id)
-		        if(l==res[l].key){
-		          var swiper = new Swiper('.'+res[l].data.id+res[l].key, {
+			carousel(_res){
+		      for(let l=0;l<_res.length;l++){
+		      	console.log('调用轮播插件:',_res[l].data.id);
+		        if(l==_res[l].key){
+		          new Swiper('.'+_res[l].data.id+_res[l].key, {
 		            autoplay: {
 					   //自动播放
 		              delay: 3000,
@@ -385,9 +387,9 @@
 		                  for(var i= 0; i<total; i++) {
 		                  // 判断是不是激活焦点
 		                    if(i === (current-1)){
-		                        paginationHtml += '<span class="'+res[l].data.params.butStyle+'" style="background:'+res[l].data.params.clickColor+'"></span>';
+		                        paginationHtml += '<span class="'+_res[l].data.params.butStyle+'" style="background:'+_res[l].data.params.clickColor+'"></span>';
 		                      }else{
-		                        paginationHtml += '<span class="'+res[l].data.params.butStyle+'" style="background:'+res[l].data.params.butColor+'"></span>';
+		                        paginationHtml += '<span class="'+_res[l].data.params.butStyle+'" style="background:'+_res[l].data.params.butColor+'"></span>';
 		                      }
 		                  }
 		                  return paginationHtml;
@@ -400,10 +402,10 @@
 			/*删除，对应-页面data*/
 			del_data(_event){
 				var that = this;
+				var del_url = _event.target.getAttribute('attr_url');
+				console.log('删除的ajax-url',del_url);
 				/*确认-弹框*/
 				layer.confirm("是否确定删除", { icon: 3, title: '提示'},function(){
-					var del_url = _event.target.getAttribute('attr_url');
-					console.log('删除的ajax-url',del_url);
 					/*axios=>请求-页面数据*/
 					axios.get(del_url, {
 						

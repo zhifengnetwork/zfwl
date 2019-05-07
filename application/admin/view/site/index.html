@@ -62,7 +62,53 @@
   
     }
   </style>
-
+<style>    
+    .pad-mar {
+        margin: 10px 0 10px 20px;
+    }
+    
+    .panel-heading {
+        background: #E8ECEF;
+        padding: 5px 0px 5px 40px;
+        margin: 20px 0px 0 0;
+        border: 1px solid #CFCFCF;
+        border-bottom: none;
+        font-size: 16px;
+        font-weight: 200;
+    }
+    
+    .panel-body {
+        padding: 20px 0;
+        margin-bottom: 20px;
+        border: 1px solid #CFCFCF;
+        border-top: none;
+    }
+    .form-group label{
+        font-size: 12px;
+    }
+    
+    .vbox .row{
+        margin-right: -5px;
+        margin-left: -5px;
+    }
+    
+    .vbox .col-xs-12.col-md-6.col-lg-4{
+        margin-bottom: 10px;
+    }
+    
+    .form-horizontal .form-group{
+        margin-right: -15px;
+        margin-left: -15px;
+        margin-bottom: 15px;
+    }
+    
+    .form-horizontal .control-label{
+        padding-top: 7px;
+        margin-bottom: 0;
+        text-align: right;
+    }
+    
+</style>
 <div class="wrapper wrapper-content animated fadeInRight">
     <div class="row">
         <div class="col-lg-12">
@@ -130,6 +176,77 @@
                             <label class="col-sm-2 control-label">网站页脚</label>
                             <div class="col-sm-9">
                                 <script id="editor" name="copyright" type="text/plain" style="width:100%;height:400px;">{$info.copyright}</script> 
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-1 control-label"></label>
+                            <div class="col-sm-10">
+                                    <div class="panel-heading"> 联系方式 </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">客服电话</label>
+                            <div class="col-sm-9">
+                                <input type="text" name="shop_contact[phone]" value="{if condition='isset($info.shop_contact.phone)'}{$info.shop_contact.phone}{/if}" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">客服电话</label>
+                            <div class="col-sm-9">
+                                <input type="text" name="shop_contact[address]" value="{if condition='isset($info.shop_contact.address)'}{$info.shop_contact.address}{/if}" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">商城简介</label>
+                            <div class="col-sm-9">
+                                <textarea name="shop_contact[description]"  class="form-control" placeholder="说点什么...最少输入0个字符" datatype="*0-100" onkeyup="textarealength(this,100)">{if condition='isset($info.shop_contact.description)'}{$info.shop_contact.description}{/if}</textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-1 control-label"></label>
+                            <div class="col-sm-10">
+                                    <div class="panel-heading"> 消息提醒设置 </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">公众号消息提醒</label>
+                            <div class="col-sm-9">
+                                <label style="margin-top:4px; margin-right:20px;">
+                                    <input type="radio" value="1" name="noticeset[uniacid]" {if condition='isset($info.noticeset.uniacid) and $info.noticeset.uniacid'} checked {/if} /> 开启
+                                </label>
+                                <label>
+                                    <input type="radio" value="0" name="noticeset[uniacid]" {if condition='(isset($info.noticeset.uniacid) and !$info.noticeset.uniacid) or !isset($info.noticeset.uniacid)'} checked {/if} /> 关闭
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">站内信消息提醒</label>
+                            <div class="col-sm-9">
+                                <label style="margin-top:4px; margin-right:20px;">
+                                    <input type="radio" value="1" name="noticeset[message]" {if condition='isset($info.noticeset.message) and $info.noticeset.message'} checked {/if} /> 开启
+                                </label>
+                                <label>
+                                    <input type="radio" value="0" name="noticeset[message]" {if condition='(isset($info.noticeset.message) and !$info.noticeset.message) or !isset($info.noticeset.message)'} checked {/if} /> 关闭
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">手机短信消息提醒</label>
+                            <div class="col-sm-9">
+                                <label style="margin-top:4px; margin-right:20px;">
+                                    <input type="radio" value="1" name="noticeset[phone]" {if condition='isset($info.noticeset.phone) and $info.noticeset.phone'} checked {/if} /> 开启
+                                </label>
+                                <label>
+                                    <input type="radio" value="0" name="noticeset[phone]" {if condition='(isset($info.noticeset.phone) and !$info.noticeset.phone) or !isset($info.noticeset.phone)'} checked {/if} /> 关闭
+                                </label>
                             </div>
                         </div>
 

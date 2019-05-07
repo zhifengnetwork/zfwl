@@ -600,7 +600,7 @@
 }
 
 .ng-scope {
-	margin: 10px 8px 0 0;
+	margin: 10px 20px 0 0;
 	float: left;
 	width: 127px;
 	background: #eee;
@@ -649,26 +649,32 @@
 	-webkit-line-clamp: 2;
 }
 
-.modal-footer {
+/*商品-页数*/
+.comm_modal_footer {
+	position: relative;
 	padding: 15px;
 	box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
+	height: 105px;
 }
-
-
-/*页数*/
-
+/*没有-关闭按钮*/
+.comm_modal_footer_shut {
+	height: 60px;
+}
 .paging {
-	display: none;
-	padding-left: 285px;
+	display: table;
+	margin: 0 auto;
+	width: auto;
+	/*padding-left: 285px;
 	box-sizing: border-box;
 	-moz-box-sizing: border-box;
-	-webkit-box-sizing: border-box;
+	-webkit-box-sizing: border-box;*/
 }
 
 .paging p {
 	display: inline-block;
+	margin: 0 5px;
 	width: 25px;
 	height: 25px;
 	font-size: 14px;
@@ -678,13 +684,18 @@
 	border: 1px solid #ccc;
 }
 
-.modal-footer .paging .btns {
+.comm_modal_footer .paging .btns {
+	/*float: right;*/
+	/*margin-left: 10px;*/
 	width: 55px;
 	height: 25px;
 }
 
 .shut {
-	margin: 15px 0 0 833px;
+	position: absolute;
+	right: 15px;
+	bottom: 15px;
+	z-index: 1;
 	width: 55px;
 	height: 35px;
 	text-align: center;
@@ -1146,8 +1157,8 @@
 
 .edit_content_textinpt {
 	width: 60%;
-	height: 20px;
-	line-height: 30px;
+	height: 25px;
+	line-height: 23px;
 	color: #aaa;
 	margin-top: 4px;
 	padding-left: 8px;
@@ -1214,8 +1225,8 @@
 	width: 120px;
 	height: 120px;
 }
-
-.edit_img {
+/*重新选择图片*/
+.edit_img, .edit_img_com {
 	position: relative;
 	float: left;
 	width: 138px;
@@ -1225,6 +1236,22 @@
 .edit_img::after {
 	display: block;
 	content: "重新选择图片";
+	position: absolute;
+	left: 0px;
+	bottom: 0px;
+	z-index: 10;
+	width: 100%;
+	height: 26px;
+	font-size: 14px;
+	text-align: center;
+	line-height: 26px;
+	color: #ffffff;
+	background: rgba(0, 0, 0, 0.4);
+}
+/*重新选择商品*/
+.edit_img_com::after {
+	display: block;
+	content: "重新选择商品";
 	position: absolute;
 	left: 0px;
 	bottom: 0px;
