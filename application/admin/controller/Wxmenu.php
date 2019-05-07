@@ -4,7 +4,7 @@ namespace app\admin\controller;
 
 use \think\Db;
 use \think\Request;
-use \mgcore\model\Wx;
+use app\common\model\Wx;
 
 /**
  * 微信菜单管理

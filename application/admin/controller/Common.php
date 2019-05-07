@@ -116,7 +116,7 @@ class Common extends Controller
                     $val['left']  =  1;
                 } else {
                     $val['class2'] = empty(array_filter(array_column($val['_child'], 'class2'))) ? '' : 'select';
-                    $val['class'] = empty(array_filter(array_column($val['_child'], 'class'))) ? '' : 'active';
+                    $val['class']  = empty(array_filter(array_column($val['_child'], 'class'))) ? '' : 'active';
                 }
                 foreach($val['_child'] as $v){
                         if(!empty($v['_child'])){

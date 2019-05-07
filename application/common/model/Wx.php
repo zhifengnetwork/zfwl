@@ -1,6 +1,6 @@
 <?php
 
-namespace mgcore\model;
+namespace app\common\model;
 
 use Overtrue\Wechat\Broadcast;
 use Overtrue\Wechat\Exception;

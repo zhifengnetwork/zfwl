@@ -1,5 +1,7 @@
 <?php
 use think\Db;
+// 加载wechat微信处理类库
+require VENDOR_PATH . 'wechat-2/autoload.php';
 
 function jason($data=array(),$msg="ok",$code=1){
     $result=array(  
@@ -11,6 +13,24 @@ function jason($data=array(),$msg="ok",$code=1){
     echo json_encode($result);  
     exit;  
 } 
+/*
+ * 获取商品的第一分类的下拉列表
+ */
+function get_wxmenu_html($selid = 0)
+{
+    static $catearr;
+    if (empty($catearr)) {
+        $catearr = \think\Db::table('wx_menu')->where(array('pid' => 0, 'state' => 0))->column('title', 'id');
+    }
+
+    $list = '<option value="0">顶级菜单</option>';
+    if ($catearr) {
+        foreach ($catearr as $key => $val) {
+            $list .= '<option value="' . $key . '" ' . ($key == $selid ? 'selected' : '') . '>' . $val . '</option>';
+        }
+    }
+    return $list;
+}
 
 function getTree($array, $pid =0, $level = 0){
     //声明静态数组,避免递归调用时,多次声明导致数组覆盖

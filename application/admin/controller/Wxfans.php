@@ -4,7 +4,7 @@ namespace app\admin\controller;
 
 use \think\Db;
 use \think\Request;
-use \mgcore\model\Wx;
+use app\common\model\Wx;
 
 /**
  * 公众号粉条管理控制器
