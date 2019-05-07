@@ -293,7 +293,7 @@ return [
         'id'    => 60000,
         'title' => '财务管理',
         'sort'  => 2,
-        'url'   => 'total/index',
+        'url'   => 'total/balance_logs',
         'hide'  => 1,
         'icon'  => 'glyphicon glyphicon-file',
         'child' => [
@@ -301,7 +301,7 @@ return [
                 'id'    => 60100,
                 'title' => '财务管理',
                 'sort'  => 1,
-                'url'   => '',
+                'url'   => 'total/balance_logs',
                 'hide'  => 1,
                 'child' => [
                     [
