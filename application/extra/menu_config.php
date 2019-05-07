@@ -301,11 +301,7 @@ return [
                 'id'    => 60100,
                 'title' => '财务管理',
                 'sort'  => 1,
-<<<<<<< HEAD
                 'url'   => 'total/index',
-=======
-                'url'   => 'total/balance_logs',
->>>>>>> c5933dc93471534481f74e28deb09326f9cf8ca8
                 'hide'  => 1,
                 'child' => [
                     [
