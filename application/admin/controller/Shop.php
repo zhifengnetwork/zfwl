@@ -68,13 +68,12 @@ class Shop extends Common
     public function gooodsList () {
         $keyword = request()->param('keyword');
         $page    = request()->param('page');
+        if($page < 0){ $page = 1;}
         $list    = model('Goods')->getGoodsList($keyword,0,$page);
         if (!empty($list)){
-            $page = $list['page'];
-            unset($list['page']);
-            return json(['code'=>1,'msg'=>'','page' => $page,'data'=>$list]);
+            return json(['code'=>1,'msg'=>'','data'=>$list]);
         }else{
-            return json(['code'=>0,'msg'=>'还没有商品哦','page' => 0,'data'=>$list]);
+            return json(['code'=>0,'msg'=>'还没有商品哦','data'=>$list]);
         }
     }
 

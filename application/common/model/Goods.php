@@ -26,13 +26,7 @@ class Goods extends Model
                 $query->where('cat_id1', $cat_id)->whereor('cat_id2', $cat_id);})
                 ->field($field)->paginate(6,false,['page'=>$page]);
         }else{
-            $limit = 6;
-            $start = ($page - 1) * $limit;
-            $end   =  $page * $limit;
-            $total = $this->where($where)->field($field)->count();
-            $list  = $this->where($where)->field($field)->limit($start,$end)->select();
-            $pages = ceil($total/$limit);
-            $list['page'] = $pages;
+            $list = $this->where($where)->field($field)->paginate(6,false,['page'=> $page]);
         }
         return $list;
     }
