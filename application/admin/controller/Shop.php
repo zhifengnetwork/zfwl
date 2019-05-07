@@ -68,6 +68,7 @@ class Shop extends Common
     public function gooodsList () {
         $keyword = request()->param('keyword');
         $page    = request()->param('page');
+        if($page < 0){ $page = 1;}
         $list    = model('Goods')->getGoodsList($keyword,0,$page);
         if (!empty($list)){
             return json(['code'=>1,'msg'=>'','data'=>$list]);

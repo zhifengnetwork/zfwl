@@ -22,6 +22,10 @@ class Site extends Common
 
             if( isset($data['logo_mobile']) ) $data['logo_mobile'] = $this->base_img($data['logo_mobile'],'site','logo_mobile',$this->info['logo_mobile']);
 
+            $data['shop_contact'] = serialize($data['shop_contact']);
+            $data['noticeset'] = serialize($data['noticeset']);
+
+            
             if($data['id']){
                 Db::table('site')->update($data,$data['id']);
             }else{
@@ -29,6 +33,9 @@ class Site extends Common
             }
             $this->success('修改成功!');
         }
+
+        if( $this->info['shop_contact'] ) $this->info['shop_contact'] = unserialize( $this->info['shop_contact'] );
+        if( $this->info['noticeset'] ) $this->info['noticeset'] = unserialize( $this->info['noticeset'] );
 
         return $this->fetch('',[
             'meta_title'    =>  '网站设置',

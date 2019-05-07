@@ -156,8 +156,18 @@ class Goods extends ApiBase
         //sku信息
         $skuRes = Db::name('goods_sku')->where('goods_id',$goods_id)->select();
         foreach ($skuRes as $sku_k=>$sku_v){
-//            dump($sku_v['sku_attr']);die;
-            $sku_v['sku_attr'] = json_decode($sku_v['sku_attr']);
+            
+            // $skuRes[$sku_k]['sku_attr'] = preg_replace("/(\w):/",  '"$1":' ,  $sku_v['sku_attr']);
+            $str = preg_replace("/(\w):/",  '"$1":' ,  $sku_v['sku_attr']);
+            $arr = json_decode($str,true);
+            $str = '';
+            foreach($arr as $k=>$v){
+                $str .= $v . ',';
+            }
+            $str = rtrim($str,',');
+            $skuRes[$sku_k]['sku_attr1'] = $str;
+
+            // $skuRes[$sku_k]['sku_attr'] = json_decode($sku_v['sku_attr'],true);
         }
         $specData = array();
         $specData['spec_attr'] = $specRes;

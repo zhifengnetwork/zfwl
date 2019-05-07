@@ -1220,4 +1220,16 @@ class Goods extends Common
         }
     }
 
+    public function ts(){
+
+        
+
+        return $this->fetch('',[
+            'meta_title'    =>  '测试',
+        ]);
+    }
+
+
+
+
 }
