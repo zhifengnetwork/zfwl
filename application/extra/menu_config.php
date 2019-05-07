@@ -95,6 +95,23 @@ return [
                     ],
                 ],
             ],
+            [
+                'id'    => 20400,
+                'title' => '系统操作日志',
+                'sort'  => 4,
+                'icon'  => 'fa-th-large',
+                'url'   => 'index/notice',
+                'hide'  => 1,
+                'child' => [
+                    [
+                        'id'    => 20401,
+                        'title' => '系统操作日志',
+                        'sort'  => 1,
+                        'url'   => 'log/index',
+                        'hide'  => 1,
+                    ],
+                ],
+            ],
         ],
     ],
 
