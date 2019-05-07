@@ -405,7 +405,7 @@ return [
         'id'    => 210000,
         'title' => '系统设置',
         'sort'  => 21,
-        'url'   => 'auths/auth_group',
+        'url'   => 'mguser/index',
         'hide'  => 1,
         'icon'  => 'glyphicon glyphicon-cog',
         'child' => [
@@ -450,7 +450,7 @@ return [
             ],
             [
                 'id'    => 210200,
-                'title' => '权限管理',
+                'title' => '权限分组',
                 'sort'  => 2,
                 'url'   => 'auths/auth_group',
                 'hide'  => 1,
@@ -480,7 +480,7 @@ return [
                     ],
                     [
                         'id'    => 210204,
-                        'title' => '权限管理',
+                        'title' => '权限分组',
                         'sort'  => 1,
                         'url'   => 'auths/auth_group',
                         'hide'  => 1,
@@ -489,7 +489,7 @@ return [
             ],
             [
                 'id'    => 210300,
-                'title' => '菜单',
+                'title' => '系统菜单',
                 'sort'  => 3,
                 'url'   => 'menu/index',
                 'hide'  => 1,
@@ -497,9 +497,34 @@ return [
                 'child' => [
                     [
                         'id'    => 210301,
-                        'title' => '更新菜单',
+                        'title' => '菜单列表',
                         'sort'  => 1,
-                        'url'   => 'menu/import_menu',
+                        'url'   => 'menu/index',
+                        'hide'  => 1,
+                    ],
+                ],
+            ],
+            [
+                'id'    => 210400,
+                'title' => '微信管理',
+                'sort'  => 1,
+                'url'   => 'wxfans/index',
+                'hide'  => 1,
+                'icon'  => 'fa-th-large',
+                'child' => [
+                   
+                    [
+                        'id'    => 210401,
+                        'title' => '粉丝列表',
+                        'sort'  => 1,
+                        'url'   => 'wxfans/index',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 210402,
+                        'title' => '微信菜单',
+                        'sort'  => 2,
+                        'url'   => 'wxmenu/index',
                         'hide'  => 1,
                     ],
                 ],

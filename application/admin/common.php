@@ -148,6 +148,47 @@ function setSukMore2($goods_id, $data_spec)
     }
     return 1;
 }
+/**
+ * 粉丝分组
+ */
+function get_fans_group()
+{
+    $arr = \think\Db::table('user_group')->column('*', 'wechatgroupid');
+    return $arr;
+}
+/*
+ * 获取微信分组下拉html
+ */
+function get_fans_group_html($g_id = -1)
+{
+    static $groups;
+    if (empty($groups)) {
+        $groups = get_fans_group();
+    }
+
+    foreach ($groups as $key => $val) {
+
+        $list .= '<option value="' . $key . '"' . ($key == $g_id ? 'selected' : '') . '>' . $val['name'] . '</option>';
+    }
+    return $list;
+}
+
+function group_text($id)
+{
+    static $groups;
+    if (empty($groups)) {
+        $groups = get_fans_group();
+    }
+
+    return empty($groups[$id]) ? '' : $groups[$id]['name'];
+}
+
+function sex_text($id)
+{
+    $arr = array('0' => '未设置', '1' => '男', '2' => '女');
+
+    return $arr[$id];
+}
 
 /**
  * 获取当前用户权限，控制菜单对某个用户是否显示
