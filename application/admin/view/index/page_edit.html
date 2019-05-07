@@ -655,26 +655,31 @@
                     <div class="slide_mask" :class="active.edit_slide_mask == true ? 'show_box':'hide_box'">
                         <div class="slide_mask_content fall_animation">
                             <div class="mask_content_title">
-                                <span>图片</span>
-                                <span @click="call_off()"><img class="del_icon hover_box" src="__PAGE__/img/pc/delete_icon.png"/></span>
+                                <span class="mask_content_title_name">图片上传</span>
+                                <span class="mask_content_title_hide" @click="call_off()"><img class="del_icon hover_box" src="__PAGE__/img/pc/delete_icon.png"/></span>
                             </div>
                             <div class="mask_content">
                                 <div class="mask_content_tab clearfloat">
-                                    <span :class="{active:active.edit_slide}" @click="tabs">本地上传</span>
-                                    <span :class="{active:!active.edit_slide}" @click="tabs">网络图片</span>
+                                    <span class="hover_box" :class="{active:active.edit_slide}" @click="tabs">本地上传</span>
+                                    <span class="hover_box" :class="{active:!active.edit_slide}" @click="tabs">网络图片</span>
                                 </div>
                                 <div class="mask_content_list2" v-if="active.edit_slide">
                                     <div class="mask_content_item">
-                                        <label>上传文件</label>
-                                        <input type="text" v-model="upImages.name">
-                                        <input class="type1" type="file" @change="up_imageFun($event)" accept="image/*">
+                               			<p class="mask_content_item_name">上传文件</p>
+                                        <input class="mask_content_item_input" type="text" disabled v-model="upImages.name">
+                                        <p class="mask_content_item_but">
+                                        	<span>浏览</span>
+                                        	<input class="mask_content_item_but_file" type="file" @change="up_imageFun($event)" accept="image/*">
+                                        </p>
+                                        
+                                        <!--图片过大，压缩-->
                                         <canvas id="canvas" hidden></canvas>
                                     </div>
                                 </div>
                                 <div class="mask_content_list1" v-if="!active.edit_slide">
                                     <div class="mask_content_item">
-                                        <label>图片地址</label>
-                                        <input type="text">
+                                        <p class="mask_content_item_name">图片地址</p>
+                                        <input class="mask_content_item_input" type="text" v-model="networkUrl.baseUrl">
                                         <!--<button>图片空间</button>-->
                                     </div>
                                     <!--<div class="mask_content_item">
@@ -684,14 +689,12 @@
                                 </div>
                             </div>
                             <div class="mask_content_btn">
-                                <div class="btn_wrap">
-                                    <button @click="confirmFun()">确定</button>
-                                    <button @click="call_off()">取消</button>
-                                </div>
+                                <p class="hover_box btn_wrap_p" @click="call_off()">取消</p>
+                                <p class="hover_box btn_wrap_p" @click="confirmFun()">确定</p>
                             </div>
                             <div class="upload" :class="axios_state == false ? 'show_box':'hide_box'">
                                 <div class="load_text">
-                                    上传中
+                                	上传中
                                     <div class="load">
                                         <!--动画-->
                                         <span></span><span></span><span></span>
@@ -1875,7 +1878,7 @@
                         if(response['data']['code'] == 1){
                             alert(response['data']['msg']);
                             /*页面跳转*/
-                            window.location.href = "index/page_edit?id="+ response['data']['data']['id'];
+                            window.location.href = "index?id="+ response['data']['data']['id'];
                         }else {
                             /*保存失败*/
                             alert(response['data']['msg']);
