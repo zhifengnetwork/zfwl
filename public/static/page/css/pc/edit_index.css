@@ -510,6 +510,7 @@
 	border-radius: 10px;
 	-webkit-box-shadow: 0 5px 15px rgba(0, 0, 0, .5);
 	box-shadow: 0 5px 15px rgba(0, 0, 0, .5);
+	color: #233645;
 	background: #fff;
 }
 
@@ -519,6 +520,7 @@
 	box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
+	
 	border-bottom: 1px solid #e5e5e5;
 }
 
@@ -690,6 +692,17 @@
 	width: 55px;
 	height: 25px;
 }
+/*不能点击*/
+.comm_modal_footer .paging .no_but_color {
+	color: #d9d9d9;
+	border-color: #d9d9d9;
+}
+/*点击后的颜色*/
+.comm_modal_footer .paging .active_color {
+	color: #999;
+	border-color: #999;
+}
+
 
 .shut {
 	position: absolute;

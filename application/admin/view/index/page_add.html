@@ -739,10 +739,13 @@
                                 </div>
 
                                 <div class="comm_modal_footer comm_modal_footer_shut">
-                                    <div class="paging">
-                                    	<p class="btns">上一页</p>
-                                    	<p>1</p>
-                                        <p class="btns">下一页</p>
+                                	<!--分页-->
+                                    <div class="paging hide_box" :style="search_data['show_paging'] == true ? 'display:table;':''">
+                                    	<p class="btns" :class="search_data['this_page'] == 1 ? 'no_but_color':'' " @click.stop="first_page()">首页</p>
+                                    	<p class="btns" :class="search_data['this_page'] == 1 ? 'no_but_color':'' " @click.stop="upper_page()">上一页</p>
+                                    	<p v-for="(item,ind) in search_data['total_page']" :class="search_data['this_page'] == item['page'] ? 'active_color':'' " @click.stop="this_page(item['page'])" v-show="search_data['this_page'] - item['page'] <=2 && item['page'] - search_data['this_page'] <=2">{{item['page']}}</p>
+                                        <p class="btns" :class="search_data['this_page'] == search_data['total_page'].length ? 'no_but_color':'' " @click.stop="lower_page()">下一页</p>
+                                        <p class="btns" :class="search_data['this_page'] == search_data['total_page'].length ? 'no_but_color':'' " @click.stop="last_page()">尾页</p>
                                     </div>
                                     <!--<div class="shut" @click.stop="two_way_button()">关闭</div>-->
                                 </div>
@@ -760,7 +763,7 @@
                                 </div>
 
                                 <div class="modal-body">
-
+									<!--数据渲染-->
                                     <div class="module-menus clearfloat">
                                         
                                     </div>
@@ -933,7 +936,18 @@
                 ],
                 /*搜索-商品的data*/
                 search_data: {
+                	/*关键字*/
                     key_word: '',
+                    /*是否显示分页*/
+                    show_paging: false,
+                    /*当前页数 || 请求页数，默认:1*/
+                    this_page: 1,
+                    /*总页数*/
+                    total_page: [
+                    	/*{
+                    		page: 1,
+                    	},*/
+                    ],
                 },
                 /* 页面渲染data || 传个后台-data ，对象形式*/
                 backData: {
@@ -1740,7 +1754,7 @@
                 console.log('更换的data的index: ', this.changeImg_ind);
                 /*this.changeImg_ind不等于 初始值：null; 0=>else{}*/
                 if(this.changeImg_ind != null) {
-                    console.log(666666666666666666);
+                    /*console.log(66666666);*/
                     /*更换=>对应商品*/
                     this.backData['data'][this.puStateObj['key_num']]['data']['msg'][this.changeImg_ind] = clones(_item);
                     return false;
@@ -1757,20 +1771,35 @@
                     return false;
                 }
                 that.axios_state = false;
-                console.log('关键字:', that.search_data['key_word']);
+                console.log('关键字:', that.search_data['key_word'],'页数:',that.search_data['this_page']);
                 axios.post("{:url('shop/gooodsList')}", {
+                		/*页数*/
+                		page: that.search_data['this_page'],
+                		/*关键字*/
                         keyword: that.search_data['key_word'],
                     })
                     .then(function(response) {
                         console.log(response['data']);
                         if(response['data']['code'] == 1) {
+                        	var re_data = response['data']['data'];
                             /*成功之后=>清除-本地数据,在更新*/
                             that.comm_data = [];
                             /*循环赋值*/
-                            for(var g = 0; g < response['data']['data']['data'].length; g++) {
+                            for(var g = 0; g < re_data['data'].length; g++) {
                                 /*(深克隆)赋值给页面渲染的data*/
-                                that.comm_data.push(clones(response['data']['data']['data'][g]));
+                                that.comm_data.push(clones(re_data['data'][g]));
                             }
+                            /*判断是否显示-分页*/
+                            if(re_data['total'] > re_data['per_page']){
+                            	that.search_data['show_paging'] = true;
+                            }
+                            /*总页数*/
+                           	if(re_data['last_page'] > 0){
+                           		for(var r=0;r<re_data['last_page'];r++){
+                        			that.search_data['total_page'][r] = {page: r+1};
+                        		}
+                           	}
+                        	
                             console.log('商品ajax成功:', that.comm_data);
                         } else {
                             /*提示*/
@@ -1783,6 +1812,47 @@
                         console.log(error);
                         that.axios_state = true;
                     });
+            },
+            /*商品组-当前点击-页数*/
+            this_page(_page){
+            	console.log('当前点击-页数：',_page);
+            	/*当前页数*/
+            	this.search_data['this_page'] = _page;
+            	/*商品ajax=>渲染*/
+            	this.comDataRe(); 
+            },
+            /*商品组-首页*/
+            first_page(){
+            	if(this.search_data['this_page'] != 1){
+            		this.search_data['this_page'] = 1;
+            		console.log('首页：',this.search_data['this_page']);
+            		this.comDataRe();
+            	}
+            },
+            /*商品组-上一页*/
+            upper_page(){
+            	if(this.search_data['this_page'] != 1){
+            		this.search_data['this_page']--;
+            		console.log('当前点击-页数：',this.search_data['this_page']);
+            		this.comDataRe();
+            	}
+            },
+            /*商品组-下一页*/
+            lower_page(){
+            	if(this.search_data['this_page'] != this.search_data['total_page'].length){
+            		this.search_data['this_page']++;
+            		console.log('当前点击-页数：',this.search_data['this_page']);
+            		this.comDataRe(); 
+            	}
+            	
+            },
+            /*商品组-尾页*/
+            last_page(){
+            	if(this.search_data['this_page'] != this.search_data['total_page'].length){
+            		this.search_data['this_page'] = this.search_data['total_page'].length;
+            		console.log('尾页 ：',this.search_data['this_page']);
+            		this.comDataRe(); 
+            	}
             },
             /*对应-添加数据(如:轮播图，单图等)*/
             add_data(_id, _item) {
