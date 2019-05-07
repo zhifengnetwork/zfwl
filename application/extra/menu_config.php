@@ -326,7 +326,7 @@ return [
                 'id'    => 60100,
                 'title' => '财务管理',
                 'sort'  => 1,
-                'url'   => '',
+                'url'   => 'total/index',
                 'hide'  => 1,
                 'child' => [
                     [
