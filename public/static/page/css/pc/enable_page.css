@@ -62,7 +62,6 @@
 
 
 /*隐藏滚动条*/
-
 .html_box_new {
 	/*防止页面未渲染完成--vue的{{变量名}}*/
 	display: none;
@@ -70,6 +69,8 @@
 	width: 359px;
 	height: 100%;
 	overflow-y: scroll;
+	/*防止轮播图溢出-X轴出现滚动条*/
+	overflow-x: hidden;
 }
 
 
@@ -183,10 +184,16 @@
 	width: 20px;
 	height: 4px;
 }
-/* 线形按钮 */
-.slide_but .linetype {
+/* 正方形按钮 */
+
+.slide_but .square {
 	width: 10px;
 	height: 10px;
+}
+/* 线形按钮 */
+.slide_but .linetype {
+	width: 24px;
+	height: 2px;
 }
 
 

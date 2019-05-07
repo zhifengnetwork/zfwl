@@ -95,7 +95,7 @@
 								<!--div 循环-->
 								<div class="drag_box" v-for="(v,i) in backData['data']">
 									<!--轮播图 box-->
-									<div class="modle_box swiper-container" v-if="v.id == 'rotationId'? true:''" :key="v.id">
+									<div class="modle_box" :class="v.id+v.key_num" v-if="v.id == 'rotationId'? true:''" :key="v.id">
 										<div class="slide swiper-wrapper">
 											<div class="slide_item swiper-slide" v-for="(val,index) in v.data.images">
 												<img :src="val.imgUrl" alt="" />
@@ -325,6 +325,8 @@
             /* 预览-页面数据-请求*/
 			send(_event){
 				var that = this;
+				/*存轮播数据*/
+				var res = [];
 				that.page_id = Number(_event.target.getAttribute("page_id"));
 				console.log('预览id:',that.page_id);
 				/*axios=>请求-页面数据*/
@@ -343,7 +345,7 @@
 						for(let i=0;i<response.data.data.data.length;i++){
 							if(response.data.data.data[i].id=="rotationId"){
 								/*轮播图设置*/
-								let res=response.data.data.data[i];
+								res.push({'data':response.data.data.data[i],'key':response.data.data.data[i].key_num});
 								console.log(res)
 								that.$nextTick(function(){
 									that.carousel(res);
@@ -362,33 +364,39 @@
 			},
 			/*调用轮播插件*/
 			carousel(res){
-				var swiper = new Swiper('.swiper-container', {
-					autoplay: {
-						//自动播放
-						delay: 3000,
-						//用户操作swiper之后，是否禁止autoplay。默认为true：停止。
-						disableOnInteraction: false,
-					},
-					loop: true, // 循环模式选项
-					pagination:{
-							el: '.swiper-pagination',
-							// 自定义分页器，必须的type类型
-							type: 'custom',
-							renderCustom: function(swiper,current, total){
-								var paginationHtml = "";
-								for(var i= 0; i<total; i++) {
-									// 判断是不是激活焦点
-									if(i === (current-1)){
-											paginationHtml += '<span class="'+res.params.butStyle+'" style="background:'+res.params.clickColor+'"></span>';
-										}else{
-											paginationHtml += '<span class="'+res.params.butStyle+'" style="background:'+res.params.butColor+'"></span>';
-										}
-								}
-								return paginationHtml;
-						}
-					}
-				});       
-			},
+		      for(let l=0;l<res.length;l++){
+		      	console.log(res[l].data.id)
+		        if(l==res[l].key){
+		          var swiper = new Swiper('.'+res[l].data.id+res[l].key, {
+		            autoplay: {
+					   //自动播放
+		              delay: 3000,
+					  //用户操作swiper之后，是否禁止autoplay。默认为true：停止。
+		              disableOnInteraction: false,
+						
+		            },
+		            loop: true, // 循环模式选项
+		            pagination:{
+		                el: '.swiper-pagination',
+		                // 自定义分页器，必须的type类型
+		                type: 'custom',
+		                renderCustom: function(swiper,current, total){
+		                  var paginationHtml = "";
+		                  for(var i= 0; i<total; i++) {
+		                  // 判断是不是激活焦点
+		                    if(i === (current-1)){
+		                        paginationHtml += '<span class="'+res[l].data.params.butStyle+'" style="background:'+res[l].data.params.clickColor+'"></span>';
+		                      }else{
+		                        paginationHtml += '<span class="'+res[l].data.params.butStyle+'" style="background:'+res[l].data.params.butColor+'"></span>';
+		                      }
+		                  }
+		                  return paginationHtml;
+		              }
+		            }
+		          }); 
+		        }
+		      } 
+		    },
 			/*删除，对应-页面data*/
 			del_data(_event){
 				var that = this;
