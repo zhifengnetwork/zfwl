@@ -71,9 +71,9 @@ class Member extends Common
                         ->join("member_level l",'dm.level =l.id','LEFT')
                         ->join("user f",'f.openid=dm.openid','LEFT')
                         ->where($where)
-                        // ->order('create_time')
+                       ->order('createtime desc')
                         ->paginate(10, false, ['query' => $where]);
-        
+                       
         foreach ($list as &$row) {
             $row['levelname']  = empty($row['levelname']) ?  '普通会员' : $row['levelname'];
             $order_info        = Db::table('order1')->where(['openid' =>$row['openid'],'status' => 3])->field('count(id) as order_count,sum(goodsprice) as ordermoney')->find();

@@ -320,7 +320,7 @@ class Member extends Model
     public static function getCredit($dephp_0 = '', $dephp_8 = 'credit1'){
         $dephp_1 = mc_openid2uid($dephp_0);
         if (!empty($dephp_1)){
-            $credit = Db::table('mc_members')->field('uid,openid,credit1,credit2')->where(['uid' => $dephp_1])->find();
+            $credit = Db::table('mc_members')->field('uid,credit1,credit2')->where(['uid' => $dephp_1])->find();
         }else{
             $credit = Db::table('member')->field('uid,openid,credit1,credit2')->where(['openid' => $dephp_0])->find();
         }
