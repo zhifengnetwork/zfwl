@@ -119,6 +119,13 @@ $.ajax({
     } 
 });
 
+function where(array, obj) {
+    const keys = Object.keys(obj);
+    return array.filter(m => {
+        return keys.every(key => m.hasOwnProperty(key) && m[key] === obj[key]);
+    });
+}
+
 $('input[type="radio"]').on('click',function(){
     
     if( $(this).attr('checked') ){
@@ -129,93 +136,46 @@ $('input[type="radio"]').on('click',function(){
 
     var spec_id = '';
     var attr_id = '';
-    var str_sku = '';
-    var arr = new Array;
     var arr = {};
     $('input[type=radio]:checked').each(function(key,val){
         spec_id = $(val).attr('name');
         attr_id = $(val).val();
 
         arr[spec_id] = parseInt( attr_id );
-        // str_sku = spec_id + ':' + attr_id;
-        // arr.push(str_sku);
-        // str_sku += spec_id + ':' + attr_id + ',';
-        // arr.push(attr_id);
     });
-    // console.log( arr )
 
     $('input[type=radio]').attr('disabled','disabled');
 
     if( Object.keys(arr).length == 0 ){
         $('input[type=radio]').removeAttr('disabled');
+        $('#num').html( 0 );
+        $('#pri').html( 0 );
         return;
     }
-
+    var new_arr = new Array();
     $(goods_sku).each(function(key,val){
         $( eval('('+val.sku_attr+')') ).each(function(k,v){
-
-
-            for(var kk in v){
-                var flag = false;
-                if(v[kk] == arr[kk]){
-                    flag = true;    
-                }else{
-                    if( flag && arr[kk] == undefined ){
-                        flag = true;
-                    }else{
-                        flag = false;
-                    }
-                }
-
-                if(flag){
-                    for(var kkk in v){
-                        $('input[value='+v[kkk]+']').removeAttr('disabled');
-                    }
-                }
-
-                    // console.log( arr[kk] )
-            }
-            // if(flag){
-            //     $('input[value='+v[kk]+']').removeAttr('disabled');
-            //     flag = false;
-            // }
-            // console.log( v )
-
+            new_arr.push(v);
         });
     });
-    // console.log( arr )
 
-    // for(var key in arr){
-        
-    // }
+    var res = where(new_arr,arr);
+    var sku_attr = '';
+    for(var i=0;i<res.length;i++){
+        sku_attr =  JSON.stringify(res[i]);
+        for(var key in res[i]){
+            $('input[value='+res[i][key]+']').removeAttr('disabled');
+        }
+    }
 
-    // console.log( goods_sku )
+    for(var i=0;i<goods_sku.length;i++){
+        if( sku_attr == goods_sku[i].sku_attr ){
+            $('#num').html( goods_sku[i].inventory );
+            $('#pri').html( goods_sku[i].price );
+        }
+    }
 
-    // str_sku = str_sku.substr(0, str_sku.length - 1); 
-
-
-    // $('input[type=radio]').attr('disabled','disabled');
-    // $(goods_sku).each(function(key,val){
-    //     if( val.sku_attr.match(str_sku) ){
-    //         $( eval('('+val.sku_attr+')') ).each(function(k,v){
-    //             for(var kk in v){
-    //                 if( arr.indexOf(v[kk]) ){
-    //                     $('input[value='+v[kk]+']').removeAttr('disabled');
-    //                     $('#num').html( val.inventory )
-    //                     $('#pri').html( val.price )
-    //                 }
-    //             }
-    //         })
-    //     }
-    // });
 });
-
-
-
-
-
-
-
 
 </script>
 {/block}

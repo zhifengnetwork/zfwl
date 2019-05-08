@@ -157,7 +157,7 @@ class Goods extends ApiBase
         $skuRes = Db::name('goods_sku')->where('goods_id',$goods_id)->select();
         foreach ($skuRes as $sku_k=>$sku_v){
             
-            // $skuRes[$sku_k]['sku_attr'] = preg_replace("/(\w):/",  '"$1":' ,  $sku_v['sku_attr']);
+            $skuRes[$sku_k]['sku_attr'] = preg_replace("/(\w):/",  '"$1":' ,  $sku_v['sku_attr']);
             $str = preg_replace("/(\w):/",  '"$1":' ,  $sku_v['sku_attr']);
             $arr = json_decode($str,true);
             $str = '';
