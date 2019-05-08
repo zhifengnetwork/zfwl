@@ -296,6 +296,8 @@ class Goods extends Common
                 }
             }
     
+            $data['add_time'] = strtotime( $data['add_time'] );
+            
             $data['goods_spec'] = '[' . $default_spec_str . ']';
             
             $skuRes = setSukMore2($goods_id, $data_spec);
@@ -1257,16 +1259,54 @@ class Goods extends Common
         }
     }
 
-    public function ts(){
+    /**
+     * 商品评论列表
+     */
+    public function comment_list(){
+        $goods_id = input('goods_id');
 
+        $where['goods_id'] = $goods_id;
+        $pageParam['query']['goods_id'] = $goods_id;
         
 
+        $list = Db::table('goods_comment')->alias('gc')
+                ->join('member m','m.id=gc.uid','LEFT')
+                ->field('gc.*,m.mobile')
+                ->where($where)
+                ->paginate(10,false,$pageParam);
+
+
         return $this->fetch('',[
-            'meta_title'    =>  '测试',
+            'list'          =>  $list,
+            'meta_title'    =>  '商品评论列表',
         ]);
     }
 
+    /**
+     * 商品评论回复
+     */
+    public function comment_replies(){
+        $id = input('id');
 
+        if(!$id) $this->error('参数错误！');
+
+        $info = Db::table('goods_comment')->find($id);
+
+        if( request()->isPost() ){
+            $data = input('post.');
+
+            if( Db::table('goods_comment')->update($data) !== false ){
+                slog($id);
+                $this->success('修改成功！',url('goods/comment_list',['goods_id'=>$info['goods_id']],false));
+            }
+            $this->error('修改失败！');
+        }
+
+        return $this->fetch('',[
+            'info'          =>  $info,
+            'meta_title'    =>  '商品评论回复',
+        ]);
+    }
 
 
 }

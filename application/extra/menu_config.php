@@ -206,6 +206,15 @@ return [
                         'sort'  => 2,
                         'url'   => 'goods/virtual_category_list',
                         'hide'  => 1,
+                        'child' => [
+                            [
+                                'id'    => 30403,
+                                'title' => '添加虚拟分类',
+                                'sort'  => 1,
+                                'url'   => 'goods/virtual_category_add',
+                                'hide'  => 0,
+                            ],
+                        ],
                     ],
                 ],
             ],

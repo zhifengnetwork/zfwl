@@ -56,11 +56,11 @@
                     </form>
                     </div>
 
-                    <div class="row">
-                        <div class="col-sm-1"><a href="{:url('Goods/add')}">添加商品</a></div>
-                        <div class="col-sm-1"><a onclick="is_show_all(1)" href="javascript:;">批量上架</a></div>
-                        <div class="col-sm-1"><a onclick="is_show_all(0)" href="javascript:;">批量下架</a></div>
-                        <div class="col-sm-1"><a onclick="del_all()" href="javascript:;">批量删除</a></div>
+                    <div class="row" style="margin-left:0px;" >
+                        <a class="btn btn-default delete" href="{:url('Goods/add')}" >添加商品 </i></a>
+                        <a class="btn btn-default delete" onclick="is_show_all(1)" href="javascript:;" >批量上架 </i></a>
+                        <a class="btn btn-default delete" onclick="is_show_all(0)" href="javascript:;" >批量上架 </i></a>
+                        <a class="btn btn-default delete" onclick="del_all(0)" href="javascript:;" >批量删除 <i class="fa fa-trash-o"></i></a>
 
                     </div>
 
@@ -91,6 +91,8 @@
                                 <td>{$vo.number_sales}</td>
                                 <td>{$vo.add_time|date="Y-m-d",###}</td>
                                 <td>
+                                    <a class="btn btn-default delete" href="{:url('Goods/comment_list',['goods_id'=>$vo.goods_id],false)}" >评论 </i></a>
+
                                     <a href="{:url('Goods/edit',['goods_id'=>$vo.goods_id],false)}">编辑</a>
                                     <a is_show="{$vo.is_show}" onclick="is_show(this,{$vo.goods_id})" href="javascript:;">{if condition="$vo.is_show"}下架{else /}上架{/if}</a>
                                     <a onclick="del(this,{$vo.goods_id})" href="javascript:;">删除</a>

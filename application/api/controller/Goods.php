@@ -125,6 +125,26 @@ class Goods extends ApiBase
 
         $goodsRes['img'] = Db::table('goods_img')->where('goods_id',$goods_id)->field('picture')->order('main DESC')->select();
 
+        
+        $goodsRes['comment'] = Db::table('goods_comment')->alias('gc')
+                ->join('member m','m.id=gc.uid','LEFT')
+                ->field('m.mobile,gc.*')
+                ->where('gc.goods_id',$goods_id)
+                ->select();
+        if($goodsRes['comment']){
+            foreach($goodsRes['comment'] as $key=>$value ){
+
+                $goodsRes['comment'][$key]['mobile'] = substr_cut($value['mobile']);
+
+                if($value['img']){
+                    $goodsRes['comment'][$key]['img'] = explode(',',$value['img']);
+                }else{
+                    $goodsRes['comment'][$key]['img'] = [];
+                }
+            }
+        }
+
+
         $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$goodsRes]);
 
     }
@@ -157,7 +177,7 @@ class Goods extends ApiBase
         $skuRes = Db::name('goods_sku')->where('goods_id',$goods_id)->select();
         foreach ($skuRes as $sku_k=>$sku_v){
             
-            // $skuRes[$sku_k]['sku_attr'] = preg_replace("/(\w):/",  '"$1":' ,  $sku_v['sku_attr']);
+            $skuRes[$sku_k]['sku_attr'] = preg_replace("/(\w):/",  '"$1":' ,  $sku_v['sku_attr']);
             $str = preg_replace("/(\w):/",  '"$1":' ,  $sku_v['sku_attr']);
             $arr = json_decode($str,true);
             $str = '';
