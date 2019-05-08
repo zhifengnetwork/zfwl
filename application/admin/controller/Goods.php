@@ -296,6 +296,8 @@ class Goods extends Common
                 }
             }
     
+            $data['add_time'] = strtotime( $data['add_time'] );
+            
             $data['goods_spec'] = '[' . $default_spec_str . ']';
             
             $skuRes = setSukMore2($goods_id, $data_spec);

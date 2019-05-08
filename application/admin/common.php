@@ -143,7 +143,7 @@ function setSukMore2($goods_id, $data_spec)
         $map = [];
         foreach ($val as $k => $v) {
             if ($k !== 'sku_id') {
-                if ($v['key'] != '库存' && $v['key'] != 'pri' && $v['key'] != 'tiered_pri') {
+                if ($v['key'] != '库存' && $v['key'] != 'pri') {
                     $goods_spec_data = array();
                     $spec_id = array_keys($all_spec, $v['key'])[0];
                     $goods_spec_data['spec_id'] = $spec_id;
@@ -181,7 +181,7 @@ function setSukMore2($goods_id, $data_spec)
             $res2 = Db::name('goods_sku')->where('sku_id', $sku_data['sku_id'])->update($sku_data);
         }
 
-        if (!$res2) {
+        if ($res2 === false) {
             return 0;
         }
     }
