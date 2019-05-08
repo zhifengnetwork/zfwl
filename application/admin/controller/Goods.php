@@ -150,6 +150,9 @@ class Goods extends Common
             $goods_id = Db::table('goods')->strict(false)->insertGetId($data);
             if ( $goods_id ) {
 
+                //添加操作日志
+                slog($goods_id);
+
                 //图片处理
                 if( isset($data['img']) && !empty($data['img'][0])){
                     foreach ($data['img'] as $key => $value) {
@@ -336,6 +339,8 @@ class Goods extends Common
             }
             
             if ( Db::table('goods')->strict(false)->update($data) !== false ) {
+                //添加操作日志
+                slog($goods_id);
                 $this->success('修改成功', url('goods/index'));
             } else {
                 $this->error('修改失败');
@@ -412,7 +417,8 @@ class Goods extends Common
         }
 
         Db::table('goods_img')->update(['id'=>$id,'main'=>1]);
-        
+        //添加操作日志
+        slog($id);
         return Db::table('goods_img')->where('goods_id',$res['goods_id'])->where('id','neq',$id)->update(['main'=>0]);
     }
 
@@ -429,7 +435,8 @@ class Goods extends Common
             }
 
             @unlink(ROOT_PATH .Config('c_pub.img') . $info['picture']);
-            
+            //添加操作日志
+            slog($data['id']);
             return Db::table('goods_img')->where('id','=',$data['id'])->delete();
         }
     }
@@ -448,6 +455,8 @@ class Goods extends Common
         }
 
         if( Db::table('goods')->where('goods_id',$goods_id)->update(['is_del'=>1]) ){
+            //添加操作日志
+            slog($goods_id);
             jason([],'删除商品成功！');
         }else{
             jason([],'删除商品失败！',0);
@@ -470,6 +479,8 @@ class Goods extends Common
         }
 
         if( Db::table('goods')->where('goods_id',$goods_id)->update(['is_show'=>$is_show]) ){
+            //添加操作日志
+            slog($goods_id);
             jason(200);
         }
         jason([],'失败',0);
@@ -487,6 +498,8 @@ class Goods extends Common
         }
 
         if( Db::table('goods')->where('goods_id','in',$goods_id)->update(['is_show'=>$is_show]) ){
+            //添加操作日志
+            slog($goods_id);
             jason([]);
         }
         jason([],'失败',0);
@@ -503,6 +516,8 @@ class Goods extends Common
         }
 
         if( Db::table('goods')->where('goods_id','in',$goods_id)->update(['is_del'=>1]) ){
+            //添加操作日志
+            slog($goods_id);
             jason([]);
         }
         jason([],'失败',0);
@@ -895,8 +910,10 @@ class Goods extends Common
             if($data['is_default']){
                 Db::table('goods_delivery')->where('delivery_id','neq',0)->update(['is_default'=>0]);
             }
-            
-            if ( Db::table('goods_delivery')->strict(false)->insert($data) ) {
+            $delivery_id = Db::table('goods_delivery')->strict(false)->insertGetId($data);
+            if ( $delivery_id ) {
+                //添加操作日志
+                slog($delivery_id);
                 $this->success('添加成功', url('goods/goods_delivery_list','',false));
             } else {
                 $this->error('添加失败');
@@ -947,6 +964,8 @@ class Goods extends Common
             }
             
             if ( Db::table('goods_delivery')->strict(false)->update($data) ) {
+                //添加操作日志
+                slog($delivery_id);
                 $this->success('修改成功', url('goods/goods_delivery_list','',false));
             } else {
                 $this->error('修改失败');
@@ -972,6 +991,8 @@ class Goods extends Common
         if( request()->isAjax()){
             $delivery_id = input('delivery_id');
             if( Db::table('goods_delivery')->where('delivery_id','=',$delivery_id)->delete()){
+                //添加操作日志
+                slog($delivery_id);
                 jason([],'删除配送方式成功！');
             }else{
                 jason([],'删除配送方式成功！',0);
@@ -1025,10 +1046,14 @@ class Goods extends Common
             }
             $data['fields'] = serialize($fields);
             if($id){
+                //添加操作日志
+                slog($id,'edit');
                 Db::table('virtual_goods')->strict(false)->update($data);
                 $this->success('修改成功！',url('goods/virtual_goods_list'));
             }else{
-                Db::table('virtual_goods')->strict(false)->insert($data);
+                $id = Db::table('virtual_goods')->strict(false)->insertGetId($data);
+                //添加操作日志
+                slog($id);
                 $this->success('添加成功！',url('goods/virtual_goods_list'));
             }
         }
@@ -1052,6 +1077,8 @@ class Goods extends Common
         if( request()->isAjax()){
             $id = input('id');
             if( Db::table('virtual_goods')->where('id','=',$id)->delete()){
+                //添加操作日志
+                slog($id);
                 jason([],'删除虚拟商品成功！');
             }else{
                 jason([],'删除虚拟商品成功！',0);
@@ -1124,9 +1151,11 @@ class Goods extends Common
 
             if($id){
                 Db::table('virtual_data')->strict(false)->update($arr[0]);
+                //添加操作日志
+                slog($id,'edit');
                 $this->success('修改成功！',url('goods/virtual_data_list',['type_id'=>$type_id],false));
             }else{
-                Db::table('virtual_data')->strict(false)->insertAll($arr);
+                $ids = Db::table('virtual_data')->strict(false)->insertAll($arr);
                 $this->success('添加成功！',url('goods/virtual_data_list',['type_id'=>$type_id],false));
             }
         }
@@ -1148,6 +1177,8 @@ class Goods extends Common
         if( request()->isAjax()){
             $id = input('id');
             if( Db::table('virtual_data')->where('id','=',$id)->delete()){
+                //添加操作日志
+                slog($id);
                 jason([],'删除数据成功！');
             }else{
                 jason([],'删除数据成功！',0);
@@ -1192,10 +1223,14 @@ class Goods extends Common
                 $this->error('分类名称不能为空！');
             }
             if($data['id']){
+                //添加操作日志
+                slog($id,'edit');
                 Db::table('virtual_category')->update($data);
                 $this->success('修改成功！',url('virtual_category_list'));
             }else{
-                Db::table('virtual_category')->insert($data);
+                $id = Db::table('virtual_category')->insertGetId($data);
+                //添加操作日志
+                slog($id);
                 $this->success('添加成功！',url('virtual_category_list'));
             }
         }
@@ -1213,6 +1248,8 @@ class Goods extends Common
         if( request()->isAjax()){
             $id = input('id');
             if( Db::table('virtual_category')->where('id','=',$id)->delete()){
+                //添加操作日志
+                slog($id);
                 jason([],'删除虚拟分类成功！');
             }else{
                 jason([],'删除虚拟分类成功！',0);

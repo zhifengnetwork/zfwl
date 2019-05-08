@@ -75,6 +75,7 @@ class Common extends Controller
             // $where['hide']   = 1;
             $all_menu        = Db::table('menu')->where($where)->order('sort ASC')->field("id,title,pid,url,hide,tip,group,sort,icon")->select();
         }
+        Session::set('all_menu', $all_menu);
        
         //权限判断
         $auth_rules = get_menu_auth();

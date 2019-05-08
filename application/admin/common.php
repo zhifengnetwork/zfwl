@@ -1,7 +1,38 @@
 <?php
 use think\Db;
+use think\Request;
+use think\Session;
 // 加载wechat微信处理类库
 require VENDOR_PATH . 'wechat-2/autoload.php';
+
+function slog($id='',$title=''){
+
+    $ca = Request::instance()->controller() . '/' . Request::instance()->action();
+
+    $all_menu = Session::get('all_menu');
+    if($all_menu){
+        $data['uid'] = Session::get('admin_user_auth.mgid');
+        $data['type'] = $ca;
+        $data['createtime'] = time();
+        $data['ip'] = Request::instance()->ip();
+        foreach($all_menu as $key=>$value){
+            if( strtolower($value['url']) == strtolower($ca) ){
+                $data['name'] = $value['title'];
+                $data['op'] = $value['title'] . ' ID:' . $id;
+                if($value['pid']){
+                    foreach($all_menu as $k=>$v ){
+                        if( $v['id'] == $value['pid'] ){
+                            $data['name'] = $v['title'] . '-' . $value['title'];
+                            break;
+                        }
+                    }
+                }
+                break;
+            }
+        }
+        Db::table('admin_log')->insert($data);
+    }
+}
 
 function jason($data=array(),$msg="ok",$code=1){
     $result=array(  

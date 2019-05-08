@@ -74,6 +74,8 @@
                     <form method="post" class="form-horizontal" action="">
                     <div id="gg">
                         
+                        <div>库存数量:<div id='num'>0</div></div>
+                        <div>商品价格:<div id='pri'>0</div></div>
                     </div>
                     </form>
                 </div>
@@ -118,32 +120,94 @@ $.ajax({
 });
 
 $('input[type="radio"]').on('click',function(){
+    
+    if( $(this).attr('checked') ){
+        $(this).removeAttr('checked');
+    }else{
+        $(this).attr('checked','checked');
+    }
+
     var spec_id = '';
     var attr_id = '';
     var str_sku = '';
     var arr = new Array;
+    var arr = {};
     $('input[type=radio]:checked').each(function(key,val){
         spec_id = $(val).attr('name');
         attr_id = $(val).val();
 
-        str_sku += spec_id + ':' + attr_id + ',';
-        arr.push(attr_id);
+        arr[spec_id] = parseInt( attr_id );
+        // str_sku = spec_id + ':' + attr_id;
+        // arr.push(str_sku);
+        // str_sku += spec_id + ':' + attr_id + ',';
+        // arr.push(attr_id);
     });
-    console.log(arr)
-    str_sku = str_sku.substr(0, str_sku.length - 1); 
+    // console.log( arr )
+
     $('input[type=radio]').attr('disabled','disabled');
 
+    if( Object.keys(arr).length == 0 ){
+        $('input[type=radio]').removeAttr('disabled');
+        return;
+    }
+
     $(goods_sku).each(function(key,val){
-        if( val.sku_attr.match(str_sku) ){
-            $( eval('('+val.sku_attr+')') ).each(function(k,v){
-                for(var kk in v){
-                    if( arr.indexOf(v[kk]) ){
-                        $('input[value='+v[kk]+']').removeAttr('disabled');
+        $( eval('('+val.sku_attr+')') ).each(function(k,v){
+
+
+            for(var kk in v){
+                var flag = false;
+                if(v[kk] == arr[kk]){
+                    flag = true;    
+                }else{
+                    if( flag && arr[kk] == undefined ){
+                        flag = true;
+                    }else{
+                        flag = false;
                     }
                 }
-            })
-        }
+
+                if(flag){
+                    for(var kkk in v){
+                        $('input[value='+v[kkk]+']').removeAttr('disabled');
+                    }
+                }
+
+                    // console.log( arr[kk] )
+            }
+            // if(flag){
+            //     $('input[value='+v[kk]+']').removeAttr('disabled');
+            //     flag = false;
+            // }
+            // console.log( v )
+
+        });
     });
+    // console.log( arr )
+
+    // for(var key in arr){
+        
+    // }
+
+    // console.log( goods_sku )
+
+    // str_sku = str_sku.substr(0, str_sku.length - 1); 
+
+
+    // $('input[type=radio]').attr('disabled','disabled');
+    // $(goods_sku).each(function(key,val){
+    //     if( val.sku_attr.match(str_sku) ){
+    //         $( eval('('+val.sku_attr+')') ).each(function(k,v){
+    //             for(var kk in v){
+    //                 if( arr.indexOf(v[kk]) ){
+    //                     $('input[value='+v[kk]+']').removeAttr('disabled');
+    //                     $('#num').html( val.inventory )
+    //                     $('#pri').html( val.price )
+    //                 }
+    //             }
+    //         })
+    //     }
+    // });
 });
 
 
