@@ -336,7 +336,7 @@ class Pay extends Common
         // 发送客户付款成功模板消息
         try {
             $appid     = Config::get('biz_wx_config.appid');
-            $appsecret = Config::get('biz_wx_config.appsecret');
+                        $appsecret = Config::get('biz_wx_config.appsecret');
             $notice    = new Notice($appid, $appsecret);
 
             $template = Config::get('biz_wx_tmplmsg.pay_success');

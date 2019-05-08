@@ -34,6 +34,47 @@ function slog($id='',$title=''){
     }
 }
 
+
+/**
+ * @param $arr
+ * @param $key_name
+ * @return array
+ * 将数据库中查出的列表以指定的 id 作为数组的键名 
+ */
+function convert_arr_key($arr, $key_name)
+{
+	$arr2 = array();
+	foreach($arr as $key => $val){
+		$arr2[$val[$key_name]] = $val;        
+	}
+	return $arr2;
+}
+function array_allow_keys($array, $keys)
+{
+    $newArr = [];
+    foreach ($keys as $key) {
+        if (isset($array[$key])) {
+            $newArr[$key] = $array[$key];
+        }
+    }
+    return $newArr;
+}
+
+/**
+ * 获取数组中的某一列
+ * @param array $arr 数组
+ * @param string $key_name  列名
+ * @return array  返回那一列的数组
+ */
+function get_arr_column($arr, $key_name)
+{
+	$arr2 = array();
+	foreach($arr as $key => $val){
+		$arr2[] = $val[$key_name];        
+	}
+	return $arr2;
+}
+
 function jason($data=array(),$msg="ok",$code=1){
     $result=array(  
       'code'=>$code,  
@@ -44,6 +85,119 @@ function jason($data=array(),$msg="ok",$code=1){
     echo json_encode($result);  
     exit;  
 } 
+function get_agent_log($user_id){
+
+	
+	$agent_money = Db::table('agent_performance')->where(['user_id'=>$user_id])->find();
+	
+	if(empty($agent_money)){
+		$money = 0;
+	}else{
+		$money = $agent_money['ind_per']+$agent_money['agent_per'];
+	}
+
+	return $money;
+}
+
+/***
+ * 获取一个或者多个openid 的用户id
+ */
+
+function mc_openid2uid($openid) {
+	global $_W;
+	if (is_numeric($openid)) {
+		return $openid;
+	}
+	if (is_string($openid)) {
+        $uid = Db::table('user')->where(['openid' => $openid])->value('uid');
+		return $uid;
+	}
+	if (is_array($openid)) {
+		$uids = array();
+		foreach ($openid as $k => $v) {
+			if (is_numeric($v)) {
+				$uids[] = $v;
+			} elseif (is_string($v)) {
+				$fans[] = $v;
+			}
+		}
+		if (!empty($fans)) {
+            $fans = Db::table('user')->where(['openid'=>['in',$fans]])->select(); 
+			$fans = array_keys($fans);
+			$uids = array_merge((array)$uids, $fans);
+		}
+		return $uids;
+	}
+	return false;
+}
+
+
+function getSetData($_var_6 = 0)
+	{
+		global $_W;
+		if (empty($_var_6)) {
+			$_var_6 = $_W['uniacid'];
+		}
+		$_var_7 = m('cache')->getArray('sysset', $_var_6);
+		if (empty($_var_7)) {
+			$_var_7 = pdo_fetch('select * from ' . tablename('sz_yi_sysset') . ' where uniacid=:uniacid limit 1', array(':uniacid' => $_var_6));
+			if (empty($_var_7)) {
+				$_var_7 = array();
+			}
+			m('cache')->set('sysset', $_var_7, $_var_6);
+		}
+		return $_var_7;
+	}
+
+function getSysset($_var_8 = '', $_var_6 = 0)
+	{
+		
+		global $_W, $_GPC;
+		
+		$_var_7 = getSetData($_var_6);
+		$_var_9 = unserialize($_var_7['sets']);
+		$_var_10 = array();
+		if (!empty($_var_8)) {
+			if (is_array($_var_8)) {
+				foreach ($_var_8 as $_var_11) {
+					$_var_10[$_var_11] = isset($_var_9[$_var_11]) ? $_var_9[$_var_11] : array();
+				}
+			} else {
+				$_var_10 = isset($_var_9[$_var_8]) ? $_var_9[$_var_8] : array();
+			}
+			return $_var_10;
+		} else {
+			return $_var_9;
+		}
+	}
+/**
+ * 是否关注
+ */
+function followed($dephp_3 = ''){
+    $dephp_28 = !empty($dephp_3);
+    if ($dephp_28){
+        $dephp_29 = Db::table('user')->where(['openid' =>$dephp_28])->find();
+        $dephp_28 = $dephp_29['state'] == 1;
+    }
+    return $dephp_28;
+}
+
+function get_agent_user($first_leader){
+
+	$first_leader_user = Db::table('users')->where(['user_id'=>$first_leader])->find();
+	if(empty($first_leader_user)){
+		$name = "无";
+	}else{
+		if($first_leader_user['nickname'] == null)
+		{
+			$name = $first_leader_user['mobile'];
+		}else{
+			$name = $first_leader_user['nickname'];
+		}
+	}
+
+	return $name;
+}
 /*
  * 获取商品的第一分类的下拉列表
  */
