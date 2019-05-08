@@ -39,10 +39,14 @@ class Distribution extends Common
 
             if($info){
                 $data['id'] = $info['id'];
+                //添加操作日志
+                slog($data['id'],'edit');
                 $res = Db::name('distribution_set')->update($data);
             }else{
                 $data['shop_id'] = $shop_id;
-                $res = Db::name('distribution_set')->insert($data);
+                $res = Db::name('distribution_set')->insertGetId($data);
+                //添加操作日志
+                slog($res);
             }
 
             if( $res !== false ){
@@ -72,10 +76,14 @@ class Distribution extends Common
 
             if($info){
                 $data['id'] = $info['id'];
+                //添加操作日志
+                slog($data['id'],'edit');
                 $res = Db::name('distribution_set')->update($data);
             }else{
                 $data['shop_id'] = $shop_id;
-                $res = Db::name('distribution_set')->insert($data);
+                $res = Db::name('distribution_set')->insertGetId($data);
+                //添加操作日志
+                slog($res);
             }
 
             if( $res !== false ){
@@ -102,10 +110,14 @@ class Distribution extends Common
             
             if($info){
                 $data['id'] = $info['id'];
+                //添加操作日志
+                slog($data['id'],'edit');
                 $res = Db::name('distribution_set')->update($data);
             }else{
                 $data['shop_id'] = $shop_id;
-                $res = Db::name('distribution_set')->insert($data);
+                $res = Db::name('distribution_set')->insertGetId($data);
+                //添加操作日志
+                slog($res);
             }
 
             if( $res !== false ){
@@ -177,9 +189,13 @@ class Distribution extends Common
             $data['authority']   = serialize($data['authority']);
 
             if($id){
+                //添加操作日志
+                slog($id,'edit');
                 $res = Db::table('distribution_level')->update($data);
             }else{
-                $res = Db::table('distribution_level')->insert($data);
+                $res = Db::table('distribution_level')->insertGetId($data);
+                //添加操作日志
+                slog($res);
             }
 
             if($res !== false){
@@ -219,6 +235,8 @@ class Distribution extends Common
         }
 
         if( Db::table('distribution_level')->where('id',$id)->delete() ){
+            //添加操作日志
+            slog($id);
             jason([],'删除成功！');
         }
     }
@@ -236,9 +254,13 @@ class Distribution extends Common
             $data = input('post.');
             $data['tm'] = serialize($data['tm']);
             if($data['id']){
+                //添加操作日志
+                slog($data['id']);
                 Db::table('distribution_set')->update($data);
             }else{
-                Db::table('distribution_set')->insert($data);
+                $id = Db::table('distribution_set')->insertGetId($data);
+                //添加操作日志
+                slog($id);
             }
             $this->success('成功！');
         }

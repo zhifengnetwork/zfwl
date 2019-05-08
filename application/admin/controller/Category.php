@@ -58,8 +58,10 @@ class Category extends Common
             if($pid){
                 $data['level'] = Db::table('category')->where('cat_id',$pid)->value('level') + 1;
             }
-            
-            if ( Db::table('category')->insert($data) ) {
+            $cat_id = Db::table('category')->insertGetId($data);
+            if ( $cat_id ) {
+                //添加操作日志
+                slog($cat_id);
                 $this->success('添加成功', url('category/index'));
             } else {
                 $this->error('添加失败');
@@ -117,6 +119,8 @@ class Category extends Common
             }
 
             if ( Db::table('category')->update($data) !== false ) {
+                //添加操作日志
+                slog($cat_id);
                 $this->success('修改成功', url('category/index'));
             } else {
                 $this->error('修改失败');
@@ -149,6 +153,8 @@ class Category extends Common
             if( $info['img'] ){
                 @unlink( ROOT_PATH .Config('c_pub.img') . $info['img'] );
             }
+            //添加操作日志
+            slog($cat_id);
             jason([],'删除分类成功！');
         }
 
@@ -192,6 +198,8 @@ class Category extends Common
             }
 
             if( $res !== false ){
+                //添加操作日志
+                slog($data['set_id']);
                 $this->success('修改成功！');
             }else{
                 $this->error('修改失败！');
