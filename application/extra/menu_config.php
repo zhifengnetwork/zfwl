@@ -776,4 +776,53 @@ return [
         ],
     ],
 
+    'user' => [
+        'id'    => 90000,
+        'title' => '我的会员',
+        'sort'  => 9,
+        'url'   => 'user/index',
+        'hide'  => 1,
+        'icon'  => 'glyphicon glyphicon-user',
+        'child' => [
+            [
+                'id'    => 90100,
+                'title' => '会员设置',
+                'sort'  => 1,
+                'url'   => 'user/index',
+                'hide'  => 1,
+                'icon'  => 'fa-th-large',
+                'child' => [
+                    [
+                        'id'    => 90101,
+                        'title' => '会员管理',
+                        'sort'  => 1,
+                        'url'   => 'user/index',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 90102,
+                        'title' => '会员等级',
+                        'sort'  => 2,
+                        'url'   => 'user/rank',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 90103,
+                        'title' => '会员分组',
+                        'sort'  => 3,
+                        'url'   => 'user/group',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 90104,
+                        'title' => '会员设置',
+                        'sort'  => 4,
+                        'url'   => 'user/set',
+                        'hide'  => 1,
+                    ],
+                ],
+            ],
+        ],
+    ],
+
 ];
