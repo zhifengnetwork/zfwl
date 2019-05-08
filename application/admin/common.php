@@ -17,6 +17,10 @@ function slog($id='',$title=''){
         $data['ip'] = Request::instance()->ip();
         foreach($all_menu as $key=>$value){
             if( strtolower($value['url']) == strtolower($ca) ){
+                if($title){
+                    $pos = strpos($value['title'],"添加");
+                    $value['title'] = substr_replace($value['title'], '修改', $pos, 6);
+                }
                 $data['name'] = $value['title'];
                 $data['op'] = $value['title'] . ' ID:' . $id;
                 if($value['pid']){
@@ -30,7 +34,9 @@ function slog($id='',$title=''){
                 break;
             }
         }
-        Db::table('admin_log')->insert($data);
+        if(isset($data['name'])){
+            Db::table('admin_log')->insert($data);
+        }
     }
 }
 
