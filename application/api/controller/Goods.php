@@ -125,28 +125,40 @@ class Goods extends ApiBase
 
         $goodsRes['img'] = Db::table('goods_img')->where('goods_id',$goods_id)->field('picture')->order('main DESC')->select();
 
-        
-        $goodsRes['comment'] = Db::table('goods_comment')->alias('gc')
+        $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$goodsRes]);
+
+    }
+
+    /**
+     * 获取评论列表
+     */
+    public function comment_list(){
+
+        $goods_id = input('goods_id');
+
+
+
+        $comment = Db::table('goods_comment')->alias('gc')
                 ->join('member m','m.id=gc.uid','LEFT')
                 ->field('m.mobile,gc.*')
                 ->where('gc.goods_id',$goods_id)
                 ->select();
-        if($goodsRes['comment']){
-            foreach($goodsRes['comment'] as $key=>$value ){
 
-                $goodsRes['comment'][$key]['mobile'] = substr_cut($value['mobile']);
+        if (empty($comment)) {
+            $this->ajaxReturn(['status' => 1 , 'msg'=>'暂无评论！','data'=>[]]);
+        }
+        
+        foreach($comment as $key=>$value ){
 
-                if($value['img']){
-                    $goodsRes['comment'][$key]['img'] = explode(',',$value['img']);
-                }else{
-                    $goodsRes['comment'][$key]['img'] = [];
-                }
+            $comment[$key]['mobile'] = substr_cut($value['mobile']);
+
+            if($value['img']){
+                $comment[$key]['img'] = explode(',',$value['img']);
+            }else{
+                $comment[$key]['img'] = [];
             }
         }
-
-
-        $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$goodsRes]);
-
+        $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$comment]);
     }
 
 

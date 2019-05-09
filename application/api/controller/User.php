@@ -10,6 +10,101 @@ use think\Db;
 class User extends ApiBase
 {
 
+    /*
+     *  注册接口
+     */
+    public function register(){
+        $mobile = input('mobile');
+        $email  = input('email');
+        $password    = input('password');
+        $code   = input('code');
+        $uid    = input('uid',0);
+
+        $member = Db::table('member')->where('mobile',$mobile)->value('id');
+		
+		if ( $member ) {
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'此手机号已注册，请直接登录！']);
+        }
+
+        if($uid){
+            $uid = Db::table('member')->where('mobile',$mobile)->value('id');
+            if(!$uid){
+                $this->ajaxReturn(['status' => -2 , 'msg'=>'邀请人账号不存在！']);
+            }
+        }
+
+        $res = action('PhoneAuth/phoneAuth',[$mobile,$code]);
+        if( $res === '-1' ){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'验证码已过期！','data'=>'']);
+		}else if( !$res ){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'验证码错误！','data'=>'']);
+		}
+
+        if( strlen($password) < 6 ){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'密码长度必须大于或6位！','data'=>'']);
+        }
+        
+        
+        $id = Db::table('member')->insertGetId(['mobile'=>$mobile,'uid'=>$uid,'createtime'=>time()]);
+        if(!$id){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'注册失败，请重试！','data'=>'']);
+        }
+
+        $salt = create_salt();
+        $password = md5( $salt . $password);
+
+        Db::table('mc_members')->insert(['uid'=>$id,'mobile'=>$mobile,'createtime'=>time(),'salt'=>$salt,'password'=>$password]);
+
+        $data['token'] = $this->create_token($id);
+        $data['mobile'] = $mobile;
+        
+        $this->ajaxReturn(['status' => 1 , 'msg'=>'注册成功！','data'=>$data]);
+    }
+
+    /*
+     *  登录接口
+     */
+    public function login(){
+        $mobile   = input('mobile');
+        $password = input('password');
+        $code     = input('code');
+
+        $res = action('PhoneAuth/phoneAuth',[$mobile,$code]);
+        if( $res === '-1' ){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'验证码已过期！','data'=>'']);
+		}else if( !$res ){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'验证码错误！','data'=>'']);
+		}
+
+        $data = Db::table("mc_members")->where('mobile',$mobile)
+            ->field('uid,password,salt')
+            ->find();
+
+        if(!$data){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'手机不存在或错误！']);
+        }
+
+        $password = md5( $data['salt'] . $password);
+        
+        if ($password != $data['password']) {
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'登录密码错误！']);
+        }
+
+        unset($data['password'],$data['salt']);
+        //重写
+        $data['token'] = $this->create_token($data['uid']);
+        $this->ajaxReturn(['status' => 1 , 'msg'=>'登录成功！','data'=>$data]);
+    }
+
+
+
+
+
+
+
+
+
+
 
     public function userinfo(){
         //解密token
@@ -19,7 +114,7 @@ class User extends ApiBase
         }else{
             $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
         }
-        $this->ajaxReturn(['status' => 0 , 'msg'=>'获取成功','data'=>$data]);
+        $this->ajaxRe·turn(['status' => 0 , 'msg'=>'获取成功','data'=>$data]);
 
     }
     
