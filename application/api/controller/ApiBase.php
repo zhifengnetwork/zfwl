@@ -29,10 +29,17 @@ class ApiBase extends Controller
             $action_array[] = strtolower('goods/categoryList');
             $action_array[] = strtolower('goods/category');
             $action_array[] = strtolower('goods/goodsDetail');
+            $action_array[] = strtolower('phoneauth/verifycode');
+            $action_array[] = strtolower('user/register');
+            $action_array[] = strtolower('user/login');
             if (in_array($action, $action_array)) {
                 return;
             }
-            exit(json_encode(['code'=>0,'msg'=>'您未登录，请登录！']));
+
+            $user_id = $this->decode_token(input('token'));
+
+            if(empty($user_id)) exit(json_encode(['code'=>0,'msg'=>'您未登录，请登录！']));
+
         }
     }
 

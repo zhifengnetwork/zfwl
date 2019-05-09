@@ -50,7 +50,13 @@ class Goods extends Common
             $pageParam['query']['cat_id2'] = $cat_id2;
         }
 
-        $list  = Db::table('goods')->alias('g')->order('goods_id DESC')->where($where)->paginate(10,false,$pageParam);
+        $list  = Db::table('goods')->alias('g')
+                ->join('category c1','c1.cat_id=g.cat_id1','LEFT')
+                ->join('category c2','c2.cat_id=g.cat_id2','LEFT')
+                ->order('goods_id DESC')
+                ->field('g.*,c1.cat_name c1_name,c2.cat_name c2_name')
+                ->where($where)
+                ->paginate(10,false,$pageParam);
 
         //商品一级分类
         $cat_id11 = Db::table('category')->where('level',1)->select();

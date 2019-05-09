@@ -71,6 +71,8 @@
                             <tr>
 
                                 <th><input class="ch_all" type="checkbox">ID</th>
+                                <th>一级分类 </th>
+                                <th>二级分类 </th>
                                 <th>商品 </th>
                                 <th>商品状态 </th>
                                 <th>商品价格（元）</th>
@@ -84,6 +86,8 @@
                             {volist name="list" id="vo"}
                             <tr>
                                 <td><input type="checkbox" class="i-checks ch_item" name="goods_id[]"   value="{$vo.goods_id}">{$vo.goods_id}</td>
+                                <td>{$vo.c1_name}</td>
+                                <td>{$vo.c2_name}</td>
                                 <td>{$vo.goods_name}</td>
                                 <td>{if condition="$vo.is_show"}已上架{else /}未上架{/if}</td>
                                 <td>{$vo.price}</td>
@@ -91,7 +95,7 @@
                                 <td>{$vo.number_sales}</td>
                                 <td>{$vo.add_time|date="Y-m-d",###}</td>
                                 <td>
-                                    <a class="btn btn-default delete" href="{:url('Goods/comment_list',['goods_id'=>$vo.goods_id],false)}" >评论 </i></a>
+                                    <!-- <a class="btn btn-default delete" href="{:url('Goods/comment_list',['goods_id'=>$vo.goods_id],false)}" >评论 </i></a> -->
 
                                     <a href="{:url('Goods/edit',['goods_id'=>$vo.goods_id],false)}">编辑</a>
                                     <a is_show="{$vo.is_show}" onclick="is_show(this,{$vo.goods_id})" href="javascript:;">{if condition="$vo.is_show"}下架{else /}上架{/if}</a>
