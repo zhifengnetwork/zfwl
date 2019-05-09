@@ -176,17 +176,6 @@ function getSysset($_var_8 = '', $_var_6 = 0)
 			return $_var_9;
 		}
 	}
-/**
- * 是否关注
- */
-function followed($dephp_3 = ''){
-    $dephp_28 = !empty($dephp_3);
-    if ($dephp_28){
-        $dephp_29 = Db::table('user')->where(['openid' =>$dephp_28])->find();
-        $dephp_28 = $dephp_29['state'] == 1;
-    }
-    return $dephp_28;
-}
 
 function get_agent_user($first_leader){
 

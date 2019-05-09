@@ -1,0 +1,81 @@
+{extend name="common:base" /}
+{block name="style"}
+<link href="__INSPINIA__/css/plugins/clockpicker/clockpicker.css" rel="stylesheet">
+{/block}
+
+{block name="content"}
+<div class="main">
+        <form action="" method="post" class="form-horizontal form" enctype="multipart/form-data">
+            <div class='panel panel-default'>
+                <div class='panel-heading'>会员等级新增</div>
+                <div class='panel-body'>
+                     <div class="form-group">
+                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <label class="col-xs-12 col-sm-3 col-md-3 control-label">等级权重</label>
+                            <div class="col-sm-9 col-xs-12">
+                                <input type="text" name="level" class="form-control" value="{$level['level']}" />
+                                <span class='help-block'>等级权重，数字越大越高级</span>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <label class="col-xs-12 col-sm-3 col-md-3 control-label"><span style='color:red'>*</span> 等级名称</label>
+                            <div class="col-sm-9 col-xs-12">
+                                <input type="text" name="levelname" class="form-control" value="{$level['levelname']}" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <label class="col-xs-12 col-sm-3 col-md-3 control-label">升级条件</label>
+                            <div class="col-sm-9 col-xs-12">
+                        
+                                <div class='input-group'>
+                                     {if empty($shopset['leveltype'])}
+                                    <span class='input-group-addon'>完成订单金额满</span>
+                                    <input type="text" name="ordermoney" class="form-control" value="{$level['ordermoney']}" />
+                                    <span class='input-group-addon'>元</span>
+                                    {/if}
+                                    {if $shopset['leveltype']==1} 
+                                    <span class='input-group-addon'>完成订单数量满</span>
+                                    <input type="text" name="ordercount" class="form-control" value="{$level['ordercount']}" />
+                                    <span class='input-group-addon'>个</span>
+                                    {/if}
+                                  
+                                </div>
+                                  <span class='help-block'>会员升级条件，不填写默认为不自动升级, 设置<a href="{:url('member/set')}">【会员升级依据】</a> </span>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <label class="col-xs-12 col-sm-3 col-md-3 control-label">折扣</label>
+                            <div class="col-sm-9 col-xs-12">
+                               
+                                <input type="text" name="discount" class="form-control" value="{$level['discount']}" />
+                                <span class='help-block'>请输入0.1~10之间的数字,值为空代表不设置折扣</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group"></div>
+                    <div class="form-group">
+                        <label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
+                        <div class="col-sm-9 col-xs-12">
+                            <input type="hidden" name="id" value="{$level['id']}" />
+                            <input type="submit" name="submit" value="提交" class="btn btn-primary col-lg-1"  />
+                           <input type="button" name="back" onclick='history.back()'  value="返回列表" class="btn btn-default" />
+                        </div>
+                </div>
+                    
+                </div>
+            </div>
+          
+        </form>
+    </div>
+{/block}
+{block name="script"}
+<script src="__INSPINIA__/js/plugins/clockpicker/clockpicker.js"></script>
+<script>
+$(function(){
+    $('.clockpicker').clockpicker();
+});
+</script>
+{/block}

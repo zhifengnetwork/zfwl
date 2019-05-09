@@ -16,23 +16,23 @@
                             <div class="col-sm-1">
                                     <div class="form-group">
                                         <label class="control-label" for="order_id">ID</label>
-                                        <input type="text" placeholder="会员id" name="mid" value="" class="form-control">
+                                        <input type="text" placeholder="会员id" name="mid" value="{$id}" class="form-control">
                                     </div>
                              </div>
                             <div class="col-sm-2">
                                 <div class="form-group">
                                     <label class="control-label" for="invoice_no">会员信息</label>
-                                    <input type="text" placeholder="会员信息" name="realname" value="" class="form-control">
+                                    <input type="text" placeholder="会员信息" name="realname" value="{$kw}" class="form-control">
                                 </div>
                             </div>
                             <div class="col-sm-2">
                                 <div class="form-group">
                                     <label class="control-label" for="status">是否关注</label>
-                                        <select name='followed' class='form-control' style="width:180px;">
-                                            <option value=''></option>
-                                            <option value='0' {if 0=='0'}selected{/if}>未关注</option>
-                                            <option value='1' {if 1=='1'}selected{/if}>已关注</option>
-                                            <option value='2' {if 2=='2'}selected{/if}>取消关注</option>
+                                        <select name='followed' class='form-control' style="width:150px;">
+                                            <option value=''  {if $followed==''}selected{/if}>默认全部</option>
+                                            <option value='0' {if $followed=='0'}selected{/if}>未关注</option>
+                                            <option value='1' {if $followed=='1'}selected{/if}>已关注</option>
+                                            <option value='2' {if $followed=='2'}selected{/if}>取消关注</option>
                                         </select>
                                 </div>
                             </div>
@@ -40,18 +40,22 @@
                             <div class="col-sm-2">
                                 <div class="form-group">
                                     <label class="control-label" for="status">会员等级</label>
-                                    <select name="order_status" class="form-control" style="width:180px;">
-                                           
-                                            
-                                        </select>
+                                            <select name='level' class='form-control' style="width:150px;">
+                                                    <option value=''>默认全部</option>
+                                                    {foreach $levels as $key => $vo}
+                                                    <option value='{$key}' {if $level==$vo['id']}selected{/if}>{$vo['levelname']}</option>
+                                                    {/foreach}
+                                             </select>
                                 </div>
                           </div>
                           <div class="col-sm-2">
                             <div class="form-group">
                                 <label class="control-label" for="status">会员分组</label>
-                                <select name="order_status" class="form-control" style="width:180px;">
-                                       
-                                        
+                                <select name='groupid' class='form-control' style="width:150px;">
+                                        <option value=''>默认全部</option>
+                                        {foreach $groups as $key => $vo}
+                                        <option value='{$key}' {if $groupid==$vo['id']}selected{/if}>{$vo['groupname']}</option>
+                                        {/foreach}
                                 </select>
                             </div>
                          </div>
@@ -59,10 +63,10 @@
                          <div class="col-sm-2">
                             <div class="form-group">
                                 <label class="control-label" for="status">黑名单</label>
-                                <select name='isblack' class='form-control'>
-                                    <option value=''></option>
-                                    <option value='0' {if 1=='0'}selected{/if}>否</option>
-                                    <option value='1' {if 0=='1'}selected{/if}>是</option>
+                                <select name='isblack' class='form-control' style="width:150px;">
+                                    <option value='' {if  $isblack==''}selected{/if}>默认全部</option>
+                                    <option value='0' {if $isblack=='0'}selected{/if}>否</option>
+                                    <option value='1' {if $isblack=='1'}selected{/if}>是</option>
                                 </select>
                             </div>
                          </div>
@@ -80,9 +84,9 @@
                             <div class="form-group">
                                 <label class="control-label">日期</label>
                                 <div class="input-daterange input-group" data-provide="datepicker">
-                                    <input class="form-control input-sm" name="begin_time" type="text" value=""/>
+                                    <input class="form-control input-sm" name="begin_time" type="text" value="{$begin_time}"/>
                                     <span class="input-group-addon">到</span>
-                                    <input class="form-control input-sm" name="end_time" type="text" value=""/>
+                                    <input class="form-control input-sm" name="end_time" type="text" value="{$end_time}"/>
                                 </div>
                             </div>
                         </div>
@@ -185,14 +189,14 @@
                                         <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false" href="javascript:;">操作 <span class="caret"></span></a>
                                     <ul class="dropdown-menu dropdown-menu-left" role="menu" style='z-index: 9999'>
                                         
-                                        <li><a href="{:url('member',array('op'=>'detail','id' => $vo['id']));}" title="会员详情"><i class='fa fa-edit'></i> 会员详情</a></li>
+                                        <li><a href="{:url('member/member_edit',array('id' => $vo['id']));}" title="会员详情"><i class='fa fa-edit'></i> 会员详情</a></li>
                                         <li><a href="{:url('order', array('op' => 'display','member'=>$vo['openid']))}" title='会员订单'><i class='fa fa-list'></i> 会员订单</a></li>
                                         <li><a href="{:url('finance/recharge', array('op'=>'credit1','id'=>$vo['id']))}" title='充值积分'><i class='fa fa-credit-card'></i> 充值积分</a></li>
                                         <li><a href="{:url('finance/recharge', array('op'=>'credit2','id'=>$vo['id']))}" title='充值余额'><i class='fa fa-money'></i> 充值余额 </a></li>
 
-                                        <li><a href="{:url('member/list',array('op'=>'setblack','id' => $vo['id'],'black'=>0));}" title='取消黑名单'><i class='fa fa-minus-square'></i> 取消黑名单</a></li>
+                                        <!-- <li><a href="{:url('member/list',array('op'=>'setblack','id' => $vo['id'],'black'=>0));}" title='取消黑名单'><i class='fa fa-minus-square'></i> 取消黑名单</a></li>
                                     
-                                        <li><a href="{:url('member/list',array('op'=>'setblack','id' => $vo['id'],'black'=>1));}" title='设置黑名单'><i class='fa fa-minus-circle'></i> 设置黑名单</a></li>
+                                        <li><a href="{:url('member/list',array('op'=>'setblack','id' => $vo['id'],'black'=>1));}" title='设置黑名单'><i class='fa fa-minus-circle'></i> 设置黑名单</a></li> -->
                                     
                                         <li><a  href="{:url('member',array('op'=>'delete','id' => $vo['id']));}" title='删除会员' onclick="return confirm('确定要删除该会员吗？');"><i class='fa fa-remove'></i> 删除会员</a></li>
                                     </ul>

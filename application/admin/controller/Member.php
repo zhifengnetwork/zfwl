@@ -3,7 +3,8 @@
 
 namespace app\admin\controller;
 use app\common\model\Member as MemberModel;
-
+use app\common\model\User as UserModel;
+use think\Request;
 
 use app\admin\logic\OrderLogic;
 use think\AjaxPage;
@@ -64,14 +65,15 @@ class Member extends Common
     public function index()
     {
         
-        $where      = array();
+        //携带参数
+        $where            = $this->get_where();
         $list       = MemberModel::alias('dm')
                         ->field('dm.*,l.levelname,g.groupname,dm.realname,dm.realname as username,dm.nickname as agentnickname,dm.avatar as agentavatar')
                         ->join("member_group g",'dm.groupid=g.id','LEFT')
                         ->join("member_level l",'dm.level =l.id','LEFT')
                         ->join("user f",'f.openid=dm.openid','LEFT')
                         ->where($where)
-                       ->order('createtime desc')
+                        ->order('createtime desc')
                         ->paginate(10, false, ['query' => $where]);
                        
         foreach ($list as &$row) {
@@ -81,22 +83,343 @@ class Member extends Common
             $row['ordermoney'] = empty($order_info['ordermoney'])?0:$order_info['ordermoney'];
             $row['credit1']    = MemberModel::getCredit($row['openid'], 'credit1');
             $row['credit2']    = MemberModel::getCredit($row['openid'], 'credit2');
-            $row['followed']   = followed($row['openid']);//是否关注;
+            $row['followed']   = UserModel::followed($row['openid']);//是否关注;
         }
         unset($row);
+        $groups  =  MemberModel::getGroups();
+        $levels  =  MemberModel::getLevels();
+        $this->assign('groups', $groups);
+        $this->assign('levels', $levels);
         $this->assign('list', $list);
         $this->assign('meta_title', '会员管理');
         return $this->fetch();
     }
 
-   
-    public function ajaxindex()
+    private function &get_where()
     {
-        // 搜索条件
-        $condition = array();
-      
-        return $this->fetch();
+        $begin_time      = input('begin_time', '');
+        $end_time        = input('end_time', '');
+        $id              = input('mid','');
+        $kw              = input('realname', '');
+        $followed        = input('followed','');
+        $isblack         = input('isblack', '');
+        $level           = input('level','');
+        $groupid         = input('groupid','');
+        $where = [];
+        if (!empty($id)) {
+            $where['dm.id']    = $id;
+        }
+        if (!empty($followed)) {
+            $where['f.state']   = $followed;
+        }
+        if(!empty($isblack)){
+            $where['dm.isblack'] = $isblack;
+        }
+        if(!empty($level)){
+            $where['dm.level'] = $level;
+        }
+        if(!empty($groupid)){
+            $where['dm.groupid'] = $groupid;
+        }
+
+        if(!empty($kw)){
+            is_numeric($kw)?$where['dm.mobile'] = $kw:$where['dm.realname'] = $kw;
+        }
+        if ($begin_time && $end_time) {
+            $where['dm.createtime'] = [['EGT', $begin_time], ['LT', $end_time]];
+        } elseif ($begin_time) {
+            $where['dm.createtime'] = ['EGT', $begin_time];
+        } elseif ($end_time) {
+            $where['dm.createtime'] = ['LT', $end_time];
+        }
+        $this->assign('kw', $kw);
+        $this->assign('id', $id);
+        $this->assign('followed', $followed);
+        $this->assign('isblack', $isblack);
+        $this->assign('level', $level);
+        $this->assign('groupid', $groupid);
+        $this->assign('begin_time', empty($begin_time)?date('Y-m-d'):$begin_time);
+        $this->assign('end_time', empty($end_time)?date('Y-m-d'):$end_time);
+        return $where;
     }
+    /***
+     * 会员详情
+     */
+    public function member_edit(){
+        $uid     = input('id');
+        $member  = MemberModel::get($uid);
+        $order_info        = Db::table('order1')->where(['openid' =>$member['openid'],'status' => 3])->field('count(id) as order_count,sum(goodsprice) as ordermoney')->find();
+      
+        $member['self_ordercount'] = $order_info['order_count'];
+        $member['self_ordermoney'] = empty($order_info['ordermoney'])?0:$order_info['ordermoney'];
+        // //更新数据
+        // $member && $this->dataupdate($uid);
+        $groups  =  MemberModel::getGroups();
+        $levels  =  MemberModel::getLevels();
+        $this->assign('followed', 1);
+        $this->assign('groups', $groups);
+        $this->assign('levels', $levels);
+        $this->assign('member', $member);
+        $this->assign('meta_title', '会员详情');
+        return $this->fetch();
+
+    }
+    /**
+     * 更新用户数据
+     */
+
+    public function dataupdate($id){
+
+        $account_wechats = pdo_fetch("select `key`,secret  from " . tablename('account_wechats')  . " where uniacid=' ".$_W['uniacid']." ' ");
+    
+        $appid = $account_wechats['key'];
+    
+        $appsecret =  $account_wechats['secret'];
+    
+        $url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={$appid}&secret={$appsecret}";
+    
+        $ch = curl_init();
+    
+        curl_setopt($ch, CURLOPT_URL, $url);
+    
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE); 
+    
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE); 
+    
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    
+        $output = curl_exec($ch);
+    
+        curl_close($ch);
+    
+        $jsoninfo = json_decode($output, true);
+    
+        $access_token = $jsoninfo["access_token"];
+    
+        $member = m('member')->getMember($id);
+    
+        load()->model('account');
+    
+        $acc = WeAccount::create($_W['acid']);
+    
+        $token = $acc->getAccessToken();
+    
+        $url3="https://api.weixin.qq.com/cgi-bin/user/info?access_token=".$access_token."&openid=".$member['openid']."&lang=zh_CN";
+    
+        
+    
+        $ch1 = curl_init();
+    
+        curl_setopt($ch1, CURLOPT_URL, $url3);
+    
+        curl_setopt($ch1, CURLOPT_SSL_VERIFYPEER, FALSE); 
+    
+        curl_setopt($ch1, CURLOPT_SSL_VERIFYHOST, FALSE); 
+    
+        curl_setopt($ch1, CURLOPT_RETURNTRANSFER, 1);
+    
+        $output1 = curl_exec($ch1);
+    
+        curl_close($ch1);
+    
+        if(!is_error($output1)){
+    
+            $jsoninfo1 = json_decode($output1, true);
+    
+            $_var_0 = filterEmoji($jsoninfo1['nickname']);
+    
+    
+    
+            if ($jsoninfo1['headimgurl'] && $_var_0) {
+    
+                pdo_update('sz_yi_member',array('nickname'=>$_var_0,'avatar'=>$jsoninfo1['headimgurl']),array('openid'=>$jsoninfo1['openid']));
+    
+            } elseif ($jsoninfo1['headimgurl'] && empty($_var_0)) {
+    
+                $_var_0 = '(非法昵称)';
+    
+                pdo_update('sz_yi_member',array('nickname'=>$_var_0,'avatar'=>$jsoninfo1['headimgurl']),array('openid'=>$jsoninfo1['openid']));
+    
+            }
+    
+        }
+    
+    }
+
+
+
+
+
+
+
+
+
+
+    public function level(){
+        $where      = array();
+        $list       = Db::table('member_level')
+                        ->field('*')
+                        ->where($where)
+                        ->order('id')
+                        ->paginate(10, false, ['query' => $where]);
+        $this->assign('list', $list);
+        $this->assign('meta_title', '会员等级');
+        return $this->fetch();              
+    }
+
+
+    public function level_add(){
+        $setdata = Db::table('sysset')->find();
+        $shopset = unserialize($setdata['sets']);
+        if (Request::instance()->isPost()){
+            $levelname  = input('levelname','');
+            $level      = input('level/d',0);
+            $ordermoney = input('ordermoney/d',0);
+            $ordercount = input('ordercount/d',0);
+            $discount   = input('discount/f',0);
+            if(empty($levelname)){
+                $this->error('等级名称不能为空');
+            }
+            $add = [
+                'levelname' => $levelname,
+                'level'     => $level,
+                'ordermoney'=> $ordermoney,
+                'ordercount'=> $ordercount,
+                'discount'  => $discount
+            ];
+           $res = Db::table('member_level')->insert($add);
+
+           if($res !== false ){
+              $this->success('新增成功', url('member/level'));
+           }
+            $this->error('新增失败');
+            
+        }
+        $this->assign('shopset', $shopset['shop']);
+        $this->assign('meta_title', '会员等级设置');
+        return $this->fetch();              
+    }
+
+
+    public function level_edit(){
+        $id      = input('id');
+        $level   = Db::table('member_level')->where(['id' => $id])->find();
+        if (Request::instance()->isPost()){
+            $levelname  = input('levelname','');
+            $level      = input('level/d',0);
+            $ordermoney = input('ordermoney/d',0);
+            $ordercount = input('ordercount/d',0);
+            $discount   = input('discount/f',0);
+            if(empty($levelname)){
+                $this->error('等级名称不能为空');
+            }
+            $update = [
+                'levelname' => $levelname,
+                'level'     => $level,
+                'ordermoney'=> $ordermoney,
+                'ordercount'=> $ordercount,
+                'discount'  => $discount
+            ];
+           $res = Db::table('member_level')->where(['id' => $id])->update($update);
+
+           if($res !== false ){
+              $this->success('编辑成功', url('member/level'));
+           }
+            $this->error('编辑失败');
+        }
+        $setdata = Db::table('sysset')->find();
+        $shopset = unserialize($setdata['sets']);
+        $this->assign('shopset', $shopset['shop']);
+        $this->assign('level', $level);
+        $this->assign('meta_title', '会员等级设置');
+        return $this->fetch();              
+    }
+
+
+    public function group(){
+        $where       = array();
+        $membercount = Db::table('member')->where(['groupid' => 0])->count();
+        $list        =  [
+            [
+                'id'          => 0,
+                'groupname'   => '无分组',
+                'membercount' => $membercount
+            ]
+        ];
+        $alllist  = Db::table('member_group')
+                        ->field('*')
+                        ->where($where)
+                        ->order('id')
+                        ->select();
+        foreach ($alllist as &$row) {
+            $row['membercount'] = Db::table('member')->where(['groupid' => $row['id']])->count();
+        }
+        unset($row);
+        $list = array_merge($list, $alllist);
+        $this->assign('list', $list);
+        $this->assign('meta_title', '会员分组设置');
+        return $this->fetch();              
+    }
+
+    public function group_add(){
+    
+        if (Request::instance()->isPost()){
+            $groupname = input('groupname','');
+            if(empty($groupname)){
+                $this->error('分组名称不能为空');
+            }
+            $add['groupname'] = $groupname;
+           $res = Db::table('member_group')->insert($add);
+           if($res !== false ){
+               $this->success('新增成功', url('member/group'));
+           }
+                $this->error('新增失败');
+
+         }
+        $this->assign('meta_title', '会员分组新增');
+        return $this->fetch();              
+    }
+
+    public function group_edit(){
+          $id = input('id');
+        if (Request::instance()->isPost()){
+            $groupname = input('groupname','');
+            if(empty($groupname)){
+                $this->error('分组名称不能为空');
+            }
+            $uodate['groupname'] = $groupname;
+            $res = Db::table('member_group')->where(['id' => $id])->update($uodate);
+            if($res !== false ){
+                $this->success('编辑成功', url('member/group'));
+              }
+                $this->error('编辑失败');
+        }
+        $info = Db::table('member_group')->where(['id' => $id])->find();
+        $this->assign('info', $info);
+        $this->assign('meta_title', '会员等级设置');
+        return $this->fetch();              
+    }
+
+    public function set(){
+        $setdata = Db::table('sysset')->find();
+        $set = unserialize($setdata['sets']);
+        if (Request::instance()->isPost()){
+            $patdata = input('post.');
+            $set['shop'] = $patdata['shop'];
+            $update['sets']    = serialize($set);
+            $res = Db::table('sysset')->where(['id' => 1])->update($update);
+            if($res !== false ){
+                $this->success('编辑成功', url('member/set'));
+            }
+            $this->error('编辑失败');
+        }
+        $this->assign('set', $set);
+        $this->assign('meta_title', '会员设置');
+        return $this->fetch();              
+    }
+
+
+
 
     /**
      * 会员详细信息查看
@@ -404,17 +727,17 @@ class Member extends Common
         return $this->fetch();
     }
 
-    public function level()
-    {
-        $act = I('get.act', 'add');
-        $this->assign('act', $act);
-        $level_id = I('get.level_id');
-        if ($level_id) {
-            $level_info = D('user_level')->where('level_id=' . $level_id)->find();
-            $this->assign('info', $level_info);
-        }
-        return $this->fetch();
-    }
+    // public function level()
+    // {
+    //     $act = I('get.act', 'add');
+    //     $this->assign('act', $act);
+    //     $level_id = I('get.level_id');
+    //     if ($level_id) {
+    //         $level_info = D('user_level')->where('level_id=' . $level_id)->find();
+    //         $this->assign('info', $level_info);
+    //     }
+    //     return $this->fetch();
+    // }
 
     public function levelList()
     {

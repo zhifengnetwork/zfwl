@@ -427,9 +427,9 @@ class Member extends Model
         if($dephp_16 && is_weixin()){
         }
     }
-    function getLevels(){
-        global $_W;
-        return pdo_fetchall('select * from ' . tablename('sz_yi_member_level') . ' where uniacid=:uniacid order by level asc', array(':uniacid' => $_W['uniacid']));
+    public static  function getLevels(){
+        $Leve = Db::table('member_level')->order('level')->select();
+        return $Leve;
     }
     function getLevel($dephp_0){
         global $_W;
@@ -492,15 +492,15 @@ class Member extends Model
             m('notice') -> sendMemberUpgradeMessage($dephp_0, $dephp_22, $dephp_17);
         }
     }
-    function getGroups(){
-        global $_W;
-        return pdo_fetchall('select * from ' . tablename('sz_yi_member_group') . ' where uniacid=:uniacid order by id asc', array(':uniacid' => $_W['uniacid']));
+    public static function getGroups(){
+        $Group = Db::table('member_group')->order('id')->select();
+        return $Group;
     }
-    function getGroup($dephp_0){
+    public static function getGroup($dephp_0){
         if (empty($dephp_0)){
             return false;
         }
-        $dephp_7 = m('member') -> getMember($dephp_0);
+        $dephp_7 = self::getMember($dephp_0);
         return $dephp_7['groupid'];
     }
     function setRechargeCredit($dephp_0 = '', $dephp_24 = 0){
