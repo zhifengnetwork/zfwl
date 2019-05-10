@@ -231,26 +231,15 @@ class Goods extends ApiBase
     public function get_sku_str($sku_id)
     {
         $sku_attr = Db::name('goods_sku')->where('sku_id', $sku_id)->value('sku_attr');
+
+        $sku_attr = preg_replace("/(\w):/",  '"$1":' ,  $sku_attr);
         $sku_attr = json_decode($sku_attr, true);
-        $key_arr = [];
-        $val_arr = [];
-        $key_arr = array_merge($key_arr, array_keys($sku_attr));
-        $val_arr = array_merge($val_arr, array_values($sku_attr));
 
-        $key_arr = array_unique($key_arr);
-        $val_arr = array_unique($val_arr);
-
-        $key_str = implode(',', $key_arr);
-        $val_str = implode(',', $val_arr);
-
-        //求出所有规格值
-        $spec_res = Db::name('goods_spec')->where('spec_id', 'in', $key_str)->column('spec_name', 'spec_id');
-        //求出所有属性值
-        $attr_res = Db::name('goods_spec_val')->where('val_id', 'in', $val_str)->column('val_name', 'val_id');
-
-        foreach ($sku_attr as $k => $v) {
-            $sku_attr[$spec_res[$k]] = $attr_res[$v];
-            unset($sku_attr[$k]);
+        foreach($sku_attr as $key=>$value){
+            $spec_name = Db::table('goods_spec')->where('spec_id',$key)->value('spec_name');
+            $attr_name = Db::table('goods_spec_attr')->where('attr_id',$value)->value('attr_name');
+            $sku_attr[$spec_name] = $attr_name;
+            unset($sku_attr[$key]);
         }
 
         $sku_attr = json_encode($sku_attr, JSON_UNESCAPED_UNICODE);

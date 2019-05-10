@@ -336,8 +336,15 @@ class Goods extends Common
                     $data['img'][] = $name.$saveName;
                 }
                 $data['img'] = array_values($data['img']);
-                
+                $img = Db::table('goods_img')->where('goods_id',$goods_id)->find();
                 foreach ($data['img'] as $key => $value) {
+                    if(!$img){
+                        if(!$key){
+                            $datas[$key]['main'] = 1;
+                        }else{
+                            $datas[$key]['main'] = 0;
+                        }
+                    }
                     
                     $datas[$key]['picture'] = $value;
                     $datas[$key]['goods_id'] = $data['goods_id'];
