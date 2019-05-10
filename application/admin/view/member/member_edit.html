@@ -73,7 +73,7 @@
                                     <div class='input-group'>
                                         <div class=' input-group-addon'  style='width:200px;text-align: left;'>{$member['credit1']}</div>
                                         <div class='input-group-btn'>
-                                            <a class='btn btn-primary' href="{:url('finance/recharge', array('op'=>'credit1','id'=>$member['id']))}">充值</a>
+                                            <a class='btn btn-primary' href="{:url('finance/integral_recharge', array('id'=>$member['id']))}">充值</a>
                                         </div>
                                     </div>
                                  
@@ -101,7 +101,7 @@
                                     <div class='input-group'>
                                         <div class=' input-group-addon' style='width:200px;text-align: left;'>{$member['credit2']}</div>
         
-                                        <div class='input-group-btn'><a class='btn btn-primary' href="{php echo $this->createWebUrl('finance/recharge', array('op'=>'credit2','id'=>$member['id']))}">充值</a>
+                                        <div class='input-group-btn'><a class='btn btn-primary' href="{:url('finance/balance_recharge', array('id'=>$member['id']))}">充值</a>
                                         </div>
                                     </div>
                                 </div></td>

@@ -81,8 +81,6 @@ class Member extends Common
             $order_info        = Db::table('order1')->where(['openid' =>$row['openid'],'status' => 3])->field('count(id) as order_count,sum(goodsprice) as ordermoney')->find();
             $row['ordercount'] = $order_info['order_count'];
             $row['ordermoney'] = empty($order_info['ordermoney'])?0:$order_info['ordermoney'];
-            $row['credit1']    = MemberModel::getCredit($row['openid'], 'credit1');
-            $row['credit2']    = MemberModel::getCredit($row['openid'], 'credit2');
             $row['followed']   = UserModel::followed($row['openid']);//是否关注;
         }
         unset($row);
@@ -148,6 +146,23 @@ class Member extends Common
     public function member_edit(){
         $uid     = input('id');
         $member  = MemberModel::get($uid);
+        if (Request::instance()->isPost()){
+            $data = input('data/a');
+            if( !empty(input('password')) && !empty($uid) ){
+                //修改密码
+                $data['pwd'] = md5(input('password'));
+            }
+            
+            $res = MemberModel::where(['id' => $uid])->update($data);
+
+            if($res !== false ){
+                $this->success('编辑成功', url('member/index'));
+            }
+                $this->error('编辑失败');
+
+        }
+       
+       
         $order_info        = Db::table('order1')->where(['openid' =>$member['openid'],'status' => 3])->field('count(id) as order_count,sum(goodsprice) as ordermoney')->find();
       
         $member['self_ordercount'] = $order_info['order_count'];
@@ -164,6 +179,59 @@ class Member extends Common
         return $this->fetch();
 
     }
+
+    /***
+     * 会员详情
+     */
+    public function member_isblack(){
+        $uid     = input('id');
+        $isblack = input('isblack');
+        $member  = MemberModel::get($uid);
+        if(empty($member)){
+            $this->error('会员不存在，无法设置黑名单!');
+        }
+        if($member['isblack']){
+             $update['isblack'] = 0;
+        }else{
+             $update['isblack'] = 1;
+        }
+        $res = MemberModel::where(['id' => $uid])->update($update);
+        if($res !== false){
+            $this->success('设置成功');
+        }
+            $this->error('设置失败!');
+    }
+
+
+     /***
+     * 会员删除
+     */
+    public function member_delete(){
+        $uid     = input('id');
+        $member  = MemberModel::get($uid);
+        if(empty($member)){
+            $this->error('会员不存在，无法删除!');
+        }
+        $agentcount = MemberModel::where(['agentid' => $uid])->count();
+
+        if ($agentcount > 0) {
+            $this->error('此会员有下线存在，无法删除!');
+        }
+
+        $res = MemberModel::where(['id' => $uid])->delete();
+
+        if($res !== false){
+            $this->success('删除成功');
+        }
+            $this->error('删除失败!');
+    }
+
+
+
+
+
+
+
     /**
      * 更新用户数据
      */

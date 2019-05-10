@@ -292,31 +292,23 @@ class Member extends Model
         $dephp_7 = $this -> getMember($dephp_0);
         return $dephp_7['id'];
     }
-    public function setCredit($dephp_0 = '', $dephp_8 = 'credit1', $dephp_6 = 0, $dephp_9 = array()){
-        global $_W;
-        load() -> model('mc');
-        $dephp_1 = mc_openid2uid($dephp_0);
-        if (!empty($dephp_1)){
-            $dephp_10 = pdo_fetchcolumn("SELECT {$dephp_8} FROM " . tablename('mc_members') . ' WHERE `uid` = :uid', array(':uid' => $dephp_1));
+
+
+
+    /***
+     * 充值积分and余额
+     */
+    public static function setCredit($dephp_0 = '',$dephp_13 = '', $dephp_8 = 'credit1', $dephp_6 = 0, $dephp_9 = array()){
+            $dephp_10  = self::where(['openid' => $dephp_0])->value($dephp_8);
             $dephp_11 = $dephp_6 + $dephp_10;
             if ($dephp_11 <= 0){
                 $dephp_11 = 0;
             }
-            pdo_update('mc_members', array($dephp_8 => $dephp_11), array('uid' => $dephp_1));
-            if (empty($dephp_9) || !is_array($dephp_9)){
-                $dephp_9 = array($dephp_1, '未记录');
-            }
-            $dephp_12 = array('uid' => $dephp_1, 'credittype' => $dephp_8, 'uniacid' => $_W['uniacid'], 'num' => $dephp_6, 'createtime' => TIMESTAMP, 'operator' => intval($dephp_9[0]), 'remark' => $dephp_9[1]);
-            pdo_insert('mc_credits_record', $dephp_12);
-        }else{
-            $dephp_10 = pdo_fetchcolumn("SELECT {$dephp_8} FROM " . tablename('sz_yi_member') . ' WHERE  uniacid=:uniacid and openid=:openid limit 1', array(':uniacid' => $_W['uniacid'], ':openid' => $dephp_0));
-            $dephp_11 = $dephp_6 + $dephp_10;
-            if ($dephp_11 <= 0){
-                $dephp_11 = 0;
-            }
-            pdo_update('sz_yi_member', array($dephp_8 => $dephp_11), array('uniacid' => $_W['uniacid'], 'openid' => $dephp_0));
-        }
+            self::where(['openid' => $dephp_0])->update([$dephp_8 => $dephp_11]);
+            $dephp_12 = array('uid' => $dephp_13, 'credittype' => $dephp_8, 'num' => $dephp_6, 'createtime' => time(), 'operator' => intval($dephp_9[0]), 'remark' => $dephp_9[1]);
+            Db::name('credits_record')->insert($dephp_12);
     }
+
     public static function getCredit($dephp_0 = '', $dephp_8 = 'credit1'){
         $dephp_1 = mc_openid2uid($dephp_0);
         if (!empty($dephp_1)){

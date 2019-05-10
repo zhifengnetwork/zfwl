@@ -110,10 +110,11 @@ function get_agent_log($user_id){
  */
 
 function mc_openid2uid($openid) {
-	global $_W;
+
 	if (is_numeric($openid)) {
 		return $openid;
-	}
+    }
+    
 	if (is_string($openid)) {
         $uid = Db::table('user')->where(['openid' => $openid])->value('uid');
 		return $uid;

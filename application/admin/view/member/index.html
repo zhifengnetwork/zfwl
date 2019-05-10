@@ -169,16 +169,14 @@
                                 {if $vo['isblack']==1}
                                 <span class="label label-default" style='color:#fff;background:black'>黑名单</span>
                                 {else}
-                                    {if empty($vo['followed'])}
-                                    {if empty($vo['uid'])}
-                                    
-                                    <label class='label label-default'>未关注</label>
+                                    {if !($vo.followed)}
+                                        {if empty($vo['uid'])}
+                                        <label class='label label-default'>未关注</label>
+                                        {else/}
+                                        
+                                        <label class='label label-warning'>取消关注</label>
+                                        {/if}
                                     {else/}
-                                    
-                                    <label class='label label-warning'>取消关注</label>
-                                    {/if}
-                                    {else/}
-                                    
                                     <label class='label label-success'>已关注</label>    
                                     {/if}
                                 {/if}
@@ -193,12 +191,13 @@
                                         <li><a href="{:url('order', array('op' => 'display','member'=>$vo['openid']))}" title='会员订单'><i class='fa fa-list'></i> 会员订单</a></li>
                                         <li><a href="{:url('finance/recharge', array('op'=>'credit1','id'=>$vo['id']))}" title='充值积分'><i class='fa fa-credit-card'></i> 充值积分</a></li>
                                         <li><a href="{:url('finance/recharge', array('op'=>'credit2','id'=>$vo['id']))}" title='充值余额'><i class='fa fa-money'></i> 充值余额 </a></li>
+                                        {if $vo['isblack'] == 1}
+                                            <li><a href="javascript:void(0);" title='取消黑名单'  class="isblack" isblack ="{$vo.isblack}" uid = "{$vo['id']}"><i class='fa fa-minus-square'></i> 取消黑名单</a></li>
+                                        {else/}
+                                            <li><a href="javascript:void(0);" title='设置黑名单'  class="isblack" isblack ="{$vo.isblack}" uid = "{$vo['id']}"> <i class='fa fa-minus-circle'></i> 设置黑名单</a></li> 
+                                        {/if}
 
-                                        <!-- <li><a href="{:url('member/list',array('op'=>'setblack','id' => $vo['id'],'black'=>0));}" title='取消黑名单'><i class='fa fa-minus-square'></i> 取消黑名单</a></li>
-                                    
-                                        <li><a href="{:url('member/list',array('op'=>'setblack','id' => $vo['id'],'black'=>1));}" title='设置黑名单'><i class='fa fa-minus-circle'></i> 设置黑名单</a></li> -->
-                                    
-                                        <li><a  href="{:url('member',array('op'=>'delete','id' => $vo['id']));}" title='删除会员' onclick="return confirm('确定要删除该会员吗？');"><i class='fa fa-remove'></i> 删除会员</a></li>
+                                        <li><a  href="javascript:void(0);" title='删除会员' class="delete" id = "{$vo['id']}"><i class='fa fa-remove'></i> 删除会员</a></li>
                                     </ul>
                                 </div>
                             </td>
@@ -213,4 +212,50 @@
                 
 
 
+{/block}
+{block name="script"}
+<script>
+$(function() {
+    // 删除
+    $('.delete').click(function(e) {
+        var id = this.id;
+        layer.confirm('是否确定删除', { icon: 3, title: '提示' }, function(index) {
+
+            $.post("{:url('member/member_delete')}", { id: id }, function(res) {
+                if (res.code) {
+                    layer.msg(res.msg, { icon: 6 });
+                    setTimeout(function() {
+                        location.reload();
+                    }, 1000);
+                } else {
+                    layer.msg(res.msg, { icon: 5 });
+                }
+            });
+        });
+    });
+      // 设置黑名单
+      $('.isblack').click(function(e) {
+        var isblack     = $(this).attr('isblack');
+        var id          = $(this).attr('uid');
+        if(isblack == 1){
+            var stat = '确定取消黑名单';
+        }else{
+            var stat = '确定设置黑名单';
+        }
+        layer.confirm(stat, { icon: 3, title: '提示' }, function(index) {
+
+            $.post("{:url('member/member_isblack')}", { id: id,isblack:isblack }, function(res) {
+                if (res.code) {
+                    layer.msg(res.msg, { icon: 6 });
+                    setTimeout(function() {
+                        location.reload();
+                    }, 1000);
+                } else {
+                    layer.msg(res.msg, { icon: 5 });
+                }
+            });
+        });
+    });
+});
+</script>
 {/block}

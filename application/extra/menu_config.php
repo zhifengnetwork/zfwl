@@ -319,7 +319,7 @@ return [
         'id'    => 60000,
         'title' => '财务管理',
         'sort'  => 2,
-        'url'   => 'total/balance_logs',
+        'url'   => 'finance/balance_logs',
         'hide'  => 1,
         'icon'  => 'glyphicon glyphicon-file',
         'child' => [
@@ -327,23 +327,38 @@ return [
                 'id'    => 60100,
                 'title' => '财务管理',
                 'sort'  => 1,
-                'url'   => 'total/index',
+                'url'   => 'finance/index',
                 'hide'  => 1,
                 'child' => [
                     [
                         'id'    => 60101,
                         'title' => '余额记录',
                         'sort'  => 1,
-                        'url'   => 'total/balance_logs',
+                        'url'   => 'finance/balance_logs',
                         'hide'  => 1,
                     ],
                     [
                         'id'    => 60102,
                         'title' => '积分记录',
                         'sort'  => 1,
-                        'url'   => 'total/integral_logs',
+                        'url'   => 'finance/integral_logs',
                         'hide'  => 1,
                     ],
+                    [
+                        'id'    => 60103,
+                        'title' => '余额充值',
+                        'sort'  => 1,
+                        'url'   => 'finance/balance_Recharge',
+                        'hide'  => 0,
+                    ],
+                    [
+                        'id'    => 60104,
+                        'title' => '积分充值',
+                        'sort'  => 1,
+                        'url'   => 'finance/integral_Recharge',
+                        'hide'  => 0,
+                    ],
+
                 ],
 
             ],
