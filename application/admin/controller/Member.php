@@ -78,7 +78,7 @@ class Member extends Common
                        
         foreach ($list as &$row) {
             $row['levelname']  = empty($row['levelname']) ?  '普通会员' : $row['levelname'];
-            $order_info        = Db::table('order1')->where(['openid' =>$row['openid'],'status' => 3])->field('count(id) as order_count,sum(goodsprice) as ordermoney')->find();
+            $order_info        = Db::table('order')->where(['user_id' =>$row['id'],'order_status' => 3])->field('count(order_id) as order_count,sum(goods_price) as ordermoney')->find();
             $row['ordercount'] = $order_info['order_count'];
             $row['ordermoney'] = empty($order_info['ordermoney'])?0:$order_info['ordermoney'];
             $row['followed']   = UserModel::followed($row['openid']);//是否关注;
