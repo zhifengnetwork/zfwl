@@ -44,19 +44,26 @@ class User extends ApiBase
             $this->ajaxReturn(['status' => -2 , 'msg'=>'密码长度必须大于或6位！','data'=>'']);
         }
         
-        
-        $id = Db::table('member')->insertGetId(['mobile'=>$mobile,'uid'=>$uid,'createtime'=>time()]);
-        if(!$id){
-            $this->ajaxReturn(['status' => -2 , 'msg'=>'注册失败，请重试！','data'=>'']);
+        $agenttime = 0;
+        $agentid = 0;
+        if($uid){
+            $agentid = $uid;
+            $agenttime = time();
         }
 
         $salt = create_salt();
         $password = md5( $salt . $password);
+        
+        $id = Db::table('member')->insertGetId(['mobile'=>$mobile,'uid'=>$uid,'agentid'=>$agentid,'agenttime'=>$agenttime,'isagent'=>1,'salt'=>$salt,'password'=>$password,'createtime'=>time()]);
+        if(!$id){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'注册失败，请重试！','data'=>'']);
+        }
 
-        Db::table('mc_members')->insert(['uid'=>$id,'mobile'=>$mobile,'createtime'=>time(),'salt'=>$salt,'password'=>$password]);
+        // Db::table('mc_members')->insert(['uid'=>$id,'mobile'=>$mobile,'createtime'=>time(),'salt'=>$salt,'password'=>$password]);
 
         $data['token'] = $this->create_token($id);
         $data['mobile'] = $mobile;
+        $data['id'] = $id;
         
         $this->ajaxReturn(['status' => 1 , 'msg'=>'注册成功！','data'=>$data]);
     }
@@ -68,16 +75,16 @@ class User extends ApiBase
         $mobile   = input('mobile');
         $password = input('password');
         $code     = input('code');
-
+        
         $res = action('PhoneAuth/phoneAuth',[$mobile,$code]);
         if( $res === '-1' ){
             $this->ajaxReturn(['status' => -2 , 'msg'=>'验证码已过期！','data'=>'']);
-		}else if( !$res ){
+        }else if( !$res ){
             $this->ajaxReturn(['status' => -2 , 'msg'=>'验证码错误！','data'=>'']);
-		}
+        }
 
-        $data = Db::table("mc_members")->where('mobile',$mobile)
-            ->field('uid,password,salt')
+        $data = Db::table("member")->where('mobile',$mobile)
+            ->field('id,password,mobile,salt')
             ->find();
 
         if(!$data){
@@ -92,7 +99,8 @@ class User extends ApiBase
 
         unset($data['password'],$data['salt']);
         //重写
-        $data['token'] = $this->create_token($data['uid']);
+        $data['token'] = $this->create_token($data['id']);
+        
         $this->ajaxReturn(['status' => 1 , 'msg'=>'登录成功！','data'=>$data]);
     }
 

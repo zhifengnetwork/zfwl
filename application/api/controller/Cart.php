@@ -22,28 +22,11 @@ class Cart extends ApiBase
             $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
         }
 
-        $cart_list = Db::table('cart')->field('id,user_id,goods_id,goods_sn,goods_name,market_price,goods_price,member_goods_price,subtotal_price,sku_id,goods_num,spec_key_name')->where('user_id',$user_id)->select();
-
-        $arr = [];
-        if($cart_list){
-            foreach($cart_list as $key=>$value){
-                if( isset($arr[$value['goods_id']]) ){
-                    $arr[$value['goods_id']]['subtotal_price'] = sprintf("%.2f",$arr[$value['goods_id']]['subtotal_price'] + $value['subtotal_price']);
-                    $arr[$value['goods_id']]['goods_num'] = $arr[$value['goods_id']]['goods_num'] + $value['goods_num'];
-                    $arr[$value['goods_id']]['spec'][] = $value;
-                }else{
-                    $arr[$value['goods_id']]['goods_name'] = $value['goods_name'];
-                    $arr[$value['goods_id']]['goods_sn'] = $value['goods_sn'];
-                    $arr[$value['goods_id']]['img'] = Db::table('goods_img')->where('goods_id',$value['goods_id'])->where('main',1)->value('picture');
-                    $arr[$value['goods_id']]['market_price'] = $value['market_price'];
-                    $arr[$value['goods_id']]['subtotal_price'] = $value['subtotal_price'];
-                    $arr[$value['goods_id']]['goods_num'] = $value['goods_num'];
-                    $arr[$value['goods_id']]['spec'][] = $value;
-                }
-            }
-        }
+        $cart_where['user_id'] = $user_id;
+        $cartM = model('Cart');
+        $cart_res = $cartM->cartList($cart_where);
         
-        $this->ajaxReturn(['status' => 1 , 'msg'=>'成功','data'=>$arr]);
+        $this->ajaxReturn(['status' => 1 , 'msg'=>'成功','data'=>$cart_res]);
     }
 
 
@@ -143,11 +126,11 @@ class Cart extends ApiBase
             
             $sku_attr = action('Goods/get_sku_str', $sku_id);
             $cartData['spec_key_name'] = $sku_attr;
-            $result = Db::table('cart')->insert($cartData);
+            $cart_id = Db::table('cart')->insertGetId($cartData);
         }
 
-        if($result) {
-            $this->ajaxReturn(['status' => 1 , 'msg'=>'成功！','data'=>'']);
+        if($cart_id) {
+            $this->ajaxReturn(['status' => 1 , 'msg'=>'成功！','data'=>$cart_id]);
         } else {
             $this->ajaxReturn(['status' => -2 , 'msg'=>'系统异常！','data'=>'']);
         }
