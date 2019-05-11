@@ -41,7 +41,7 @@ function getTree1($items,$pid ="pid") {
 
 function checkMobile($mobilePhone)
 {
-    if (preg_match("/^1[34578]\d{9}$/", $mobilePhone)) {
+    if (preg_match("/^1[345678]\d{9}$/", $mobilePhone)) {
         return $mobilePhone;
     } else {
         return false;
@@ -91,6 +91,14 @@ function xmlToArray($xml){
     libxml_disable_entity_loader(true);
     $values = json_decode(json_encode(simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
     return $values;
+}
+
+/**
+ * 对象转数组操作
+ **/
+function ota($data){
+    $array = json_decode(json_encode($data), true);
+    return $array;
 }
 
 /**
