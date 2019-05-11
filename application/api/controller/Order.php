@@ -3,22 +3,22 @@
  * 订单API
  */
 namespace app\api\controller;
-use app\common\model\Users;
-use app\common\logic\UsersLogic;
-use app\common\logic\Integral;
-use app\common\logic\Pay;
-use app\common\logic\PlaceOrder;
-use app\common\logic\PreSellLogic;
-use app\common\logic\UserAddressLogic;
-use app\common\logic\CouponLogic;
-use app\common\logic\CartLogic;
-use app\common\logic\OrderLogic;
-use app\common\model\Combination;
-use app\common\model\PreSell;
-use app\common\model\Shop;
-use app\common\model\SpecGoodsPrice;
-use app\common\model\Goods;
-use app\common\util\TpshopException;
+// use app\common\model\Users;
+// use app\common\logic\UsersLogic;
+// use app\common\logic\Integral;
+// use app\common\logic\Pay;
+// use app\common\logic\PlaceOrder;
+// use app\common\logic\PreSellLogic;
+// use app\common\logic\UserAddressLogic;
+// use app\common\logic\CouponLogic;
+// use app\common\logic\CartLogic;
+// use app\common\logic\OrderLogic;
+// use app\common\model\Combination;
+// use app\common\model\PreSell;
+// use app\common\model\Shop;
+// use app\common\model\SpecGoodsPrice;
+// use app\common\model\Goods;
+// use app\common\util\TpshopException;
 use think\Loader;
 use think\Db;
 
@@ -61,7 +61,9 @@ class Order extends ApiBase
         
         $data['goods_res'] = $cart_res;
         $data['addr_res'] = $addr_res;
-
+        $data['pay_type'] = config('PAY_TYPE');
+        unset($data['pay_type'][2],$data['pay_type'][4],$data['pay_type'][4],$data['pay_type'][8]);
+        
         $this->ajaxReturn(['status' => 1 , 'msg'=>'成功','data'=>$data]);
     }
 
@@ -105,7 +107,6 @@ class Order extends ApiBase
         if(!$cart_res){
             $this->ajaxReturn(['status' => -2 , 'msg'=>'购物车商品不存在！','data'=>'']);
         }
-        
         
         $order_amount = ''; //订单价格
         $order_goods = [];  //订单商品

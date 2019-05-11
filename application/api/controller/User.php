@@ -75,44 +75,26 @@ class User extends ApiBase
         $mobile   = input('mobile');
         $password = input('password');
         $code     = input('code');
-        $token    = input('token');
-        $user_id    = input('user_id');
-        $md5_token    = input('token1');
-        if($token && $md5_token){
-            $md5 = md5($user_id.$mobile.$token);
-            
-            if($md5 == $md5_token){
-                $data = Db::table("member")->where('mobile',$mobile)->where('id',$user_id)
-                ->field('id,password,mobile,salt')
-                ->find();
+        
+        $res = action('PhoneAuth/phoneAuth',[$mobile,$code]);
+        if( $res === '-1' ){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'验证码已过期！','data'=>'']);
+        }else if( !$res ){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'验证码错误！','data'=>'']);
+        }
 
-                if(!$data){
-                    $this->ajaxReturn(['status' => -2 , 'msg'=>'手机不存在或错误！']);
-                }
-            }else{
-                $this->ajaxReturn(['status' => -1 , 'msg'=>'手机不存在或错误！','data'=>'']);
-            }
-        }else{
-            $res = action('PhoneAuth/phoneAuth',[$mobile,$code]);
-            if( $res === '-1' ){
-                $this->ajaxReturn(['status' => -2 , 'msg'=>'验证码已过期！','data'=>'']);
-            }else if( !$res ){
-                $this->ajaxReturn(['status' => -2 , 'msg'=>'验证码错误！','data'=>'']);
-            }
+        $data = Db::table("member")->where('mobile',$mobile)
+            ->field('id,password,mobile,salt')
+            ->find();
 
-            $data = Db::table("member")->where('mobile',$mobile)
-                ->field('id,password,mobile,salt')
-                ->find();
+        if(!$data){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'手机不存在或错误！']);
+        }
 
-            if(!$data){
-                $this->ajaxReturn(['status' => -2 , 'msg'=>'手机不存在或错误！']);
-            }
-
-            $password = md5( $data['salt'] . $password);
-            
-            if ($password != $data['password']) {
-                $this->ajaxReturn(['status' => -2 , 'msg'=>'登录密码错误！']);
-            }
+        $password = md5( $data['salt'] . $password);
+        
+        if ($password != $data['password']) {
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'登录密码错误！']);
         }
 
         unset($data['password'],$data['salt']);

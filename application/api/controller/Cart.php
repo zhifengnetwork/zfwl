@@ -126,11 +126,11 @@ class Cart extends ApiBase
             
             $sku_attr = action('Goods/get_sku_str', $sku_id);
             $cartData['spec_key_name'] = $sku_attr;
-            $result = Db::table('cart')->insert($cartData);
+            $cart_id = Db::table('cart')->insertGetId($cartData);
         }
 
-        if($result) {
-            $this->ajaxReturn(['status' => 1 , 'msg'=>'成功！','data'=>'']);
+        if($cart_id) {
+            $this->ajaxReturn(['status' => 1 , 'msg'=>'成功！','data'=>$cart_id]);
         } else {
             $this->ajaxReturn(['status' => -2 , 'msg'=>'系统异常！','data'=>'']);
         }
