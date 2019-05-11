@@ -163,7 +163,7 @@ class Member extends Common
         }
        
        
-        $order_info        = Db::table('order1')->where(['openid' =>$member['openid'],'status' => 3])->field('count(id) as order_count,sum(goodsprice) as ordermoney')->find();
+        $order_info        = Db::table('order')->where(['user_id' =>$member['id'],'order_status' => 3])->field('count(order_id) as order_count,sum(goods_price) as ordermoney')->find();
       
         $member['self_ordercount'] = $order_info['order_count'];
         $member['self_ordermoney'] = empty($order_info['ordermoney'])?0:$order_info['ordermoney'];

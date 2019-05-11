@@ -28,7 +28,7 @@ class Order extends Common
        
         $list             = OrderModel::alias('uo')->field('uo.*,d.order_id as order_idd,d.invoice_no')
                 ->join("delivery_doc d",'uo.order_id=d.order_id','LEFT')
-                ->join("users a",'uo.user_id=a.user_id','LEFT')
+                // ->join("users a",'uo.user_id=a.user_id','LEFT')
                 ->where($where)
                 ->order('uo.order_id DESC')
                 ->paginate(10, false, ['query' => $where]);
