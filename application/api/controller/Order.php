@@ -82,7 +82,7 @@ class Order extends ApiBase
         }
         $cart_str = input("cart_id");
         $addr_id = input("address_id");
-        $pay_type = input("pay_type");
+        $pay_type = input("pay_type",2);
         $user_note = input("user_note", '', 'htmlspecialchars');
         
         // 查询地址是否存在
@@ -107,17 +107,35 @@ class Order extends ApiBase
         }
         
         
-        $order_amount = '';
-        $order_goods = [];
+        $order_amount = ''; //订单价格
+        $order_goods = [];  //订单商品
+        $sku_goods = [];  //去库存
+        $shipping_price = ''; //订单运费
         $i = 0;
         $cart_ids = ''; //提交成功后删掉购物车
         foreach($cart_res as $key=>$value){
+            //处理运费
+            $goods_res = Db::table('goods')->field('shipping_setting,shipping_price,delivery_id,less_stock_type')->where('goods_id',$value['goods_id'])->find();
+            if($goods_res['shipping_setting'] == 1){
+                $shipping_price = sprintf("%.2f",$shipping_price + $goods_res['shipping_price']);   //计算该订单的总价
+            }else if($goods_res['shipping_setting'] == 2){
+                if( !$goods_res['delivery_id'] ){
+                    $deliveryWhere['is_default'] = 1;
+                }else{
+                    $deliveryWhere['delivery_id'] = $goods_res['delivery_id'];
+                }
+                $delivery = Db::table('goods_delivery')->where($deliveryWhere)->find();
+                // $shipping_price //运费待处理
+
+            }
+
             $cart_ids .= ',' . $value['cart_id'];
             $order_amount = sprintf("%.2f",$order_amount + $value['subtotal_price']);   //计算该订单的总价
             $cat_id = Db::table('goods')->where('goods_id',$value['goods_id'])->value('cat_id1');
             foreach($value['spec'] as $k=>$v){
                 $order_goods[$i]['goods_id'] = $v['goods_id'];
                 $order_goods[$i]['user_id'] = $v['user_id'];
+                $order_goods[$i]['less_stock_type'] = $goods_res['less_stock_type'];
                 $order_goods[$i]['cat_id'] = $cat_id;
                 $order_goods[$i]['goods_name'] = $v['goods_name'];
                 $order_goods[$i]['goods_sn'] = $v['goods_sn'];
@@ -127,19 +145,12 @@ class Order extends ApiBase
                 $order_goods[$i]['member_goods_price'] = $v['member_goods_price'];
                 $order_goods[$i]['sku_id'] = $v['sku_id'];
                 $order_goods[$i]['spec_key_name'] = $v['spec_key_name'];
-                $order_goods[$i]['deliveryid'] = '';    //占空
+                $order_goods[$i]['delivery_id'] = $goods_res['delivery_id'];
                 $i++;
             }
         }
-
-        $cart_ids = ltrim($cart_ids,',');
-        pred($cart_res);
         
-        //购物车商品id集合
-        $good_str = '';
-        //购物车商品对应的数量
-        $num_str = '';
-
+        $cart_ids = ltrim($cart_ids,',');
         
         Db::startTrans();
 
@@ -149,7 +160,6 @@ class Order extends ApiBase
         $orderInfoData['pay_status'] = 0;       //支付状态 0:未支付,1:已支付,2:部分支付,3:已退款,4:拒绝退款
         $orderInfoData['shipping_status'] = 0;       //商品配送情况;0:未发货,1:已发货,2:部分发货,3:已收货,4:退货
         $orderInfoData['pay_type'] = $pay_type;    //支付方式 1:余额支付,2:后台付款,4:在线支付,5:微信支付,6:支付宝支付,7:银联支付,7:货到付款
-
         $orderInfoData['consignee'] = $addr_res['consignee'];       //收货人
         $orderInfoData['province'] = $addr_res['province'];
         $orderInfoData['city'] = $addr_res['city'];
@@ -159,59 +169,33 @@ class Order extends ApiBase
         $orderInfoData['mobile'] = $addr_res['mobile'];
         $orderInfoData['user_note'] = $user_note;       //备注
         $orderInfoData['add_time'] = time();
-        
-
-        $orderInfoData['shipping_price'] = 0;     //物流费，暂时为0
-
-        // $orderInfoData['goods_str'] = $good_str;
-        // $orderInfoData['num_str'] = $num_str;
+        $orderInfoData['shipping_price'] = $shipping_price;     //物流费(待完善)
         $orderInfoData['order_amount'] = $order_amount;     //订单金额
-        $orderInfoData['sum_amount'] = $order_amount;       //总金额(实付金额)
-        $orderInfoData['discount_amount'] = 0;              //优惠金额
- 
-
-        $orderM = Model('Order');
-        $res = $orderM->doSave($orderInfoData);
-        $order_id = $orderM->order_id;
-
-
+        $orderInfoData['total_amount'] = $order_amount;       //总金额(实付金额)
+        $orderInfoData['coupon_price'] = 0;              //优惠金额
+        
+        $order_id = Db::table('order')->insertGetId($orderInfoData);
+        
         // 添加订单商品
-        $orderGoodsDataAll = [];
-        foreach ($cart_res as $k => $v) {
-            $orderGoodsDataAll[$k]['order_id'] = $order_id;
-            $orderGoodsDataAll[$k]['goods_id'] = $v['goods_id'];
-            $orderGoodsDataAll[$k]['price'] = $v['cart_price'];
-            $orderGoodsDataAll[$k]['number'] = $v['cart_number'];
-            $orderGoodsDataAll[$k]['amount'] = $v['cart_subtotal'];
-            $orderGoodsDataAll[$k]['goods_spec'] = $v['goods_spec'];
-            $orderGoodsDataAll[$k]['goods_name'] = $v['goods_name'];
-            $orderGoodsDataAll[$k]['sku_id'] = $v['sku_id'];
+        foreach($order_goods as $key=>$value){
+            $order_goods[$key]['order_id'] = $order_id;
+            //拍下减库存
+            if($value['less_stock_type']==1){
+                Db::table('goods_sku')->where('sku_id',$value['sku_id'])->setDec('inventory',$value['goods_num']);
+            }
+            unset($order_goods[$key]['less_stock_type']);
         }
-
-        $orderGoodsM = Model('OrderGoods');
-        $res = $orderGoodsM->saveAll($orderGoodsDataAll);
-
+        
+        $res = Db::table('order_goods')->insertAll($order_goods);
         if (!empty($res)) {
-            //减(冻结)库存
-            foreach ($cart_res as $k=>$v){
-                $where = array();
-                $where['ware_id'] = $ware_id;
-                $where['sku_id'] = $v['sku_id'];
-//                dump($v);
-//                dump($where);die;
-                Db::name('warehouse_sku')->where($where)->setInc('frozen',$v['cart_number']);
-            }
             //将商品从购物车删除
-            $del_where = array();
-            $del_where['cart_id'] = ['in', $cart_str];
-            $del_res = $cartM->doDel($del_where);
-            if (!empty($del_res)) {
-                Db::commit();
-                useJson($orderInfoData['order_sn'], '提交成功！', 200);
-            }
+            Db::table('cart')->where('id','in',$cart_str)->delete();
+            
+            Db::commit();
+            $this->ajaxReturn(['status' => 1 ,'msg'=>'提交成功！','data'=>'']);
         } else {
             Db::rollback();
-            useJson(null, '提交订单失败！', 500);
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'提交订单失败！','data'=>'']);
         }
     }
 

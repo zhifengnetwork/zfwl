@@ -211,12 +211,15 @@ class Goods extends Common
         $cat_id1 = Db::table('category')->where('level',1)->select();
         //商品二级分类
         $cat_id2 = Db::table('category')->where('level',2)->select();
+        //配送方式
+        $delivery = Db::table('goods_delivery')->field('delivery_id,name')->where('is_show',1)->select();
 
         return $this->fetch('goods/add',[
             'meta_title'    =>  '添加商品',
             'goods_attr'    =>  $goods_attr,
             'cat_id1'       =>  $cat_id1,
             'cat_id2'       =>  $cat_id2,
+            'delivery'      =>  $delivery,
         ]);
     }
 
@@ -372,6 +375,8 @@ class Goods extends Common
         $cat_id2 = Db::table('category')->where('level',2)->select();
         //商品组图
         $img = Db::table('goods_img')->where('goods_id','=',$goods_id)->select();
+        //配送方式
+        $delivery = Db::table('goods_delivery')->field('delivery_id,name')->where('is_show',1)->select();
 
         return $this->fetch('goods/edit',[
             'meta_title'  =>  '编辑商品',
@@ -379,6 +384,7 @@ class Goods extends Common
             'goods_attr'  =>  $goods_attr,
             'cat_id1'     =>  $cat_id1,
             'cat_id2'     =>  $cat_id2,
+            'delivery'    =>  $delivery,
             'img'         =>  $img,
             'rsts'        =>  $rsts,
         ]);

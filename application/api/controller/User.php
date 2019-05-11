@@ -76,11 +76,13 @@ class User extends ApiBase
         $password = input('password');
         $code     = input('code');
         $token    = input('token');
+        $user_id    = input('user_id');
         $md5_token    = input('token1');
         if($token && $md5_token){
-            $md5 = md5($mobile.$token);
+            $md5 = md5($user_id.$mobile.$token);
+            
             if($md5 == $md5_token){
-                $data = Db::table("member")->where('mobile',$mobile)
+                $data = Db::table("member")->where('mobile',$mobile)->where('id',$user_id)
                 ->field('id,password,mobile,salt')
                 ->find();
 
