@@ -21,10 +21,11 @@ class Cart extends ApiBase
         if(!$user_id){
             $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
         }
+        $q = input('q');
 
         $cart_where['user_id'] = $user_id;
         $cartM = model('Cart');
-        $cart_res = $cartM->cartList($cart_where);
+        $cart_res = $cartM->cartList1($cart_where);
         
         $this->ajaxReturn(['status' => 1 , 'msg'=>'成功','data'=>$cart_res]);
     }
@@ -56,8 +57,9 @@ class Cart extends ApiBase
         }
 
         $goods = Db::table('goods')->where('goods_id',$sku_res['goods_id'])->field('single_number,most_buy_number')->find();
+
         if( $cart_number > $goods['single_number'] ){
-            $this->ajaxReturn(['status' => -2 , 'msg'=>'超过单次购买数量！','data'=>'']);
+            $this->ajaxReturn(['status' => -2 , 'msg'=>"超过单次购买数量！同类商品单次只能购买{$goods['single_number']}个",'data'=>'']);
         }
 
         $order_goods_num = Db::table('order_goods')->where('goods_id',$sku_res['goods_id'])->where('user_id',$user_id)->sum('goods_num');
@@ -80,7 +82,7 @@ class Cart extends ApiBase
 
         $num = $cart_number + $cart_goods_num;
         if( $num > $goods['single_number'] ){
-            $this->ajaxReturn(['status' => -2 , 'msg'=>'超过单次购买数量！','data'=>'']);
+            $this->ajaxReturn(['status' => -2 , 'msg'=>"超过单次购买数量！同类商品单次只能购买{$goods['single_number']}个",'data'=>'']);
         }
         if( $num > $goods['most_buy_number'] ){
             $this->ajaxReturn(['status' => -2 , 'msg'=>'超过最多购买量！','data'=>'']);
@@ -107,6 +109,7 @@ class Cart extends ApiBase
                 $update_data['goods_num'] = $new_number;
                 $update_data['subtotal_price'] = $new_number * $sku_res['price'];
                 $result = Db::table('cart')->update($update_data);
+                $cart_id = $cart_res['id'];
             } else {
                 $this->ajaxReturn(['status' => -2 , 'msg'=>'该商品库存不足！','data'=>'']);
             }

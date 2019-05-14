@@ -90,6 +90,40 @@ class Goods extends Common
             if(!$validate->scene('add')->check($data)){
                 $this->error( $validate->getError() );
             }
+            
+            // $data['img_td'] = $_FILES['img_td'];
+
+            // $img = [];
+            // foreach($data['img_td'] as $key=>$value){
+            //     foreach($value['img'] as $k=>$v){
+            //         $img[$k][$key] = $v;
+            //     }
+            // }
+
+            // foreach($img as $key=>$value){
+            //     if($value['error']==0){
+
+            //         $file_name = 'sku_img/';
+            //         $name = $file_name . request()->time().rand(0,99999) . '.png';
+            //         $names = ROOT_PATH .Config('c_pub.img');
+
+            //         //防止文件名重复
+            //         $filename = $names . $name;
+            //         //转码，把utf-8转成gb2312,返回转换后的字符串， 或者在失败时返回 FALSE。
+            //         $filename =iconv("UTF-8","gb2312",$filename);
+                    
+            //         if (!file_exists($names . $file_name)){
+            //             mkdir($names . $file_name,0777,true);
+            //         }
+                    
+            //         //保存文件,   move_uploaded_file 将上传的文件移动到新位置
+            //         move_uploaded_file($value["tmp_name"],$filename);//将临时地址移动到指定地址
+
+            //         $data_spec[$key]['img'] = ['key' => 'img', 'value' => $name];
+            //     }else{
+            //         $data_spec[$key]['img'] = ['key' => 'img', 'value' => ''];
+            //     }
+            // }
 
             // 本店售价
             $pri = $data['pri_td']['pri'];
@@ -152,8 +186,8 @@ class Goods extends Common
             }
             
             $data['add_time'] = strtotime( $data['add_time'] );
-
             $goods_id = Db::table('goods')->strict(false)->insertGetId($data);
+            
             if ( $goods_id ) {
 
                 //添加操作日志
@@ -192,8 +226,8 @@ class Goods extends Common
 
                     Db::table('goods_img')->insertAll($datas);
                 }
-
                 $skuRes = setSukMore($goods_id, $data_spec);
+
                 if ($skuRes) {
                     $this->success('添加商品成功',url('goods/add'));
                 }else{

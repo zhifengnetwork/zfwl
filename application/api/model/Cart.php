@@ -38,4 +38,22 @@ class Cart extends Model
         $arr = array_values( $arr );
         return $arr;
     }
+
+    public function cartList1($where = array())
+    {   
+
+        $cart_list = $this->field('id,user_id,goods_id,goods_sn,goods_name,market_price,goods_price,member_goods_price,subtotal_price,sku_id,goods_num,spec_key_name')->where($where)->order('id DESC')->select();
+
+        $arr = [];
+        if($cart_list){
+            foreach($cart_list as $key=>$value){
+                $cart_list[$key]['img'] = Db::table('goods_img')->where('goods_id',$value['goods_id'])->where('main',1)->value('picture');
+                // $cart_list[$key]['single_number'] = Db::table('goods')->where('goods_id',$value['goods_id'])->value('single_number');
+                // $cart_list[$key]['spec'] = action('goods/getGoodsSpec',['goods_id'=>$value['goods_id']]);
+            }
+        }
+
+        $arr = ota($cart_list);
+        return $arr;
+    }
 }
