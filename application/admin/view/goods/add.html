@@ -78,7 +78,7 @@
                     <h5>{$meta_title}</h5>
                 </div>
                 <div class="ibox-content">
-                    <form method="post" class="form-horizontal" action="">
+                    <form method="post" class="form-horizontal" action="" enctype="multipart/form-data">
                         <div class="form-group">
                             <label class="col-sm-2 control-label"><span style="color:red;">*</span>商品名称</label>
                             <div class="col-sm-9">
@@ -100,6 +100,7 @@
                                         <thead>
                                          <tr>
                                              <th class="th_1"><input type="text" readonly="readonly" style="border: 0px;" name="goods_th[1][]" value="{:lang(\'规格\')}"></th>
+                                             <!-- <th><input type="text" readonly="readonly" style="border: 0px;" name="img_th[img][]" value="{:lang(\'图片\')}"></th> -->
                                              <th><input type="text" readonly="readonly" style="border: 0px;" name="pri_th[pri][]" value="{:lang(\'本店售价(元)\')}"></th>
                                              <th><input type="text" readonly="readonly" style="border: 0px;" name="goods_th[num][]" value="{:lang(\'库存\')}"></th>
                                              <th style="width: 25px;">操作</th>
@@ -108,9 +109,10 @@
                                          <tbody>
                                              <tr class="tr_1">
                                                  <td class="td_1"><input class="input-text" type="text" name="goods_td[1][]"></td>
-                                                 <td>
-                                                     <input type="text" class="pri_id" value="" name="pri_td[pri][]">
-                                                 </td>
+                                                 <!-- <td>
+                                                     <input type="file" name="img_td[img][]" />
+                                                </td> -->
+                                                 <td><input type="text" class="pri_id" value="" name="pri_td[pri][]"></td>
                                                  <td><input class="input-text" type="text" name="goods_td[num][]"></td>
                                                  <td onclick="delTr(this)"><i class="Hui-iconfont del_td"></i></td>
                                              </tr>
@@ -160,7 +162,7 @@
                         <div class="form-group">
                             <label class="col-sm-2 control-label">上架时间</label>
                             <div class="col-sm-9">
-                                <input type="text" name="add_time" value="" class="form-control timer">
+                                <input type="text" name="add_time" value="{$Request.time|date='Y-m-d H:i:s',###}" class="form-control timer">
                             </div>
                         </div>
 
@@ -464,7 +466,7 @@
 
 <script type="text/javascript">
 var rowCount = $("#goods_table tbody").find("tr").length - 1; //行数
-var colCount = $("#goods_table thead").find("tr").find("th").length - 3; //列数
+var colCount = $("#goods_table thead").find("tr").find("th").length - 4; //列数
 var col_id = 0;
 // 添加行
 function addRow(){
