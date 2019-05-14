@@ -26,9 +26,9 @@ class Order extends Common
         $where            = $this->get_where($params_key, $param_arr);
 
        
-        $list             = OrderModel::alias('uo')->field('uo.*,d.order_id as order_idd,d.invoice_no')
+        $list             = OrderModel::alias('uo')->field('uo.*,d.order_id as order_idd,d.invoice_no,a.realname')
                 ->join("delivery_doc d",'uo.order_id=d.order_id','LEFT')
-                // ->join("users a",'uo.user_id=a.user_id','LEFT')
+                ->join("member a",'a.id=uo.user_id','LEFT')
                 ->where($where)
                 ->order('uo.order_id DESC')
                 ->paginate(10, false, ['query' => $where]);
@@ -211,9 +211,9 @@ class Order extends Common
         $order_id    = input('order_id', '');
         $invoice_no  = input('invoice_no', '');
         $order_status      = input('order_status/d',-1);
-        $kw              = input('kw', '');
-        $pay_code        = input('pay_code/d', -1);
-        $pay_status       = input('pay_status/d', -1);
+        $kw                = input('kw', '');
+        $pay_code          = input('pay_code/d', -1);
+        $pay_status        = input('pay_status/d', -1);
         $where = [];
         if (!empty($order_id)) {
             $where['uo.order_id']    = $order_id;
@@ -234,7 +234,7 @@ class Order extends Common
 
 
         if(!empty($kw)){
-            is_numeric($kw)?$where['a.mobile'] = $kw:$where['a.realname'] = $kw;
+            is_numeric($kw)?$where['uo.mobile'] = $kw:$where['a.realname'] = $kw;
         }
        
 
