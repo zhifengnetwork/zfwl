@@ -116,7 +116,7 @@ p.head-bg{
                 <input type="text" name="wechat[key]" class="form-control" value="{$payment.wechat.key}" autocomplete="off"/>
                </div>
             </div>
-            <div class="form-group form-group-s" id="mchid"  style="" >
+            <div class="form-group form-group-s" id="mchid"  style="">
                 <label class="col-xs-12 col-sm-3 control-label">微信支付商户号<br>(MchId)</label>
                 <div class="col-sm-8 col-xs-12">
                     <input type="text" name="wechat[mchid]" class="form-control" value="{$payment.wechat.mchid}" autocomplete="off"/>
@@ -126,10 +126,10 @@ p.head-bg{
             <div class="form-group form-group-s s" id="apikey">
                 <label class="col-xs-12 col-sm-3 control-label">商户支付密钥<br>(API密钥)</label>
             <div class="col-sm-8 col-xs-12">
-    <div class="input-group">
-        <input type="text" name="wechat[apikey]" id="apikey" class="form-control" maxlength="32" value="{$payment.wechat.apikey}" autocomplete="off"/>
-        <span onclick="tokenGen();" style="cursor:pointer" class="input-group-addon">生成新的</span> </div>
-    <span class="help-block">此值需要手动在腾讯商户后台API密钥保持一致。<a href="http://bbs.we7.cc/thread-5788-1-1.html" target="_blank">查看设置教程</a></span> </div>
+            <div class="input-group">
+                <input type="text" name="wechat[apikey]" id="apikey" class="form-control" maxlength="32" value="{$payment.wechat.apikey}" autocomplete="off"/>
+                <span onclick="tokenGen();" style="cursor:pointer" class="input-group-addon">生成新的</span> </div>
+            <span class="help-block">此值需要手动在腾讯商户后台API密钥保持一致。<a href="http://bbs.we7.cc/thread-5788-1-1.html" target="_blank">查看设置教程</a></span> </div>
         </div>
     </div>
 </div>
