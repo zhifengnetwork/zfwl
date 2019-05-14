@@ -3,6 +3,8 @@ namespace app\admin\controller;
 use Payment\Common\PayException;
 use Payment\Client\Charge;
 use Payment\Client\Transfer;
+use Payment\Client\Refund;
+
 use Payment\Config;
 use think\Loader;
 use think\Request;
@@ -16,8 +18,9 @@ class Index extends Common
     public function index()
     { 
         require_once ROOT_PATH.'vendor/riverslei/payment/autoload.php';
-        $type    = input('type','ali');
-        $orderNo = time() . rand(1000, 9999);
+        $type     = input('type','ali');
+        $orderNo  = time() . rand(1000, 9999);
+        $refundNo = time() . rand(1000, 9999);
         if($type == 'ali'){
             // $payData = [
             //     'body'           => 'ali wap pay',
@@ -32,15 +35,30 @@ class Index extends Common
             //     'quit_url'     => 'http://helei112g.github.io', // 收银台的返回按钮（用户打断支付操作时返回的地址,4.0.3版本新增）
             // ];
 
-            
+
             $payData = [
-                'trans_no' => time(),
-                'payee_type' => 'ALIPAY_LOGONID',
-                'payee_account' => '13226785330',// ALIPAY_USERID: 2088102169940354      ALIPAY_LOGONID：aaqlmq0729@sandbox.com
-                'amount' => '0.1',
-                'remark' => '转账拉，有钱了',
-                'payer_show_name' => '一个未来的富豪',
+                'out_trade_no' => '15578313955571',
+                'trade_no' => '',// 支付宝交易号， 与 out_trade_no 必须二选一
+                'refund_fee' => '0.5',
+                'reason' => '我要退款',
+                'refund_no' => $refundNo,
             ];
+            
+           
+            
+            //write_log('order.txt',array('order_id' => $refundNo));
+             write_log('refund.txt',array('order_id' => $refundNo));
+
+
+            
+            // $payData = [
+            //     'trans_no' => time(),
+            //     'payee_type' => 'ALIPAY_LOGONID',
+            //     'payee_account' => '13226785330',// ALIPAY_USERID: 2088102169940354      ALIPAY_LOGONID：aaqlmq0729@sandbox.com
+            //     'amount' => '0.1',
+            //     'remark' => '转账拉，有钱了',
+            //     'payer_show_name' => '一个未来的富豪',
+            // ];
 
             $aliConfig =  [
                 'use_sandbox'               => false,// 是否使用沙盒模式
@@ -82,8 +100,15 @@ class Index extends Common
 
       
        
+        // try {
+        //     $url = Transfer::run(Config::ALI_TRANSFER, $aliConfig, $payData);
+        // } catch (PayException $e) {
+        //     echo $e->errorMessage();
+        //     exit;
+        // }
+
         try {
-            $url = Transfer::run(Config::ALI_TRANSFER, $aliConfig, $payData);
+            $ret = Refund::run(Config::ALI_REFUND, $aliConfig, $payData);
         } catch (PayException $e) {
             echo $e->errorMessage();
             exit;
@@ -95,7 +120,7 @@ class Index extends Common
         //     echo $e->errorMessage();
         //     exit;
         // }
-        echo json_encode($url, JSON_UNESCAPED_UNICODE);
+        echo json_encode($ret, JSON_UNESCAPED_UNICODE);
 
         // header('Location:' . $url);
        
