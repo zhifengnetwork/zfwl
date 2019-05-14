@@ -47,7 +47,7 @@ class Index extends Common
            
             
             //write_log('order.txt',array('order_id' => $refundNo));
-             write_log('refund.txt',array('order_id' => $refundNo));
+            //  write_log('refund.txt',array('order_id' => $refundNo));
 
 
             
