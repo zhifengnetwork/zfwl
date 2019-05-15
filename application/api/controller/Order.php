@@ -78,8 +78,6 @@ class Order extends ApiBase
 
         $data['pay_type'] = $arr;
     
-
-        unset($data['pay_type'][1],$data['pay_type'][2],$data['pay_type'][5],$data['pay_type'][6]);
         $this->ajaxReturn(['status' => 1 , 'msg'=>'成功','data'=>$data]);
     }
 
@@ -209,7 +207,7 @@ class Order extends ApiBase
             Db::table('cart')->where('id','in',$cart_str)->delete();
             
             Db::commit();
-            $this->ajaxReturn(['status' => 1 ,'msg'=>'提交成功！','data'=>'']);
+            $this->ajaxReturn(['status' => 1 ,'msg'=>'提交成功！','data'=>$order_id]);
         } else {
             Db::rollback();
             $this->ajaxReturn(['status' => -2 , 'msg'=>'提交订单失败！','data'=>'']);
@@ -232,7 +230,7 @@ class Order extends ApiBase
         
         $where = [];
 
-        if ($type=='dfk')$where = array('order_status' => 1,'shipping_status' =>0,'pay_status'=>0); //待付款
+        if ($type=='dfk')$where = array('order_status' => 1 ,'pay_status'=>0 ,'shipping_status' =>0); //待付款
         if ($type=='dfh')$where = array('order_status' => 1 ,'pay_status'=>1 ,'shipping_status' =>0); //待发货
         if ($type=='dsh')$where = array('order_status' => 1 ,'pay_status'=>1 ,'shipping_status' =>1); //待收货
         if ($type=='dpj')$where = array('order_status' => 4 ,'pay_status'=>1 ,'shipping_status' =>3); //待评价
@@ -250,6 +248,22 @@ class Order extends ApiBase
                         ->group('og.order_id')
                         ->field('o.order_id,o.order_sn,og.goods_name,gi.picture img,og.spec_key_name,og.goods_price,g.original_price,og.goods_num,o.order_status,o.pay_status,o.shipping_status')
                         ->select();
+        
+        if($order_list){
+            foreach($order_list as $key=>&$value){
+                if( $value['order_status'] == 1 && $value['pay_status'] == 0 && $value['shipping_status'] == 0 ){
+                    $value['status'] = 1;   //待付款
+                }else if( $value['order_status'] == 1 && $value['pay_status'] == 1 && $value['shipping_status'] == 0 ){
+                    $value['status'] = 2;   //待发货
+                }else if( $value['order_status'] == 1 && $value['pay_status'] == 1 && $value['shipping_status'] == 1 ){
+                    $value['status'] = 3;   //待收货
+                }else if( $value['order_status'] == 4 && $value['pay_status'] == 1 && $value['shipping_status'] == 3 ){
+                    $value['status'] = 4;   //待评价
+                }else if( $value['order_status'] == 3 && $value['pay_status'] == 0 && $value['shipping_status'] == 0 ){
+                    $value['status'] = 5;   //已取消
+                }
+            }
+        }
 
         $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$order_list]);
     }
@@ -300,6 +314,26 @@ class Order extends ApiBase
         );
 
         $order = Db::table('order')->alias('o')->where($where)->field($field)->find();
+
+        $pay_type = config('PAY_TYPE');
+        foreach($pay_type as $key=>$value){
+            if($value['pay_type'] == $order['pay_type']){
+                $order['pay_type'] = $value;
+            }
+        }
+
+        if( $order['order_status'] == 1 && $order['pay_status'] == 0 && $order['shipping_status'] == 0 ){
+            $order['status'] = 1;   //待付款
+        }else if( $order['order_status'] == 1 && $order['pay_status'] == 1 && $order['shipping_status'] == 0 ){
+            $order['status'] = 2;   //待发货
+        }else if( $order['order_status'] == 1 && $order['pay_status'] == 1 && $order['shipping_status'] == 1 ){
+            $order['status'] = 3;   //待收货
+        }else if( $order['order_status'] == 4 && $order['pay_status'] == 1 && $order['shipping_status'] == 3 ){
+            $order['status'] = 4;   //待评价
+        }else if( $order['order_status'] == 3 && $order['pay_status'] == 0 && $order['shipping_status'] == 0 ){
+            $order['status'] = 5;   //已取消
+        }
+        
         $order['goods_res'] = Db::table('order_goods')->field('goods_id,goods_name,goods_num,spec_key_name,goods_price')->where('order_id',$order['order_id'])->select();
         foreach($order['goods_res'] as $key=>$value){
             $order['goods_res'][$key]['original_price'] = Db::table('goods')->where('goods_id',$value['goods_id'])->value('original_price');
@@ -317,4 +351,34 @@ class Order extends ApiBase
         $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$order]);
     }
 
+    /**
+    * 修改状态
+    */
+    public function edit_status(){
+        $user_id = $this->get_user_id();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+        }
+
+        $order_id = input('order_id');
+        $status = input('status');
+
+        if($status != 1 || $status != 3){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'参数错误！','data'=>'']);
+        }
+
+        $order = Db::table('order')->where('order_id',$order_id)->where('user_id',$user_id)->field('order_status,pay_status,shipping_status')->find();
+        if(!$order) $this->ajaxReturn(['status' => -2 , 'msg'=>'订单不存在！','data'=>'']);
+
+        if( $order['order_status'] == 1 && $order['pay_status'] == 0 && $order['shipping_status'] == 0 ){
+            if($status != 1) $this->ajaxReturn(['status' => -2 , 'msg'=>'参数错误！','data'=>'']);
+
+            $res = Db::table('order')->update(['order_id'=>$order_id,'order_status'=>3]);
+        }else if( $order['order_status'] == 1 && $order['pay_status'] == 1 && $order['shipping_status'] == 1 ){
+            if($status != 3) $this->ajaxReturn(['status' => -2 , 'msg'=>'参数错误！','data'=>'']);
+            $res = Db::table('order')->update(['order_id'=>$order_id,'order_status'=>4,'shipping_status'=>3]);
+        }
+
+        $this->ajaxReturn(['status' => 1 , 'msg'=>'成功！','data'=>'']);
+    }
 }

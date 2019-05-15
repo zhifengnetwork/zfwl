@@ -33,6 +33,14 @@ class Pay extends ApiBase
         if(!$user_id){
             $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
         }
+
+        $pay_type1 = config('PAY_TYPE');
+        foreach($pay_type1 as $key=>$value){
+            if($value['pay_type'] == $pay_type){
+                $pay_type = $key;
+            }
+        }
+
         $order_info   = Db::name('order')->where(['order_id' => $order_id])->find();//订单信息
         $member       = MemberModel::get($user_id);
         //验证是否本人的
