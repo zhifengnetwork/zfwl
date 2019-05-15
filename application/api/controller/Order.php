@@ -125,7 +125,7 @@ class Order extends ApiBase
         $order_amount = ''; //订单价格
         $order_goods = [];  //订单商品
         $sku_goods = [];  //去库存
-        $shipping_price = ''; //订单运费
+        $shipping_price = '0'; //订单运费
         $i = 0;
         $cart_ids = ''; //提交成功后删掉购物车
         foreach($cart_res as $key=>$value){
