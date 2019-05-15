@@ -9,6 +9,7 @@ use Payment\Client\Charge;
 use app\common\model\Member as MemberModel;
 use app\common\model\Order;
 
+use \think\Model;
 use \think\Config;
 use \think\Db;
 use \think\Env;
@@ -29,10 +30,18 @@ class Pay extends ApiBase
     public function payment(){
           $order_id     = input('order_id',1401);
           $pay_type     = input('pay_type','credit');//支付方式
-          $user_id      = 50;//$this->get_user_id();
+          $user_id      = $this->get_user_id();
         if(!$user_id){
             $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
         }
+
+        $pay_type1 = config('PAY_TYPE');
+        foreach($pay_type1 as $key=>$value){
+            if($value['pay_type'] == $pay_type){
+                $pay_type = $key;
+            }
+        }
+
         $order_info   = Db::name('order')->where(['order_id' => $order_id])->find();//订单信息
         $member       = MemberModel::get($user_id);
         //验证是否本人的
@@ -76,7 +85,7 @@ class Pay extends ApiBase
                 'balance'            =>  ['exp', 'balance-'.$amount.''],
             ];
 
-            Db::table('account_balance')->where(['User_ID' => $user_id,'balance_type' => 0])->update($balance);
+            Db::table('member_balance')->where(['user_id' => $user_id,'balance_type' => 0])->update($balance);
             
             //修改订单状态
             $update = [
