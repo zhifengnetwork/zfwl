@@ -28,18 +28,11 @@ class Pay extends ApiBase
      * 支付
      */
     public function payment(){
-          $order_id     = input('order_id',1401);
-          $pay_type     = input('pay_type','credit');//支付方式
-          $user_id      = 50;
+        $order_id     = input('order_id',1401);
+        $pay_type     = input('pay_type',1);//支付方式
+        $user_id      = $this->get_user_id();
         if(!$user_id){
             $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
-        }
-
-        $pay_type1 = config('PAY_TYPE');
-        foreach($pay_type1 as $key=>$value){
-            if($value['pay_type'] == $pay_type){
-                $pay_type = $key;
-            }
         }
 
         $order_info   = Db::name('order')->where(['order_id' => $order_id])->find();//订单信息
@@ -63,19 +56,19 @@ class Pay extends ApiBase
         $payData['body']            = getPayBody($order_id);
         $payData['timeout_express'] = time() + 600;
         $payData['amount']          = $order_info['order_amount'];
-        if($pay_type == 'alipay'){
+        if($pay_type == 3){
             $payData['subject']      = '支付宝支付';
             $payData['goods_type']   = 1;
             $payData['return_param'] = '';
             $payData['store_id']     = '';
             $payData['quit_url']     = '';
-        }elseif($pay_type == 'wechat'){
+        }elseif($pay_type == 2){
             $payData['subject']      = '微信支付';
             $payData['openid']       = $order_info['openid'];
             $payData['product_id']   = '';
             $payData['sub_appid']    = '';
             $payData['sub_mch_id']   = '';
-        }elseif($pay_type == 'credit'){
+        }elseif($pay_type == 1){
             $balance_info  = get_balance($user_id,0);
             if($balance_info['balance'] < $order_info['order_amount']){
                 $this->ajaxReturn(['status' => 0 , 'msg'=>'余额不足','data'=>'']);
@@ -90,7 +83,7 @@ class Pay extends ApiBase
             $update = [
                 'order_status' => 1,
                 'pay_status'   => 1,
-                'pay_type'     => 1,
+                'pay_type'     => $pay_type,
                 'pay_time'     => time(),
             ];
             $reult = Order::where(['order_id' => $order_id])->update($update);
