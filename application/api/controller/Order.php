@@ -122,7 +122,7 @@ class Order extends ApiBase
             $this->ajaxReturn(['status' => -2 , 'msg'=>'购物车商品不存在！','data'=>'']);
         }
         
-        $order_amount = ''; //订单价格
+        $order_amount = '0'; //订单价格
         $order_goods = [];  //订单商品
         $sku_goods = [];  //去库存
         $shipping_price = '0'; //订单运费
