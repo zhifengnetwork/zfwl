@@ -122,10 +122,10 @@ class Order extends ApiBase
             $this->ajaxReturn(['status' => -2 , 'msg'=>'购物车商品不存在！','data'=>'']);
         }
         
-        $order_amount = ''; //订单价格
+        $order_amount = '0'; //订单价格
         $order_goods = [];  //订单商品
         $sku_goods = [];  //去库存
-        $shipping_price = ''; //订单运费
+        $shipping_price = '0'; //订单运费
         $i = 0;
         $cart_ids = ''; //提交成功后删掉购物车
         foreach($cart_res as $key=>$value){
@@ -363,7 +363,7 @@ class Order extends ApiBase
         $order_id = input('order_id');
         $status = input('status');
 
-        if($status != 1 || $status != 3){
+        if($status != 1 && $status != 3 && $status != 4){
             $this->ajaxReturn(['status' => -2 , 'msg'=>'参数错误！','data'=>'']);
         }
 
@@ -377,6 +377,9 @@ class Order extends ApiBase
         }else if( $order['order_status'] == 1 && $order['pay_status'] == 1 && $order['shipping_status'] == 1 ){
             if($status != 3) $this->ajaxReturn(['status' => -2 , 'msg'=>'参数错误！','data'=>'']);
             $res = Db::table('order')->update(['order_id'=>$order_id,'order_status'=>4,'shipping_status'=>3]);
+        }else if( $order['order_status'] == 4 && $order['pay_status'] == 1 && $order['shipping_status'] == 3 ){
+            if($status != 4) $this->ajaxReturn(['status' => -2 , 'msg'=>'参数错误！','data'=>'']);
+            $res = Db::table('order')->where('order_id',$order_id)->delete();
         }
 
         $this->ajaxReturn(['status' => 1 , 'msg'=>'成功！','data'=>'']);
