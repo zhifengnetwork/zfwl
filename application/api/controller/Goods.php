@@ -124,6 +124,13 @@ class Goods extends ApiBase
         $goodsRes['spec'] = $this->getGoodsSpec($goods_id);
 
         $goodsRes['img'] = Db::table('goods_img')->where('goods_id',$goods_id)->field('picture')->order('main DESC')->select();
+        
+        $goodsRes['collection'] = Db::table('collection')->where('goods_id',$goods_id)->find();
+        if($goodsRes['collection']){
+            $goodsRes['collection'] = 1;
+        }else{
+            $goodsRes['collection'] = 0;
+        }
 
         $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$goodsRes]);
 
@@ -135,8 +142,6 @@ class Goods extends ApiBase
     public function comment_list(){
 
         $goods_id = input('goods_id');
-
-
 
         $comment = Db::table('goods_comment')->alias('gc')
                 ->join('member m','m.id=gc.uid','LEFT')

@@ -61,9 +61,25 @@ class Order extends ApiBase
         
         $data['goods_res'] = $cart_res;
         $data['addr_res'] = $addr_res;
-        $data['pay_type'] = config('PAY_TYPE');
-        unset($data['pay_type'][2],$data['pay_type'][4],$data['pay_type'][4],$data['pay_type'][8]);
         
+        $pay = Db::table('sysset')->value('sets');
+        $pay = unserialize($pay)['pay'];
+
+        $pay_type = config('PAY_TYPE');
+        $arr = [];
+        $i = 0;
+        foreach($pay as $key=>$value){
+            if($value){
+                $arr[$i]['pay_type'] = $pay_type[$key]['pay_type'];
+                $arr[$i]['pay_name'] = $pay_type[$key]['pay_name'];
+                $i++;
+            }
+        }
+
+        $data['pay_type'] = $arr;
+    
+
+        unset($data['pay_type'][1],$data['pay_type'][2],$data['pay_type'][5],$data['pay_type'][6]);
         $this->ajaxReturn(['status' => 1 , 'msg'=>'成功','data'=>$data]);
     }
 
@@ -157,7 +173,7 @@ class Order extends ApiBase
 
         $orderInfoData['order_sn'] = date('YmdHis',time()) . mt_rand(10000000,99999999);
         $orderInfoData['user_id'] = $user_id;
-        $orderInfoData['order_status'] = 0;         //订单状态 0:待确认,1:已确认,2:已收货,3:已取消,4:已完成,5:已作废
+        $orderInfoData['order_status'] = 1;         //订单状态 0:待确认,1:已确认,2:已收货,3:已取消,4:已完成,5:已作废
         $orderInfoData['pay_status'] = 0;       //支付状态 0:未支付,1:已支付,2:部分支付,3:已退款,4:拒绝退款
         $orderInfoData['shipping_status'] = 0;       //商品配送情况;0:未发货,1:已发货,2:部分发货,3:已收货,4:退货
         $orderInfoData['pay_type'] = $pay_type;    //支付方式 1:余额支付,2:后台付款,4:在线支付,5:微信支付,6:支付宝支付,7:银联支付,7:货到付款
@@ -207,41 +223,40 @@ class Order extends ApiBase
     */
     public function order_list()
     {   
-        // $this->ajaxReturn(['status' => 0 , 'msg'=>'获取成功','data'=>$type]);
-        $type = I('type');
         $user_id = $this->get_user_id();
         if(!$user_id){
             $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
         }
-        /*if ($type=='WAITSEND')$data = array('order_status' => [0,1],'shipping_status' =>1,'pay_code'=>'cod'); //'待发货',货到付款
-        if ($type=='WAITSEND')$data = array('pay_status'=>1,'order_status'=>[0,1],'shipping_status'=>0,'pay_code'=>['not in','cod']);//'待发货',非货到付款*/
-        if ($type=='WAITSEND')$data = array('tp_order.order_status' => ['in','0,1'],);//'待发货'
-        if ($type=='WAITPAY')$data = array('tp_order.pay_status'=>0,'tp_order.order_status'=>0,'tp_order.pay_code'=>['not in','cod'],); //'待支付',
-        if ($type=='WAITRECEIVE')$data = array('tp_order.shipping_status'=>1,'order_status'=>1,);//'待收货',
-        if ($type=='WAITCCOMMENT')$data = array('tp_order.order_status'=>2,);//'待评价',
-        // $data = '订单列表数据';
-        $data['tp_order.user_id'] = $user_id;
-        /*$name = array(
-            'tp_order.order_id',//订单id
-            'tp_order.add_time',//下单时间
-            'tp_order_goods.goods_name',//商品名称
-            'tp_order_goods.spec_key_name',//商品规格名
-            'tp_order_goods.goods_price',//本店价格
-            'tp_order_goods.goods_num',//购买数
-            'tp_order.order_amount',//应付金额
-            'seller_name',//商家名称
-            'tp_goods.original_img',//商品上传原始图
-        );*/
-        $order = Db::name('order')->join('tp_order_goods','tp_order.order_id=tp_order_goods.order_id','right')->join('tp_seller','tp_order_goods.seller_id = tp_seller.seller_id','left')->join('tp_goods','tp_goods.goods_id = tp_order_goods.goods_id')->where($data)->select();
-        foreach($order as &$k){
-            $k['original_img']=SITE_URL.$k['original_img'];
-        }
-        $this->ajaxReturn(['status' => 0 , 'msg'=>'获取成功','data'=>$order]);
+        $type = input('type');
+        if(!$type) $this->ajaxReturn(['status' => -2 , 'msg'=>'参数错误！','data'=>'']);
+        
+        $where = [];
+
+        if ($type=='dfk')$where = array('order_status' => 1,'shipping_status' =>0,'pay_status'=>0); //待付款
+        if ($type=='dfh')$where = array('order_status' => 1 ,'pay_status'=>1 ,'shipping_status' =>0); //待发货
+        if ($type=='dsh')$where = array('order_status' => 1 ,'pay_status'=>1 ,'shipping_status' =>1); //待收货
+        if ($type=='dpj')$where = array('order_status' => 4 ,'pay_status'=>1 ,'shipping_status' =>3); //待评价
+        if ($type=='yqx')$where = array('order_status' => 3 ,'pay_status'=>0 ,'shipping_status' =>0); //已取消
+
+
+        $where['o.user_id'] = $user_id;
+        $where['gi.main'] = 1;
+
+        $order_list = Db::table('order')->alias('o')
+                        ->join('order_goods og','og.order_id=o.order_id','LEFT')
+                        ->join('goods_img gi','gi.goods_id=og.goods_id','LEFT')
+                        ->join('goods g','g.goods_id=og.goods_id','LEFT')
+                        ->where($where)
+                        ->group('og.order_id')
+                        ->field('o.order_id,o.order_sn,og.goods_name,gi.picture img,og.spec_key_name,og.goods_price,g.original_price,og.goods_num,o.order_status,o.pay_status,o.shipping_status')
+                        ->select();
+
+        $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$order_list]);
     }
 
 
     /**
-    * 订单
+    * 订单详情
     */
     public function order_detail()
     {
@@ -249,124 +264,57 @@ class Order extends ApiBase
         if(!$user_id){
             $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
         }
-        $order_id = I('id');
-        //验证是否本人的
-        $order = Db::name('order')->where('order_id',$order_id)->select();
+        $order_id = input('order_id');
+
+        $where['o.user_id'] = $user_id;
+        $where['o.order_id'] = $order_id;
+
+        $order = Db::name('order')->alias('o')->where($where)->find();
         if(!$order){
-            $this->ajaxReturn(['status' => -3 , 'msg'=>'订单不存在','data'=>null]);
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'订单不存在','data'=>'']);
         }
-        if($order['0']['user_id']!=$user_id){
-            $this->ajaxReturn(['status' => -2 , 'msg'=>'非本人订单','data'=>null]);
-        }
-        $name = array(
-            'tp_order.order_id',//订单ID
-            'tp_order.order_sn',//订单编号
-            'tp_order.order_status',//订单状态
-            'tp_order.consignee',//收货人
-            'tp_order.country',//国家
-            'tp_order.province',//省份
-            'tp_order.city',//城市
-            'tp_order.district',//县区
-            'tp_order.twon',//乡镇
-            'tp_order.address',//地址
-            'seller_name',//商家名称
-            'tp_goods.original_img',//商品上传原始图
-            'tp_order_goods.goods_name',//商品名称
-            'tp_order_goods.spec_key_name',//商品规格名
-            'tp_order_goods.goods_price',//本店价格
-            'tp_order_goods.goods_num',//购买数
-            'tp_order.shipping_price',//邮费
-            'tp_order.total_amount',//订单总价
-            'tp_order.order_amount',//应付金额
-            'tp_order.pay_time',//支付时间
-            'tp_order.pay_name',//支付方式名称
-            'tp_order.mobile',//手机号
-            'tp_order.user_money',//使用余额
+
+        $field = array(
+            'o.order_id',//订单ID
+            'o.order_sn',//订单编号
+            'o.order_status',//订单状态
+            'o.pay_status',//支付状态
+            'o.shipping_status',//商品配送情况
+            'o.pay_type',//支付类型
+            'o.consignee',//收货人
+            'o.mobile',//收货人手机号
+            'o.province',//省
+            'o.city',//市
+            'o.district',//区
+            'o.twon',//街道
+            'o.address',//地址
+            'o.coupon_price',//优惠券抵扣
+            'o.order_amount',//应付款金额
+            'o.total_amount',//订单总价
+            'o.add_time',//下单时间
+            'o.shipping_name',//物流名称
+            'o.shipping_price',//物流费用
+            'o.user_note',//订单备注
+            'o.pay_time',//支付时间
+            'o.user_money',//使用余额
         );
-        $data = Db::name('order')->join('tp_order_goods','tp_order.order_id=tp_order_goods.order_id','right')->join('tp_seller','tp_order_goods.seller_id = tp_seller.seller_id','left')->join('tp_goods','tp_goods.goods_id = tp_order_goods.goods_id')->field($name)->where('tp_order.order_id',$order_id)->find();
-        $this->ajaxReturn(['status' => 0 , 'msg'=>'获取成功','data'=>$data]);
+
+        $order = Db::table('order')->alias('o')->where($where)->field($field)->find();
+        $order['goods_res'] = Db::table('order_goods')->field('goods_id,goods_name,goods_num,spec_key_name,goods_price')->where('order_id',$order['order_id'])->select();
+        foreach($order['goods_res'] as $key=>$value){
+            $order['goods_res'][$key]['original_price'] = Db::table('goods')->where('goods_id',$value['goods_id'])->value('original_price');
+            $order['goods_res'][$key]['img'] = Db::table('goods_img')->where('goods_id',$value['goods_id'])->where('main',1)->value('picture');
+        }
+
+        $order['province'] = Db::table('region')->where('area_id',$order['province'])->value('area_name');
+        $order['city'] = Db::table('region')->where('area_id',$order['city'])->value('area_name');
+        $order['district'] = Db::table('region')->where('area_id',$order['district'])->value('area_name');
+        $order['twon'] = Db::table('region')->where('area_id',$order['twon'])->value('area_name');
+
+        $order['address'] = $order['province'].$order['city'].$order['district'].$order['twon'].$order['address'];
+        unset($order['province'],$order['city'],$order['district'],$order['twon']);
+
+        $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$order]);
     }
 
-    /**
-     * 提交订单
-     */
-	 public function post_order(){   
-		$user_id = $this->get_user_id();
-        if(!$user_id){
-            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
-        }	
-
-        $address_id    = input("address_id/d", 0); //  收货地址id
-        $invoice_title = input('invoice_title');  // 发票  
-        $taxpayer      = input('taxpayer');       // 纳税人识别号
-        $invoice_desc  = input('invoice_desc');       // 发票内容
-        $coupon_id     = input("coupon_id/d"); //  优惠券id
-        $pay_points    = input("pay_points/d", 0); //  使用积分
-        $user_money    = input("user_money/f", 0); //  使用余额
-        $user_note     = input("user_note/s", ''); // 用户留言
-        $pay_pwd       = input("pay_pwd/s", ''); // 支付密码
-        $goods_id      = input("goods_id/d",0); // 商品id
-        $goods_num     = input("goods_num/d",0);// 商品数量
-        $item_id       = input("item_id/d",0); // 商品规格id
-        $action        = input("action/d",0); // 立即购买
-        $shop_id       = input('shop_id/d', 0);//自提点id
-        $take_time = input('take_time/d');//自提时间
-        $consignee = input('consignee/s');//自提点收货人
-        $mobile = input('mobile/s');//自提点联系方式
-        $is_virtual = input('is_virtual/d',0);
-        $data = input('request.');
-        $cart_validate = Loader::validate('Cart');
-        if($is_virtual === 1){
-            $cart_validate->scene('is_virtual');
-        }
-        if (!$cart_validate->check($data)) {
-            $error = $cart_validate->getError();
-            $this->ajaxReturn(['status' => -4, 'msg' => $error, 'result' => '']);  //留言长度不符或收货人错误
-        }
-        $address = Db::name('user_address')->where("address_id", $address_id)->find();
-        $cartLogic = new CartLogic();
-        $pay = new Pay();
-        try {
-            $cartLogic->setUserId($user_id);
-            if ($action === 1) {
-                $cartLogic->setGoodsModel($goods_id);
-                $cartLogic->setSpecGoodsPriceById($item_id);
-                $cartLogic->setGoodsBuyNum($goods_num);
-                $buyGoods = $cartLogic->buyNow();
-                $cartList[0] = $buyGoods;
-                $pay->payGoodsList($cartList);
-            } else {
-                $userCartList = $cartLogic->getCartList(1);
-                $cartLogic->checkStockCartList($userCartList);
-                $pay->payCart($userCartList);
-            }
-            $pay->setUserId($user_id)
-                ->setShopById($shop_id)
-                ->delivery($address['district'])
-                ->orderPromotion()
-                ->useCouponById($coupon_id)
-                ->useUserMoney($user_money)
-                ->usePayPoints($pay_points);
-            // 提交订单
-			$placeOrder = new PlaceOrder($pay);
-			$placeOrder->setUserAddress($address)
-				->setConsignee($consignee)
-				->setMobile($mobile)
-				->setInvoiceTitle($invoice_title)
-				->setUserNote($user_note)
-				->setTaxpayer($taxpayer)
-				->setInvoiceDesc($invoice_desc)
-				->setPayPsw($pay_pwd)
-				->setTakeTime($take_time)
-				->addNormalOrder();
-			$cartLogic->clear();
-			$order = $placeOrder->getOrder();
-			$this->ajaxReturn(['status' => 0, 'msg' => '提交订单成功', 'data' => ['order_sn' => $order['order_sn']] ]);
-
-        } catch (TpshopException $t) {
-            $error = $t->getErrorArr();
-            $this->ajaxReturn($error);
-        }	
-	 }
-	  
 }

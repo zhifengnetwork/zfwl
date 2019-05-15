@@ -276,12 +276,9 @@ return [
         4 => '拒绝退款'
     ),
     'PAY_TYPE' => array(
-        1 => '余额支付',
-        2 => '后台付款',
-        4 => '在线支付',
-        5 => '微信支付',
-        6 => '支付宝支付',
-        7 => '银联支付',
-        8 => '货到付款',
+        'credit' => ['pay_type'=>1,'pay_name'=>'余额支付'],
+        'weixin' => ['pay_type'=>2,'pay_name'=>'微信支付'],
+        'alipay' => ['pay_type'=>3,'pay_name'=>'支付宝支付'],
+        'cash'   => ['pay_type'=>4,'pay_name'=>'货到付款'],
     ),
 ];
