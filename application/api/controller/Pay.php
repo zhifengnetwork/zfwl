@@ -9,6 +9,7 @@ use Payment\Client\Charge;
 use app\common\model\Member as MemberModel;
 use app\common\model\Order;
 
+use \think\Model;
 use \think\Config;
 use \think\Db;
 use \think\Env;
