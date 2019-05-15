@@ -26,12 +26,13 @@ class Finance extends Common
 
         //携带参数
         $where            = $this->get_where();
-        $list  = Db::name('member_log')->alias('log')
-            ->field('log.id,m.id as mid, m.realname,m.avatar,m.weixin,log.logno,log.type,log.status,log.rechargetype,m.nickname,m.mobile,g.groupname,log.money,log.createtime,l.levelname')
-            ->join("member m",'m.openid=log.openid','LEFT')
+        $list  = Db::name('menber_balance_log')->alias('log')
+            ->field('log.id,m.id as mid, m.realname,m.avatar,m.weixin,log.note,log.source_type,m.nickname,m.mobile,g.groupname,log.old_balance,log.balance,log.create_time,l.levelname')
+            ->join("member m",'m.id=log.user_id','LEFT')
             ->join("member_group g",'m.groupid=g.id','LEFT')
             ->join("member_level l",'m.level =l.id','LEFT')
             ->where($where)
+            ->where(['log.balance_type' => 0])
             ->order('m.createtime DESC')
             ->paginate(10, false, ['query' => $where]);
         // 导出设置
@@ -60,12 +61,13 @@ class Finance extends Common
 
         //携带参数
         $where            = $this->get_where();
-        $list  = Db::name('member_points_log')->alias('log')
-            ->field('log.id,m.id as mid, m.realname,m.avatar,m.weixin,log.logno,log.type,log.status,log.rechargetype,m.nickname,m.mobile,g.groupname,log.money,log.createtime,l.levelname')
-            ->join("member m",'m.openid=log.openid','LEFT')
+        $list  = Db::name('menber_balance_log')->alias('log')
+            ->field('log.id,m.id as mid, m.realname,m.avatar,m.weixin,log.note,log.source_type,m.nickname,m.mobile,g.groupname,log.old_balance,log.balance,log.create_time,l.levelname')
+            ->join("member m",'m.id=log.user_id','LEFT')
             ->join("member_group g",'m.groupid=g.id','LEFT')
             ->join("member_level l",'m.level =l.id','LEFT')
             ->where($where)
+            ->where(['log.balance_type' => 1])
             ->order('m.createtime DESC')
             ->paginate(10, false, ['query' => $where]);
         // 导出设置
@@ -153,16 +155,19 @@ class Finance extends Common
      */
     public function balance_recharge()
     {
-        $uid     = input('id/d',27);
-        $profile = MemberModel::get($uid);
+        $uid           = input('id/d',27);
+        $profile       = MemberModel::get($uid);
+        $balance_info  = get_balance($uid,0);
         if (Request::instance()->isPost()){
             $num = input('num/f');
             if($num <= 0){
                 $this->error('输入的金额有误');
             }
-            MemberModel::setCredit($profile['openid'],$profile['id'],'credit2', $num, array(UID, '余额充值'));
+
+            MemberModel::setBalance($uid,0, $num, array(UID, '余额充值'));
             $this->success('充值成功', url('member/member_edit',['id' => $profile['id']]));
         }
+        $profile['balance'] = $balance_info['balance'];
         $this->assign('profile', $profile);
         $this->assign('meta_title', '余额充值');
         return $this->fetch();
@@ -172,17 +177,19 @@ class Finance extends Common
      */
     public function integral_recharge()
     {
-         $uid     = input('id/d',27);
-         $profile = MemberModel::get($uid);
+         $uid           = input('id/d',27);
+         $profile       = MemberModel::get($uid);
+         $balance_info  = get_balance($uid,1);
         if (Request::instance()->isPost()){
             $num = input('num/f');
             if($num <= 0){
                 $this->error('输入的积分有误');
             }
-            MemberModel::setCredit($profile['openid'], $profile['id'],'credit1', $num, array(UID, '积分充值'));
+            MemberModel::setBalance($uid,1, $num, array(UID, '积分充值'));
             $this->success('充值成功', url('member/member_edit',['id' => $profile['id']]));
 
         }
+        $profile['balance']  = $balance_info['balance'];
         $this->assign('profile', $profile);
         $this->assign('meta_title', '积分充值');
         return $this->fetch();

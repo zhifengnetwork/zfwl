@@ -160,8 +160,8 @@
                                 <br/>{if empty($vo['groupname'])}无分组{else/}{$vo['groupname']}{/if}
                             </td>
                             <td>{$vo['createtime']|date="y-m-d H:i:s",###}</td>
-                            <td>{$vo['credit1']}</td>
-                            <td>{$vo['credit2']}</td>
+                            <td>{$vo['balance']}</td>
+                            <td>{$vo['balance1']}</td>
                             <td>{$vo['ordercount']}</td>
                             <td>{:floatval($vo['ordermoney'])}</td>
                             
