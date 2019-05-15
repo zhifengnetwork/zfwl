@@ -76,7 +76,7 @@ class Pay extends ApiBase
                 'balance'            =>  ['exp', 'balance-'.$amount.''],
             ];
 
-            Db::table('account_balance')->where(['User_ID' => $user_id,'balance_type' => 0])->update($balance);
+            Db::table('account_balance')->where(['user_id' => $user_id,'balance_type' => 0])->update($balance);
             
             //修改订单状态
             $update = [

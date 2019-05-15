@@ -421,18 +421,18 @@ function get_file_name($id, $rounds, $bankerWinCount)
 
 
 function get_balance($user_id,$type){
-    $res = Db::name('account_balance')->where(['User_ID' => $user_id,'balance_type' => $type])->find();
+    $res = Db::name('account_balance')->where(['user_id' => $user_id,'balance_type' => $type])->find();
     if(!empty($res)){
            return $res;
     }else{
         $insert = [
-            'User_ID'        => $user_id,
+            'user_id'        => $user_id,
             'balance_type'   => $type,
             'create_time'    => time(),
             'update_time'    => time(),
         ];
              Db::name('account_balance')->insert($insert);
-      $res = Db::name('account_balance')->where(['User_ID' => $user_id,'balance_type' => $type])->find();
+      $res = Db::name('account_balance')->where(['user_id' => $user_id,'balance_type' => $type])->find();
       return $res;
     }
 }
