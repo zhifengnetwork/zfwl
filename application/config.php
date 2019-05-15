@@ -307,7 +307,7 @@ return [
         // 与业务相关参数
         'notify_url'                => 'http://api.zhifengwangluo.c3w.cc/pay/alipay_notify/',
         'return_url'                => 'http://api.zhifengwangluo.c3w.cc/pay/alipay_notify/',
-        'return_raw'                => false,// 在处理回调时，是否直接返回原始数据，默认为 true
+        'return_raw'                =>  true,// 在处理回调时，是否直接返回原始数据，默认为 true
     ]
 
 ];
