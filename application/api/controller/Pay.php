@@ -30,7 +30,7 @@ class Pay extends ApiBase
     public function payment(){
           $order_id     = input('order_id',1401);
           $pay_type     = input('pay_type','credit');//支付方式
-          $user_id      = $this->get_user_id();
+          $user_id      = 50;
         if(!$user_id){
             $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
         }
@@ -82,9 +82,8 @@ class Pay extends ApiBase
             }
             //扣除用户余额
             $balance = [
-                'balance'            =>  ['exp', 'balance-'.$amount.''],
+                'balance'            =>  Db::raw('balance-'.$amount.''),
             ];
-
             Db::table('member_balance')->where(['user_id' => $user_id,'balance_type' => 0])->update($balance);
             
             //修改订单状态
