@@ -29,7 +29,7 @@ class Pay extends ApiBase
     public function payment(){
           $order_id     = input('order_id',1401);
           $pay_type     = input('pay_type','credit');//支付方式
-          $user_id      = 50;//$this->get_user_id();
+          $user_id      = $this->get_user_id();
         if(!$user_id){
             $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
         }
