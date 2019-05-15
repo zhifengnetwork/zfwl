@@ -743,7 +743,7 @@
 
                                 <div class="comm_modal_footer comm_modal_footer_shut">
                                     <!--分页-->
-                                    <div class="paging hide_box" :style="search_data['show_paging'] == true && comm_search_tips == false ? 'display:table;':''">
+                                    <div class="paging hide_box" :style="search_data['show_paging'] == true ? 'display:table;':''">
                                     	<p class="btns" :class="search_data['this_page'] == 1 ? 'no_but_color':'' " @click.stop="first_page()">首页</p>
                                     	<p class="btns" :class="search_data['this_page'] == 1 ? 'no_but_color':'' " @click.stop="upper_page()">上一页</p>
                                     	<p v-for="(item,ind) in search_data['total_page']" :class="search_data['this_page'] == item['page'] ? 'active_color':'' " @click.stop="this_page(item['page'])" v-show="search_data['this_page'] - item['page'] <=2 && item['page'] - search_data['this_page'] <=2">{{item['page']}}</p>
@@ -1810,6 +1810,7 @@
 							if(that.comm_data.length == 0){
 								console.log('暂无该商品:',that.comm_data.length);
 								that.comm_search_tips = true;
+								that.search_data['show_paging'] = false;
 							}else {
 								that.comm_search_tips = false;
 							}
