@@ -61,4 +61,11 @@ class Order extends Model
         return $config[$data['shipping_status']];
     }
 
+    /***
+     * 修改订单支付状态
+     */
+    public function update_order(){
+
+    }
+
 }

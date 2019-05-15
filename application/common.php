@@ -419,6 +419,51 @@ function get_file_name($id, $rounds, $bankerWinCount)
     return $savename;
 }
 
+
+function get_balance($user_id,$type){
+    $res = Db::name('account_balance')->where(['User_ID' => $user_id,'balance_type' => $type])->find();
+    if(!empty($res)){
+           return $res;
+    }else{
+        $insert = [
+            'User_ID'        => $user_id,
+            'balance_type'   => $type,
+            'create_time'    => time(),
+            'update_time'    => time(),
+        ];
+             Db::name('account_balance')->insert($insert);
+      $res = Db::name('account_balance')->where(['User_ID' => $user_id,'balance_type' => $type])->find();
+      return $res;
+    }
+}
+/**
+ * 订单支付时, 获取订单商品名称
+ * @param unknown $order_id
+ * @return string|Ambigous <string, unknown>
+ */
+function getPayBody($order_id)
+{
+
+    if (empty($order_id)) return "订单ID参数错误";
+    $goodsNames = Db::name('order_goods')->where('order_id', $order_id)->column('goods_name');
+    $gns = implode($goodsNames, ',');
+    $payBody = getSubstr($gns, 0, 18);
+    return $payBody;
+}
+
+
+/**
+ *   实现中文字串截取无乱码的方法
+ */
+function getSubstr($string, $start, $length) {
+    if(mb_strlen($string,'utf-8')>$length){
+        $str = mb_substr($string, $start, $length,'utf-8');
+        return $str.'...';
+    }else{
+        return $string;
+    }
+}
+
 function get_period_time($type = 'day', $now = 0, $fmt = 0)
 {
     $rs = false;

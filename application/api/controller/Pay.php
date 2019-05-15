@@ -7,13 +7,14 @@ namespace app\api\controller;
 use Payment\Common\PayException;
 use Payment\Client\Charge;
 use app\common\model\Member as MemberModel;
+use app\common\model\Order;
 
 use \think\Config;
 use \think\Db;
 use \think\Env;
 use \think\Request;
 
-class Pay extends Common
+class Pay extends ApiBase
 {
      /**
      * 析构流函数
@@ -26,10 +27,9 @@ class Pay extends Common
      * 支付
      */
     public function payment(){
-        $order_id     = input('order_id','');
-        $pay_type     = input('pay_type','alipay');//支付方式
-        
-        $user_id      = $this->get_user_id();
+          $order_id     = input('order_id',1401);
+          $pay_type     = input('pay_type','credit');//支付方式
+          $user_id      = 50;//$this->get_user_id();
         if(!$user_id){
             $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
         }
@@ -67,12 +67,32 @@ class Pay extends Common
             $payData['sub_appid']    = '';
             $payData['sub_mch_id']   = '';
         }elseif($pay_type == 'credit'){
-            if($member['credit2'] < $order_info['order_amount']){
+            $balance_info  = get_balance($user_id,0);
+            if($balance_info['balance'] < $order_info['order_amount']){
                 $this->ajaxReturn(['status' => 0 , 'msg'=>'余额不足','data'=>'']);
             }
-        }else{
+            //扣除用户余额
+            $balance = [
+                'balance'            =>  ['exp', 'balance-'.$amount.''],
+            ];
+
+            Db::table('account_balance')->where(['User_ID' => $user_id,'balance_type' => 0])->update($balance);
             
+            //修改订单状态
+            $update = [
+                'order_status' => 1,
+                'pay_status'   => 1,
+                'pay_type'     => 1,
+                'pay_time'     => time(),
+            ];
+            $reult = Order::where(['order_id' => $order_id])->update($update);
+            if($reult){
+                $this->ajaxReturn(['status' => 1 , 'msg'=>'余额支付成功!','data'=>'']);
+            }else{
+                $this->ajaxReturn(['status' => 0 , 'msg'=>'余额支付失败','data'=>'']);
+            }
         }
+
         try {
             $url = Transfer::run(Config::ALI_TRANSFER, $config, $payData);
         } catch (PayException $e) {
@@ -81,13 +101,6 @@ class Pay extends Common
         }
 
     } 
-
-
-
-
-
-
-
 
 
 
