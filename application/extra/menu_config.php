@@ -57,16 +57,16 @@ return [
                 'child' => [
                     [
                         'id'    => 20201,
-                        'title' => '支付方式',
+                        'title' => '微信支付',
                         'sort'  => 1,
-                        'url'   => 'index/pay_set',
+                        'url'   => 'index/pay_wechat',
                         'hide'  => 1,
                     ],
                     [
                         'id'    => 20202,
-                        'title' => '支付参数',
+                        'title' => '支付宝支付',
                         'sort'  => 1,
-                        'url'   => 'index/pay_content',
+                        'url'   => 'index/pay_alipay',
                         'hide'  => 1,
                     ],
                     [
@@ -114,8 +114,6 @@ return [
             ],
         ],
     ],
-
-
        //商品模块
        'goods'      => [
         'id'    => 30000,

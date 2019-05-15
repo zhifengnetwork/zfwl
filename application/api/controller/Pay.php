@@ -6,6 +6,7 @@
 namespace app\api\controller;
 use Payment\Common\PayException;
 use Payment\Client\Charge;
+use app\common\model\Member as MemberModel;
 
 use \think\Config;
 use \think\Db;
@@ -26,130 +27,59 @@ class Pay extends Common
      */
     public function payment(){
         $order_id     = input('order_id','');
-        $pay_type     = input('pay_type','ali');//支付方式
+        $pay_type     = input('pay_type','alipay');//支付方式
+        
+        $user_id      = $this->get_user_id();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+        }
         $order_info   = Db::name('order')->where(['order_id' => $order_id])->find();//订单信息
+        $member       = MemberModel::get($user_id);
+        //验证是否本人的
+        if(!$order_info){
+            $this->ajaxReturn(['status' => -3 , 'msg'=>'订单不存在','data'=>'']);
+        }
+        if($order_info['user_id'] != $user_id){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'非本人订单','data'=>'']);
+        }
+
+    	if($order_info['pay_status'] == 1){
+			$this->ajaxReturn(['status' => -4 , 'msg'=>'此订单，已完成支付!','data'=>'']);
+    	}
         $sysset       = Db::name('sysset')->find();
         $config       = unserialize($sysset['sets']);
-        $body         = getPayBody($order_id);
-        $payData      = [
-            'body'            => $body,
-            'subject'         => '支付宝支付',
-            'order_no'        => $order_info['order_sn'],
-            'timeout_express' => time() + 60,// 表示必须 600s 内付款
-            'amount'          => $order_info['order_amount'],// 单位为元 ,最小为0.01
-            'return_param'    => '',// 一定不要传入汉字，只能是 字母 数字组合
-            // 'client_ip' => isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '127.0.0.1',// 客户地址
-            'goods_type'      => '1',// 0—虚拟类商品，1—实物类商品
-            'store_id'        => '',
-            'quit_url'        => 'http://helei112g.github.io', // 收银台的返回按钮（用户打断支付操作时返回的地址,4.0.3版本新增）
-        ];
-
-        $orderNo  = time() . rand(1000, 9999);
-        $refundNo = time() . rand(1000, 9999);
-        if($type == 'ali'){
-            // $payData = [
-            //     'body'           => 'ali wap pay',
-            //     'subject'        => '测试支付宝手机网站支付',
-            //     'order_no'        => $orderNo,
-            //     'timeout_express' => time() + 600,// 表示必须 600s 内付款
-            //     'amount'          => '0.5',// 单位为元 ,最小为0.01
-            //     'return_param'   => 'tata',// 一定不要传入汉字，只能是 字母 数字组合
-            //     // 'client_ip' => isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '127.0.0.1',// 客户地址
-            //     'goods_type'     => '1',// 0—虚拟类商品，1—实物类商品
-            //     'store_id'      => '',
-            //     'quit_url'     => 'http://helei112g.github.io', // 收银台的返回按钮（用户打断支付操作时返回的地址,4.0.3版本新增）
-            // ];
-
-            $payData = [
-                'out_trade_no' => '15578313955571',
-                'trade_no'     => '',// 支付宝交易号， 与 out_trade_no 必须二选一
-                'refund_fee'   => '0.5',
-                'reason'       => '我要退款',
-                'refund_no'    => $refundNo,
-            ];
-            
-           
-            
-            //write_log('order.txt',array('order_id' => $refundNo));
-            //  write_log('refund.txt',array('order_id' => $refundNo));
-
-
-            
-            // $payData = [
-            //     'trans_no' => time(),
-            //     'payee_type' => 'ALIPAY_LOGONID',
-            //     'payee_account' => '13226785330',// ALIPAY_USERID: 2088102169940354      ALIPAY_LOGONID：aaqlmq0729@sandbox.com
-            //     'amount' => '0.1',
-            //     'remark' => '转账拉，有钱了',
-            //     'payer_show_name' => '一个未来的富豪',
-            // ];
-
-            $aliConfig =  [
-                'use_sandbox'               => false,// 是否使用沙盒模式
-            
-                'app_id'                    => '2019050264367537',
-                'sign_type'                 => 'RSA2',// RSA  RSA2
-            
-                // ！！！注意：如果是文件方式，文件中只保留字符串，不要留下 -----BEGIN PUBLIC KEY----- 这种标记
-                // 可以填写文件路径，或者密钥字符串  当前字符串是 rsa2 的支付宝公钥(开放平台获取)
-                'ali_public_key'            => 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAjaw+zIeq9IU07mw62+q1xVHGxrUpyGPWchp6oJQIoKx+odn8mAvi8yZvA/idj9cjVJ9Uzv+0isaOSJoI7p19ER9wbDvmvtXDo+bWfPGNRnZTyxzrfRD9PVNvxAyVw+rnCfbG9VhV3mYll0edlCRXJJYJNhf/9jQnTBxmMpZRa0SdH2IxdcDgkf7eFJUzTZudR9oW1zvFcZjV+GVQ8vAenYTNHzWsv21I9o1ErvP0OOb2UGx+DpEW+MEjbYFXHoyqaoUnbGo2HpCkx9LliAehSgrrPKSsHukpQj9A4VRfES5sNQM5nD2ygF4hOFWsxG8E7EXNzCerxTRHjgCsRfZ43QIDAQAB',
-            
-                // ！！！注意：如果是文件方式，文件中只保留字符串，不要留下 -----BEGIN RSA PRIVATE KEY----- 这种标记
-                // 可以填写文件路径，或者密钥字符串  我的沙箱模式，rsa与rsa2的私钥相同，为了方便测试
-                'rsa_private_key'           => 'MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCNrD7Mh6r0hTTubDrb6rXFUcbGtSnIY9ZyGnqglAigrH6h2fyYC+LzJm8D+J2P1yNUn1TO/7SKxo5ImgjunX0RH3BsO+a+1cOj5tZ88Y1GdlPLHOt9EP09U2/EDJXD6ucJ9sb1WFXeZiWXR52UJFcklgk2F//2NCdMHGYyllFrRJ0fYjF1wOCR/t4UlTNNm51H2hbXO8VxmNX4ZVDy8B6dhM0fNay/bUj2jUSu8/Q45vZQbH4OkRb4wSNtgVcejKpqhSdsajYekKTH0uWIB6FKCus8pKwe6SlCP0DhVF8RLmw1AzmcPbKAXiE4VazEbwTsRc3MJ6vFNEeOAKxF9njdAgMBAAECggEAVhak0oReTdfkIj2CRsCJVC4tK/JKQYrpdMzCV3GdDIXFLXTZGUufzUE9lJwuoomI3pMzZdXcT7f4HgX8B4OLzCvelOaRgMVE7QQIskPWJUsh//rC3mzEdc+NywQavcKwQk3C+LOE+m/3x8Ws66hpi8HgNw6+a02l04ouT+8n6pYM1f+4Vy7Fb4LdDEkzKDkvtxj+czXDp/1gnRExvqpMkK9iwFfmvO4rO8Ubw+URjIX6vuIZytbnZqT1jpJNfmvigWPplOdRiyVk5YVtBKNAQYSlk8y6Tiftq9VuJEmRuSs3ohoxS9h128Fbze2/oYDtwLGZKXh2D6GivE2Xz9CGAQKBgQDezHVMJdNjIdO0iUh8oW0li9NOYkl1Bsk4ICKPiKWTEx5OT/qbvO/VZskUaHauWgwhMN12wkM6UI0tBonO/ZOON7Fh/5bQCC5QKHtN//EHz932sKyO/qHgCiWzib30jSZ5XtBx8ClPiKfDIu+UaZXlgCLgoi0fxcfyvWQXL7mDmQKBgQCiyOtdF1Alt0oKSE1v5qARmZ4ldb4FWWwaVQJgocEP11wwIQhq3y4ZgHBrDJP35ec7Hyrlr1i/+hjVd3nEtEzt1F4Jj0aNXHwlch+fsfKR1eN5EcP6zmS6idj/239w+lTGN0eIylvBW/J811E7VF1lWgnesYcmOXxCG+XJdJpp5QKBgDj1xqtAJGn8tPY7/tc2IgRuWgh5IlST9o+tz4gopEQUqDPXSLfWNu61B4V7K5Rpmx5FMulwwuU+wMkZGdRcigPbAzONt43Z+ZUutE99tq6LmzC9fHBWcyYnEfpzpafHCmYPMnVetAEMa+98mAm2cMcq2j/Z1nWACB1sBBHVdrVJAoGBAIkNUiPRQfhPJfYcQ54n9LJ8vIpbZD3KuNo+oj7LUOlOb15SIW0hNAXifkOSlm3LUXAUYKB6jeUr4oavDYVQK8i82OOBjmvr5tX8DKX+QvUHuHmxPGhIJsRq1Jktq1FqYb90wTRo8vGLwU/cVJb4A54WPWMR4nCLS5O5OzDujCcFAoGAARLKIuYqRdyemWv2LaHCvVd+r9T8uyzRJK/udX8hb6mfScCyQeLsMj6oavlWioTGVDZb1zHjd8Uo64buGyXsBqzmgQXPtt3w3Vgs+WvfpUCzSCsPalhSsCaPKRvxYtoxZ/HepwegX77aT3sT6sERIEksl9wyClV5Q3mqP5JYI8k=',
-            
-                'limit_pay'                 => [
-                    //'balance',// 余额
-                    //'moneyFund',// 余额宝
-                    //'debitCardExpress',// 	借记卡快捷
-                    //'creditCard',//信用卡
-                    //'creditCardExpress',// 信用卡快捷
-                    //'creditCardCartoon',//信用卡卡通
-                    //'credit_group',// 信用支付类型（包含信用卡卡通、信用卡快捷、花呗、花呗分期）
-                ],// 用户不可用指定渠道支付当有多个渠道时用“,”分隔
-            
-                // 与业务相关参数
-                'notify_url'                => 'https://helei112g.github.io/v1/notify/ali',
-                'return_url'                => 'https://helei112g.github.io/',
-            
-                'return_raw'                => false,// 在处理回调时，是否直接返回原始数据，默认为 true
-            ];
-
+        $amount       = $order_info['order_amount'];
+        $client_ip    = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '127.0.0.1';
+        $payData['order_no']        = $order_info['order_sn'];
+        $payData['body']            = getPayBody($order_id);
+        $payData['timeout_express'] = time() + 600;
+        $payData['amount']          = $order_info['order_amount'];
+        if($pay_type == 'alipay'){
+            $payData['subject']      = '支付宝支付';
+            $payData['goods_type']   = 1;
+            $payData['return_param'] = '';
+            $payData['store_id']     = '';
+            $payData['quit_url']     = '';
+        }elseif($pay_type == 'wechat'){
+            $payData['subject']      = '微信支付';
+            $payData['openid']       = $order_info['openid'];
+            $payData['product_id']   = '';
+            $payData['sub_appid']    = '';
+            $payData['sub_mch_id']   = '';
+        }elseif($pay_type == 'credit'){
+            if($member['credit2'] < $order_info['order_amount']){
+                $this->ajaxReturn(['status' => 0 , 'msg'=>'余额不足','data'=>'']);
+            }
         }else{
-
-
-
+            
         }
-       
-
-      
-       
-        // try {
-        //     $url = Transfer::run(Config::ALI_TRANSFER, $aliConfig, $payData);
-        // } catch (PayException $e) {
-        //     echo $e->errorMessage();
-        //     exit;
-        // }
-
         try {
-            $ret = Refund::run(Config::ALI_REFUND, $aliConfig, $payData);
+            $url = Transfer::run(Config::ALI_TRANSFER, $config, $payData);
         } catch (PayException $e) {
             echo $e->errorMessage();
             exit;
         }
 
-        // try {
-        //     $url = Charge::run(Config::ALI_CHANNEL_WAP, $aliConfig, $payData);
-        // } catch (PayException $e) {
-        //     echo $e->errorMessage();
-        //     exit;
-        // }
-        echo json_encode($ret, JSON_UNESCAPED_UNICODE);
-
-        // header('Location:' . $url);
-       
-        // $str = Charge::run();
-        // die;
     } 
 
 

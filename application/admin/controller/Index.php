@@ -101,102 +101,56 @@ class Index extends Common
     /***
      * 支付方式
      */
-    public function pay_set(){
-        $sysset = Db::table('sysset')->field('*')->find();
-        
+    public function pay_wechat(){
+        $sysset = Db::table('sysset')->find();
+        $set    = unserialize($sysset['sets']);
         if( Request::instance()->isPost() ){
             $data = input('post.');
-            $path = ROOT_PATH . '/data/cert';
-            if (!file_exists($path)){ 
-                mkdir($path,0777,true);
-            }
-            $sec = '';
-            if (!empty($_FILES['weixin_cert_file']['name'])){
-                $sec['cert'] = $this->upload_cert('weixin_cert_file');
-            }
-            if (!empty($_FILES['weixin_key_file']['name'])){
-                $sec['key'] = $this->upload_cert('weixin_key_file');
-            }
-            if (!empty($_FILES['weixin_root_file']['name'])){
-                $sec['root'] = $this->upload_cert('weixin_root_file');
-            }
-            $update['sets']    =   serialize($data);
-            if(!empty($sec)){
-                $update['sec'] =   serialize($sec);
-            }
+            $set['pay']['weixin'] = $data['pay']['weixin'];
+            $set['pay']['credit'] = $data['pay']['credit'];
+            $set['pay']['cash']   = $data['pay']['cash'];
+            $set['wechat']['account_name'] =  $data['wechat']['account_name'];
+            $set['wechat']['appid']        =  $data['wechat']['appid'];
+            $set['wechat']['secret']       =  $data['wechat']['secret'];
+            $set['wechat']['key']          =  $data['wechat']['key'];
+            $set['wechat']['mchid']        =  $data['wechat']['mchid'];
+            $set['wechat']['apikey']       =  $data['wechat']['apikey'];
+            $update['sets']    =   serialize($set);
             $res = Db::table('sysset')->where(['id' => $sysset['id']])->update($update);
             if($res){
-                $this->success('编辑成功', url('index/pay_set'));
+                $this->success('编辑成功', url('index/pay_wechat'));
             }
             $this->error('编辑失败');
         }
-      
-        $set    = unserialize($sysset['sets']);
-       
-        $sec    = unserialize($sysset['sec']);
-      
-        $this->assign('sec', $sec);
         $this->assign('set', $set);
-        $this->assign('meta_title', '支付方式');
+        $this->assign('meta_title', '微信支付');
         return $this->fetch();
     }
 
     /***
-     * 支付参数
+     * 支付宝
      */
-    public function pay_content(){
-        $sysset     = Db::table('sysset')->field('*')->find();
-        $set        = unserialize($sysset['sets']);
-        $payment    = unserialize($sysset['payment']);
-       
+    public function pay_alipay(){
+        $sysset = Db::table('sysset')->find();
         $set    = unserialize($sysset['sets']);
         if(Request::instance()->isPost()){
-            $patdata = input('post.');
-            if($patdata['pay']['alipay'] == 1){
-                if(empty($patdata['alipay']['appid'])){
-                     $this->error('支付宝appid');
-                }
-                if(empty($patdata['alipay']['partner'])){
-                    $this->error('合作者身份不能为空');
-                }
-                if(empty($patdata['alipay']['secret'])){
-                    $this->error('支付宝校验密钥不能为空');
-                }
-            }
-            if($patdata['pay']['weixin'] == 1){
-                if(empty($patdata['wechat']['appid'])){
-                    $this->error('微信appid不能为空');
-                }
-                if(empty($patdata['wechat']['secret'])){
-                    $this->error('微信secret不能为空');
-                }
-                if(empty($patdata['wechat']['key'])){
-                    $this->error('商户密钥不能为空');
-                }
-                if(empty($patdata['wechat']['account_name'])){
-                    $this->error('微信账户名称不能为空');
-                }
-                if(empty($patdata['wechat']['mchid'])){
-                    $this->error('微信支付商户号不能为空');
-                }
-                if(empty($patdata['wechat']['apikey'])){
-                    $this->error('商户支付密钥不能为空');
-                }
-            }
-            $set['pay']['weixin'] = $patdata['pay']['weixin'];
-            $set['pay']['alipay'] = $patdata['pay']['alipay'];
-            $update['sets']    = serialize($set);
-            unset($patdata['pay']);
-            $update['payment']  = serialize($patdata);
-            $res = Db::table('sysset')->where(['uniacid' => 3])->update($update);
+            $data         = input('post.');
+            $set['pay']['alipay'] = $data['pay']['alipay'];
+            $set['pay']['credit'] = $data['pay']['credit'];
+            $set['pay']['cash']   = $data['pay']['cash'];
+            $set['alipay']['account_name'] =  $data['alipay']['account_name'];
+            $set['alipay']['appid']        =  $data['alipay']['appid'];
+            $set['alipay']['public_key']   =  $data['alipay']['public_key'];
+            $set['alipay']['private_key']  =  $data['alipay']['private_key'];
+            $update['sets']  = serialize($set);
+            $res = Db::table('sysset')->where(['id' => $sysset['id']])->update($update);
             if($res !== false ){
-                $this->success('编辑成功', url('index/pay_content'));
+                $this->success('编辑成功', url('index/pay_alipay'));
             }
             $this->error('编辑失败');
         }
         $this->assign('set', $set);
-        $this->assign('payment', $payment);
-        $this->assign('meta_title', '支付参数');
+        $this->assign('meta_title', '支付宝');
         return $this->fetch();
     }
     /**
@@ -249,34 +203,6 @@ class Index extends Common
         $this->assign('meta_title', '支付交易设置');
         return $this->fetch();
     }
-
-
-
-
-    public function upload_cert($file_name){
-        $dephp_2 = $file_name . '_1.pem';
-        $dephp_4 = $_FILES[$file_name]['name'];
-        $dephp_5 = $_FILES[$file_name]['tmp_name'];
-        if (!empty($dephp_4) && !empty($dephp_5)){
-            $dephp_6 = strtolower(substr($dephp_4, strrpos($dephp_4, '.')));
-            if ($dephp_6 != '.pem'){
-                $dephp_7 = "";
-                if ($file_name == 'weixin_cert_file'){
-                    $dephp_7 = 'CERT文件格式错误';
-                }else if ($file_name == 'weixin_key_file'){
-                    $dephp_7 = 'KEY文件格式错误';
-                }else if ($file_name == 'weixin_root_file'){
-                    $dephp_7 = 'ROOT文件格式错误';
-                }
-                $this->error($dephp_7);
-            }
-            return file_get_contents($dephp_5);
-        }
-        return "";
-    }
-
-
-
 
 
 }
