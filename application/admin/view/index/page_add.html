@@ -1744,7 +1744,10 @@
                 /*（商品组）_ind存在，更换对应的商品*/
                 if(_ind != undefined) {
                     this.changeImg_ind = _ind;
-                }
+                }else {
+					/*关闭按钮=>初始化*/
+					this.changeImg_ind = null;
+				}
                 this.commState = !this.commState;
             },
             /*添加商品弹框--添加商品*/
