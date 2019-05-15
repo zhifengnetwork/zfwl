@@ -6,6 +6,7 @@
 namespace app\api\controller;
 use Payment\Common\PayException;
 use Payment\Client\Charge;
+use Payment\Config as PayConfig;
 use app\common\model\Member as MemberModel;
 use app\common\model\Order;
 
@@ -29,8 +30,8 @@ class Pay extends ApiBase
      */
     public function payment(){
         $order_id     = input('order_id',1401);
-        $pay_type     = input('pay_type',1);//支付方式
-        $user_id      = $this->get_user_id();
+        $pay_type     = input('pay_type',3);//支付方式
+        $user_id      = 50;
         if(!$user_id){
             $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
         }
@@ -48,8 +49,8 @@ class Pay extends ApiBase
     	if($order_info['pay_status'] == 1){
 			$this->ajaxReturn(['status' => -4 , 'msg'=>'此订单，已完成支付!','data'=>'']);
     	}
-        $sysset       = Db::name('sysset')->find();
-        $config       = unserialize($sysset['sets']);
+        // $sysset       = Db::name('sysset')->find();
+        // $config       = unserialize($sysset['sets']);
         $amount       = $order_info['order_amount'];
         $client_ip    = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '127.0.0.1';
         $payData['order_no']        = $order_info['order_sn'];
@@ -93,77 +94,26 @@ class Pay extends ApiBase
                 $this->ajaxReturn(['status' => 0 , 'msg'=>'余额支付失败','data'=>'']);
             }
         }
-
-        try {
-            $url = Transfer::run(Config::ALI_TRANSFER, $config, $payData);
-        } catch (PayException $e) {
-            echo $e->errorMessage();
-            exit;
-        }
+              $pay_config = Config::get('pay_config');
+            try {
+                $url = Charge::run(PayConfig::ALI_CHANNEL_WAP, $pay_config, $payData);
+                $this->ajaxReturn(['status' => 1 , 'msg'=>'请求路径','data'=> $url]);
+            } catch (PayException $e) {
+               $this->ajaxReturn(['status' => 0 , 'msg'=>$e->errorMessage(),'data'=>'']);
+               exit;
+            }
+           
 
     } 
-
-
-
-
-    /**
-     * 微信支付原生charge
-     */
-    public function charge()
-    {
-        $user_id = $this->get_user_id();
-        if(!$user_id){
-            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
-        }
-        $order_id = input('order_id/d',0);
-        //验证是否本人的
-        $order = Db::name('order')->where('order_id',$order_id)->select();
-        if(!$order){
-            $this->ajaxReturn(['status' => -3 , 'msg'=>'订单不存在','data'=>'']);
-        }
-        if($order['0']['user_id']!=$user_id){
-            $this->ajaxReturn(['status' => -2 , 'msg'=>'非本人订单','data'=>'']);
-        }
-
-        $pay_code    = input('pay_code/s','weixinH5');
-        
-    	if($order['pay_status'] == 1){
-			$this->ajaxReturn(['status' => -4 , 'msg'=>'此订单，已完成支付!','data'=>'']);
-    	}
-        
-        //获取微信支付配置
-        $weixin_pay_arr = Config::get('th_wx_config');
-        $app_id     = $weixin_pay_arr['appid'];
-        $app_key    = $weixin_pay_arr['appsecret'];
-        $mch_id     = $weixin_pay_arr['mch_id'];
-        $mch_key    = $weixin_pay_arr['mch_key'];
-        $notify_url = $weixin_pay_arr['notify_url'];
-        $trade_type = $weixin_pay_arr['trade_type'];
-        //第 1 步：定义商户
-        $business = new Business($app_id, $app_key, $mch_id, $mch_key);
-        //第 2 步：定义订单
-        $order               = new Order();
-        $order->body         = $goods['desc'];
-        $order->out_trade_no = $out_trade_no;
-
-        //配送单结算要点-付款需要扣除退款金额
-        $order->total_fee  = $service['price'] * 100;
-        $order->openid     = $openid;
-        $order->notify_url = $notify_url;
-        $order->trade_type = $trade_type;
-        try {
-            //第 3 步：统一下单
-            $unifiedOrder = new UnifiedOrder($business, $order);
-            //第 4 步：生成支付配置文件
-            $payment = new Payment($unifiedOrder);
-            $payment->getConfig();
-        } catch (Exception $e) {
-            $this->ajaxReturn(['status' => 0, 'info' => '支付请求失败:' . $e->getMessage()]);
-        } catch (\Exception $e) {
-            $this->ajaxReturn(['status' => 0, 'info' => '支付请求失败:' . $e->getMessage()]);
-        }
-        $this->ajaxReturn(['status' => 1, 'paytype' => $paytype , 'order_no' => $out_trade_no, 'info' => $payment->getConfig()]);
+    public function alipay_notify(){
+        $get_data = file_get_contents("php://input"); 
+        $result   = json_decode($get_data, true);
+        file_put_contents('log999.php', var_export($result, true)); 
     }
+
+
+
+
 
     /**
      * 微信支付完成回调
