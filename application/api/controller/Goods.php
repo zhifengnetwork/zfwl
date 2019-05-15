@@ -105,6 +105,11 @@ class Goods extends ApiBase
      */
     public function goodsDetail()
     {
+        $user_id = $this->get_user_id();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+        }
+
         $goods_id = input('goods_id');
 
         $goodsRes = Db::table('goods')->alias('g')
@@ -125,7 +130,7 @@ class Goods extends ApiBase
 
         $goodsRes['img'] = Db::table('goods_img')->where('goods_id',$goods_id)->field('picture')->order('main DESC')->select();
         
-        $goodsRes['collection'] = Db::table('collection')->where('goods_id',$goods_id)->find();
+        $goodsRes['collection'] = Db::table('collection')->where('user_id',$user_id)->where('goods_id',$goods_id)->find();
         if($goodsRes['collection']){
             $goodsRes['collection'] = 1;
         }else{

@@ -62,8 +62,13 @@ class Cart extends ApiBase
             $this->ajaxReturn(['status' => -2 , 'msg'=>"超过单次购买数量！同类商品单次只能购买{$goods['single_number']}个",'data'=>'']);
         }
 
-        $order_goods_num = Db::table('order_goods')->where('goods_id',$sku_res['goods_id'])->where('user_id',$user_id)->sum('goods_num');
-
+        $order_goods_num = Db::table('order_goods')->alias('og')
+                            ->join('order o','o.order_id=og.order_id')
+                            ->where('o.order_status','neq',3)
+                            ->where('og.goods_id',$sku_res['goods_id'])
+                            ->where('og.user_id',$user_id)
+                            ->sum('og.goods_num');
+        
         $num =  $cart_number + $order_goods_num;
         if( $num > $goods['most_buy_number'] ){
             $this->ajaxReturn(['status' => -2 , 'msg'=>'超过最多购买量！','data'=>'']);
