@@ -49,17 +49,20 @@ class Coupon extends ApiBase
 
         $where['user_id'] = $user_id;
         if( $type == 1 ){
-            $where['start_time'] = ['<', time()];
-            $where['end_time'] = ['>', time()];
-            $where['is_use'] = 0;
+            $where['c.start_time'] = ['<', time()];
+            $where['c.end_time'] = ['>', time()];
+            $where['cg.is_use'] = 0;
         }else if( $type == 2 ){
-            $where['is_use'] = 1;
+            $where['cg.is_use'] = 1;
         }else if( $type == 3 ){
-            $where['end_time'] = ['<', time()];
-            $where['is_use'] = 0;
+            $where['c.end_time'] = ['<', time()];
+            $where['cg.is_use'] = 0;
         }
 
-        $data = Db::table('coupon_get')->where($where)->select();
+        $data = Db::table('coupon_get')->alias('cg')
+                ->join('coupon c','c.coupon_id=cg.coupon_id','LEFT')
+                ->where($where)->select();
+        
         $this->ajaxReturn(['status' => 1 , 'msg'=>'成功！','data'=>$data]);
     }
 
