@@ -20,6 +20,7 @@ class TestNotify implements PayNotifyInterface
     {
         $channel = $data['channel'];
         if ($channel === Config::ALI_CHARGE) {// 支付宝支付
+            file_put_contents('log25252525.php', var_export($data , true)); 
         } elseif ($channel === Config::WX_CHARGE) {// 微信支付
         } elseif ($channel === Config::CMB_CHARGE) {// 招商支付
         } elseif ($channel === Config::CMB_BIND) {// 招商签约
