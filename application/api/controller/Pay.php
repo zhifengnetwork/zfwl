@@ -108,7 +108,7 @@ class Pay extends ApiBase
                $this->ajaxReturn(['status' => 0 , 'msg'=>$e->errorMessage(),'data'=>'']);
                exit;
             }
-            // header('Location:' . $url);
+             header('Location:' . $url);
            
 
     } 
