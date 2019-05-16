@@ -138,8 +138,8 @@ class Goods extends ApiBase
         }
 
         $where = [];
-        $where['start_time'] = ['<', strtotime(time())];
-        $where['end_time'] = ['>', strtotime(time())];
+        $where['start_time'] = ['<', time()];
+        $where['end_time'] = ['>', time()];
 
         $goodsRes['coupon'] = Db::table('coupon')->where('goods_id',$goods_id)->select();
 
