@@ -77,6 +77,18 @@ class Order extends ApiBase
         }
 
         $data['pay_type'] = $arr;
+
+        $goods_ids = '';
+        foreach($cart_res as $key=>$value){
+            $goods_ids .= ',' . $value['goods_id'];
+        }
+        $goods_ids = ltrim($goods_ids,',');
+
+        $coupon = Db::table('coupon_get')->alias('cg')
+                    ->join('coupon c','c.coupon_id=cg.coupon_id','LEFT')
+                    ->field('c.coupon_id,c.title,c.price,c.start_time,c.end_time')
+                    ->where('c.goods_id','in',$goods_ids)->where('cg.user_id',$user_id)->select();
+        $data['coupon'] = $coupon;
     
         $this->ajaxReturn(['status' => 1 , 'msg'=>'成功','data'=>$data]);
     }
@@ -259,6 +271,15 @@ class Order extends ApiBase
                     $value['status'] = 3;   //待收货
                 }else if( $value['order_status'] == 4 && $value['pay_status'] == 1 && $value['shipping_status'] == 3 ){
                     $value['status'] = 4;   //待评价
+                    
+                    //是否评价
+                    $comment = Db::table('goods_comment')->where('order_id',$value['order_id'])->find();
+                    if($comment){
+                        $value['comment'] = 1;
+                    }else{
+                        $value['comment'] = 0; 
+                    }
+
                 }else if( $value['order_status'] == 3 && $value['pay_status'] == 0 && $value['shipping_status'] == 0 ){
                     $value['status'] = 5;   //已取消
                 }
