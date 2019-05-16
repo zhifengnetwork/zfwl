@@ -137,6 +137,12 @@ class Goods extends ApiBase
             $goodsRes['collection'] = 0;
         }
 
+        $where = [];
+        $where['start_time'] = ['<', strtotime(time())];
+        $where['end_time'] = ['>', strtotime(time())];
+
+        $goodsRes['coupon'] = Db::table('coupon')->where('goods_id',$goods_id)->select();
+
         $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$goodsRes]);
 
     }
