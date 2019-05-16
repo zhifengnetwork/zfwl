@@ -97,7 +97,8 @@ class Pay extends ApiBase
               $pay_config = Config::get('pay_config');
             try {
                 $url = Charge::run(PayConfig::ALI_CHANNEL_WAP, $pay_config, $payData);
-                $this->ajaxReturn(['status' => 1 , 'msg'=>'请求路径','data'=> $url]);
+                header('Location:' . $url);
+                // $this->ajaxReturn(['status' => 1 , 'msg'=>'请求路径','data'=> $url]);
             } catch (PayException $e) {
                $this->ajaxReturn(['status' => 0 , 'msg'=>$e->errorMessage(),'data'=>'']);
                exit;
