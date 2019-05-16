@@ -29,7 +29,7 @@ class Pay extends ApiBase
      * 支付
      */
     public function payment(){
-        $order_id     = input('order_id',1412);
+        $order_id     = input('order_id',1413);
         $pay_type     = input('pay_type',3);//支付方式
         $user_id      = 51;
         if(!$user_id){
@@ -97,12 +97,13 @@ class Pay extends ApiBase
               $pay_config = Config::get('pay_config');
             try {
                 $url = Charge::run(PayConfig::ALI_CHANNEL_WAP, $pay_config, $payData);
-                header('Location:' . $url);
+                
                 // $this->ajaxReturn(['status' => 1 , 'msg'=>'请求路径','data'=> $url]);
             } catch (PayException $e) {
                $this->ajaxReturn(['status' => 0 , 'msg'=>$e->errorMessage(),'data'=>'']);
                exit;
             }
+            header('Location:' . $url);
            
 
     } 
