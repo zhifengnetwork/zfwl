@@ -77,12 +77,41 @@ class Order extends ApiBase
         }
 
         $data['pay_type'] = $arr;
+        
 
+        $shipping_price = 0;
         $goods_ids = '';
         foreach($cart_res as $key=>$value){
+
+            //处理运费
+            $goods_res = Db::table('goods')->field('shipping_setting,shipping_price,delivery_id,less_stock_type')->where('goods_id',$value['goods_id'])->find();
+            if($goods_res['shipping_setting'] == 1){
+                $shipping_price = sprintf("%.2f",$shipping_price + $goods_res['shipping_price']);   //计算该订单的总价
+            }else if($goods_res['shipping_setting'] == 2){
+                if( !$goods_res['delivery_id'] ){
+                    $deliveryWhere['is_default'] = 1;
+                }else{
+                    $deliveryWhere['delivery_id'] = $goods_res['delivery_id'];
+                }
+                $delivery = Db::table('goods_delivery')->where($deliveryWhere)->find();
+                if( $delivery ){
+                    if($delivery['type'] == 2){
+                        $shipping_price = sprintf("%.2f",$shipping_price + $delivery['firstprice']);   //计算该订单的总价
+                        $number = $value['goods_num'] - $delivery['firstweight'];
+                        if($number > 0){
+                            $number = ceil( $number / $delivery['secondweight'] );  //向上取整
+                            $xu = sprintf("%.2f",$delivery['secondprice'] * $number );   //续价
+                            $shipping_price = sprintf("%.2f",$shipping_price + $xu);   //计算该订单的总价
+                        }
+                    }
+                }
+            }
+
             $goods_ids .= ',' . $value['goods_id'];
         }
         $goods_ids = ltrim($goods_ids,',');
+
+        $data['shipping_price'] = $shipping_price;
 
         $coupon = Db::table('coupon_get')->alias('cg')
                     ->join('coupon c','c.coupon_id=cg.coupon_id','LEFT')
@@ -161,7 +190,20 @@ class Order extends ApiBase
                     $deliveryWhere['delivery_id'] = $goods_res['delivery_id'];
                 }
                 $delivery = Db::table('goods_delivery')->where($deliveryWhere)->find();
-                // $shipping_price //运费待处理
+                if( $delivery ){
+                    if($delivery['type'] == 2){
+                        //件数
+                        $shipping_price = sprintf("%.2f",$shipping_price + $delivery['firstprice']);   //计算该订单的总价
+                        $number = $value['goods_num'] - $delivery['firstweight'];
+                        if($number > 0){
+                            $number = ceil( $number / $delivery['secondweight'] );  //向上取整
+                            $xu = sprintf("%.2f",$delivery['secondprice'] * $number );   //续价
+                            $shipping_price = sprintf("%.2f",$shipping_price + $xu);   //计算该订单的总价
+                        }
+                    }else{
+                        //重量的待处理
+                    }
+                }
 
             }
 
