@@ -36,7 +36,7 @@ class Pay extends ApiBase
     public function payment(){
         $order_id     = input('order_id',1413);
         $pay_type     = input('pay_type',3);//支付方式
-        $user_id      = 51;
+        $user_id      = $this->get_user_id();
         if(!$user_id){
             $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
         }
@@ -99,24 +99,35 @@ class Pay extends ApiBase
                 $this->ajaxReturn(['status' => 0 , 'msg'=>'余额支付失败','data'=>'']);
             }
         }
-              $pay_config = Config::get('pay_config');
+               $pay_config = Config::get('pay_config');
             try {
                 $url = Charge::run(PayConfig::ALI_CHANNEL_WAP, $pay_config, $payData);
-                // $this->ajaxReturn(['status' => 1 , 'msg'=>'请求路径','data'=> $url]);
+                $this->ajaxReturn(['status' => 1 , 'msg'=>'请求路径','data'=> $url]);
             } catch (PayException $e) {
                $this->ajaxReturn(['status' => 0 , 'msg'=>$e->errorMessage(),'data'=>'']);
                exit;
             }
-            header('Location:' . $url);
-           
-
+            // header('Location:' . $url);
     } 
+
+    /***
+     * 支付宝回调
+     */
     public function alipay_notify(){
         $callback = new TestNotify();
         $config   = Config::get('pay_config');
-        $type     = 'ali_charge';
-        $ret      = Notify::run($type, $config, $callback);
-        file_put_contents('log8888.php', var_export($ret , true)); 
+        $ret      = Notify::run('ali_charge', $config, $callback);
+        echo  $ret;
+    }
+
+    /***
+     * 微信支付回调
+     */
+    public function weixin_notify(){
+        $callback = new TestNotify();
+        $config   = Config::get('pay_config');
+        $ret      = Notify::run('wx_charge', $config, $callback);
+        echo  $ret;
     }
 
 
