@@ -29,9 +29,9 @@ class Pay extends ApiBase
      * 支付
      */
     public function payment(){
-        $order_id     = input('order_id',1401);
+        $order_id     = input('order_id',1412);
         $pay_type     = input('pay_type',3);//支付方式
-        $user_id      = $this->get_user_id();;
+        $user_id      = 51;
         if(!$user_id){
             $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
         }
@@ -106,10 +106,19 @@ class Pay extends ApiBase
 
     } 
     public function alipay_notify(){
-        // $get_data = file_get_contents("php://input"); 
-        $get_data = input('');
-        $result    = json_decode($get_data, true);
-        file_put_contents('log999.php', var_export($result, true)); 
+        $get_data = file_get_contents("php://input"); 
+
+        if(!empty($get_data)){
+            $result    = json_decode($get_data, true);
+            file_put_contents('log8888.php', var_export($result, true)); 
+        }
+        $input = input('');
+      
+        if(!empty($input)){
+            // $result    = json_decode($input, true);
+            file_put_contents('log9999.php', var_export($input, true)); 
+        }
+    
     }
 
 
