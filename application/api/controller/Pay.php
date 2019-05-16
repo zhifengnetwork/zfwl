@@ -5,7 +5,9 @@
  */
 namespace app\api\controller;
 use Payment\Common\PayException;
+use Payment\Notify\PayNotifyInterface;
 use Payment\Client\Charge;
+use Payment\Client\Notify;
 use Payment\Config as PayConfig;
 use app\common\model\Member as MemberModel;
 use app\common\model\Order;
@@ -108,6 +110,17 @@ class Pay extends ApiBase
 
     } 
     public function alipay_notify(){
+        $type = 'ali_charge';
+        try {
+            $retData = Notify::getNotifyData($type,Config::get('pay_config'));// 获取第三方的原始数据，未进行签名检查
+            file_put_contents('log11111.php', var_export($result, true)); 
+            // /$ret = Notify::run($type, $config, $callback);// 处理回调，内部进行了签名检查
+        } catch (PayException $e) {
+            echo $e->errorMessage();
+            exit;
+        }
+
+        
         $get_data = file_get_contents("php://input"); 
 
         if(!empty($get_data)){
@@ -119,6 +132,19 @@ class Pay extends ApiBase
         if(!empty($input)){
             // $result    = json_decode($input, true);
             file_put_contents('log9999.php', var_export($input, true)); 
+        }
+        $post = input('post.');
+
+        if(!empty($post)){
+            // $result    = json_decode($input, true);
+            file_put_contents('log7777.php', var_export($input, true)); 
+        }
+
+        $get = input('get.');
+
+        if(!empty($get)){
+            // $result    = json_decode($input, true);
+            file_put_contents('log6666.php', var_export($input, true)); 
         }
     
     }
