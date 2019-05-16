@@ -287,7 +287,7 @@ class Order extends ApiBase
         if ($type=='dfh')$where = array('order_status' => 1 ,'pay_status'=>1 ,'shipping_status' =>0); //待发货
         if ($type=='dsh')$where = array('order_status' => 1 ,'pay_status'=>1 ,'shipping_status' =>1); //待收货
         if ($type=='dpj')$where = array('order_status' => 4 ,'pay_status'=>1 ,'shipping_status' =>3); //待评价
-        if ($type=='yqx')$where = array('order_status' => 3 ,'pay_status'=>0 ,'shipping_status' =>0); //已取消
+        if ($type=='yqx')$where = array('order_status' => 3); //已取消
 
 
         $where['o.user_id'] = $user_id;
@@ -326,7 +326,7 @@ class Order extends ApiBase
                 }
             }
         }
-
+        // pred($order_list);
         $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$order_list]);
     }
 

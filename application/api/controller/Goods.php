@@ -142,6 +142,16 @@ class Goods extends ApiBase
         $where['end_time'] = ['>', time()];
 
         $goodsRes['coupon'] = Db::table('coupon')->where('goods_id',$goods_id)->select();
+        if($goodsRes['coupon']){
+            foreach($goodsRes['coupon'] as $key=>$value){
+                $res = Db::table('coupon_get')->where('coupon_id',$value['coupon_id'])->find();
+                if($res){
+                    $goodsRes['coupon'][$key]['is_lq'] = 1;
+                }else{
+                    $goodsRes['coupon'][$key]['is_lq'] = 0;
+                }
+            }
+        }
 
         $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$goodsRes]);
 
