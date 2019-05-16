@@ -61,7 +61,7 @@ class Pay extends ApiBase
         $payData['order_no']        = $order_info['order_sn'];
         $payData['body']            = 'ADS大声地说';
         $payData['timeout_express'] = time() + 600;
-        $payData['amount']          = '0.01';
+        $payData['amount']          = $amount;
         if($pay_type == 3){
               $payData['subject']      = '支付宝支付';
             // $payData['goods_type']   = 1;
@@ -112,16 +112,11 @@ class Pay extends ApiBase
 
     } 
     public function alipay_notify(){
-                $callback   = new TestNotify();
-                $type       = 'ali_charge';
-                $pay_config = Config::get('pay_config');
-
-                $retData = Notify::getNotifyData($type, $pay_config);// 获取第三方的原始数据，未进行签名检查
-                file_put_contents('log123456.php', var_export($retData , true)); 
-        
-                $ret = Notify::run($type, $pay_config, $callback);// 处理回调，内部进行了签名检查
-                file_put_contents('log12345679.php', var_export(13123, true)); 
-                file_put_contents('log12345678.php', var_export($ret, true)); 
+        $callback = new TestNotify();
+        $config   = Config::get('pay_config');
+        $type     = 'ali_charge';
+        $ret      = Notify::run($type, $config, $callback);
+        file_put_contents('log8888.php', var_export($ret , true)); 
     }
 
 

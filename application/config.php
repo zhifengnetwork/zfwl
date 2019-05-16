@@ -283,13 +283,13 @@ return [
     ),
 
     'pay_config' => [
-        'use_sandbox'               => false,// 是否使用沙盒模式
+        'use_sandbox'               =>  false,// 是否使用沙盒模式
         'app_id'                    => '2019050264367537',
         'sign_type'                 => 'RSA2',// RSA  RSA2
     
         // ！！！注意：如果是文件方式，文件中只保留字符串，不要留下 -----BEGIN PUBLIC KEY----- 这种标记
         // 可以填写文件路径，或者密钥字符串  当前字符串是 rsa2 的支付宝公钥(开放平台获取)
-        'ali_public_key'            => 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAjaw+zIeq9IU07mw62+q1xVHGxrUpyGPWchp6oJQIoKx+odn8mAvi8yZvA/idj9cjVJ9Uzv+0isaOSJoI7p19ER9wbDvmvtXDo+bWfPGNRnZTyxzrfRD9PVNvxAyVw+rnCfbG9VhV3mYll0edlCRXJJYJNhf/9jQnTBxmMpZRa0SdH2IxdcDgkf7eFJUzTZudR9oW1zvFcZjV+GVQ8vAenYTNHzWsv21I9o1ErvP0OOb2UGx+DpEW+MEjbYFXHoyqaoUnbGo2HpCkx9LliAehSgrrPKSsHukpQj9A4VRfES5sNQM5nD2ygF4hOFWsxG8E7EXNzCerxTRHjgCsRfZ43QIDAQAB',
+        'ali_public_key'            => 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArLvewr55lEYE7iL7vyZkDjZZnofIwRtMQJNBpBOJX8HSum9igthE0wMyz+YmYV7xq1utIrRLy5Zmt991CYyaOCRnzwqrv8ZlEG38QhSwtXXlnxJiqFF5u81K6DXpFAvHYdyPmcAW/sVWE+5X4S4HFvfCvndN6RGih+YdDjzcVi1uIV1JKQG6q6l8xHRiW7EGtGvJW5Q0DAwZ6VAogKB8PIyvuRrRaO3uPezbYcyAZMOJhqkyR/18ji1W0e0Qf3GNKuF+tHJjOTPJ318LvAcuMwLm6hoscD8G6PYwxAgoZ9auYwtjLBbz8a0aQcIX51WInOXrQOBzIZuLdzggqC+2AQIDAQAB',
     
         // ！！！注意：如果是文件方式，文件中只保留字符串，不要留下 -----BEGIN RSA PRIVATE KEY----- 这种标记
         // 可以填写文件路径，或者密钥字符串  我的沙箱模式，rsa与rsa2的私钥相同，为了方便测试
