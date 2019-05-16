@@ -133,14 +133,17 @@ return [
                 'icon'  => 'fa-th-large',
                 'child' => [
                     [
-                        'id'    => 30102,
+                        'id'    => 30101,
                         'title' => '商品列表',
                         'sort'  => 1,
                         'url'   => 'goods/index',
                         'hide'  => 1,
+                        'child' => [
+                            
+                        ],
                     ],
                     [
-                        'id'    => 30101,
+                        'id'    => 30102,
                         'title' => '添加商品',
                         'sort'  => 2,
                         'url'   => 'goods/add',
@@ -148,14 +151,35 @@ return [
                     ],
                     [
                         'id'    => 30103,
-                        'title' => '配送方式',
+                        'title' => '修改商品',
                         'sort'  => 3,
+                        'url'   => 'goods/edit',
+                        'hide'  => 0,
+                    ],
+                    [
+                        'id'    => 30104,
+                        'title' => '配送方式',
+                        'sort'  => 4,
                         'url'   => 'goods/goods_delivery_list',
                         'hide'  => 1,
                         'icon'  => 'fa-th-large',
                         'child' => [
                             
                         ],
+                    ],
+                    [
+                        'id'    => 30105,
+                        'title' => '添加配送方式',
+                        'sort'  => 0,
+                        'url'   => 'goods/goods_delivery_add',
+                        'hide'  => 0,
+                    ],
+                    [
+                        'id'    => 30106,
+                        'title' => '修改配送方式',
+                        'sort'  => 0,
+                        'url'   => 'goods/goods_delivery_edit',
+                        'hide'  => 0,
                     ],
                 ],
             ],
@@ -176,6 +200,20 @@ return [
                     ],
                     [
                         'id'    => 30302,
+                        'title' => '添加分类',
+                        'sort'  => 2,
+                        'url'   => 'category/add',
+                        'hide'  => 0,
+                    ],
+                    [
+                        'id'    => 30303,
+                        'title' => '修改分类',
+                        'sort'  => 3,
+                        'url'   => 'category/edit',
+                        'hide'  => 0,
+                    ],
+                    [
+                        'id'    => 30304,
                         'title' => '分类层级设置',
                         'sort'  => 2,
                         'url'   => 'category/category_set',
@@ -200,19 +238,58 @@ return [
                     ],
                     [
                         'id'    => 30402,
-                        'title' => '虚拟分类列表',
+                        'title' => '添加虚拟物品模版',
                         'sort'  => 2,
+                        'url'   => 'goods/virtual_goods_add',
+                        'hide'  => 0,
+                    ],
+                    [
+                        'id'    => 30403,
+                        'title' => '虚拟分类列表',
+                        'sort'  => 3,
                         'url'   => 'goods/virtual_category_list',
                         'hide'  => 1,
                         'child' => [
-                            [
-                                'id'    => 30403,
-                                'title' => '添加虚拟分类',
-                                'sort'  => 1,
-                                'url'   => 'goods/virtual_category_add',
-                                'hide'  => 0,
-                            ],
+                            
                         ],
+                    ],
+                    [
+                        'id'    => 30404,
+                        'title' => '添加虚拟分类',
+                        'sort'  => 1,
+                        'url'   => 'goods/virtual_category_add',
+                        'hide'  => 0,
+                    ],
+                ],
+            ],
+            [
+                'id'    => 30500,
+                'title' => '优惠券管理',
+                'sort'  => 5,
+                'url'   => 'goods/coupon_list',
+                'hide'  => 1,
+                'icon'  => 'fa-th-large',
+                'child' => [
+                    [
+                        'id'    => 30501,
+                        'title' => '优惠券列表',
+                        'sort'  => 1,
+                        'url'   => 'goods/coupon_list',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 30502,
+                        'title' => '添加优惠券',
+                        'sort'  => 2,
+                        'url'   => 'goods/coupon_list',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 30503,
+                        'title' => '修改优惠券',
+                        'sort'  => 1,
+                        'url'   => 'goods/coupon_list',
+                        'hide'  => 0,
                     ],
                 ],
             ],
