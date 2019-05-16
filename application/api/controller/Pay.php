@@ -36,7 +36,7 @@ class Pay extends ApiBase
     public function payment(){
         $order_id     = input('order_id',1413);
         $pay_type     = input('pay_type',3);//支付方式
-        $user_id      = $this->get_user_id();
+        $user_id      = 51;
         if(!$user_id){
             $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
         }
@@ -64,10 +64,10 @@ class Pay extends ApiBase
         $payData['amount']          = $amount;
         if($pay_type == 3){
               $payData['subject']      = '支付宝支付';
-            // $payData['goods_type']   = 1;
-            // $payData['return_param'] = '';
-            // $payData['store_id']     = '';
-            // $payData['quit_url']     = '';
+              $payData['goods_type']   = 1;
+              $payData['return_param'] = '';
+              $payData['store_id']     = '';
+              $payData['quit_url']     = '';
         }elseif($pay_type == 2){
             $payData['subject']      = '微信支付';
             $payData['openid']       = $order_info['openid'];
@@ -99,15 +99,19 @@ class Pay extends ApiBase
                 $this->ajaxReturn(['status' => 0 , 'msg'=>'余额支付失败','data'=>'']);
             }
         }
-               $pay_config = Config::get('pay_config');
-            try {
-                $url = Charge::run(PayConfig::ALI_CHANNEL_WAP, $pay_config, $payData);
-                $this->ajaxReturn(['status' => 1 , 'msg'=>'请求路径','data'=> $url]);
-            } catch (PayException $e) {
-               $this->ajaxReturn(['status' => 0 , 'msg'=>$e->errorMessage(),'data'=>'']);
-               exit;
-            }
-            // header('Location:' . $url);
+        //支付方式不同
+        if($pay_type == 3){//支付宝
+            $pay_config = Config::get('pay_config');
+            $url        = Charge::run(PayConfig::ALI_CHANNEL_WAP, $pay_config, $payData);
+        }elseif($pay_type == 2){//微信
+
+        }
+        try {
+            $this->ajaxReturn(['status' => 1 , 'msg'=>'请求路径','data'=> $url]);
+        } catch (PayException $e) {
+            $this->ajaxReturn(['status' => 0 , 'msg'=>$e->errorMessage(),'data'=>'']);
+            exit;
+        }
     } 
 
     /***
