@@ -32,6 +32,6 @@ class Coupon extends Common
         $where['add_time'] = $time;
         $res = Db::table('coupon_get')->insert($where);
 
-        if($res) $this->ajaxReturn(['status' => 1 , 'msg'=>'领取成功！'] ,'data'=>'');
+        if($res) $this->ajaxReturn(['status' => 1 , 'msg'=>'领取成功！' ,'data'=>'']);
     }
 }
