@@ -36,7 +36,7 @@
                         <tr>
                             <td class="col-lg-1 active text-right">订单金额</td>
                             <td class="col-lg-2">
-                                {$order_info.total_amount}
+                                {$order_info.order_amount}
                             </td>
                             <td class="col-lg-1 active text-right">手机号码</td>
                             <td class="col-lg-2">
@@ -56,7 +56,13 @@
                         <tr>
                             <td class="col-lg-1 active text-right">支付方式</td>
                             <td class="col-lg-2">
-                                {$order_info.pay_name}
+                                {switch $order_info.pay_type}
+                                    {case 1}余额支付{/case}
+                                    {case 2}微信支付{/case}
+                                    {case 3}支付宝支付{/case}
+                                    {case 4}货到付款{/case}
+                                    {default /}其他支付
+                                {/switch}
                             </td>
                             <td class="col-lg-1 active text-right">支付时间</td>
                             <td class="col-lg-2">
@@ -115,7 +121,7 @@
                                 <td>余额抵扣-{$order_info.user_money}</td>
                                 <td>优惠券抵扣：-{$order_info.coupon_price}</td>
                                 <td>价格调整：减：{$order_info.discount}</td>
-                                <td>应付：<span style="font-size:17px;color:red">{$order_info.order_amount}</span></td>
+                                <td>应付：<span style="font-size:17px;color:red">{$order_info.total_amount}</span></td>
                                 
                             </tr>
                         </tbody>

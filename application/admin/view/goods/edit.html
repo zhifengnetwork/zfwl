@@ -296,13 +296,9 @@
                             <div class="col-sm-9">
                                 <label style="line-height:34px;float: left;">
                                     <span style="float:left;"><input type="radio" value="1" name="shipping_setting" {if condition="$info.shipping_setting eq 1"} checked {/if} /> 统一运费</span>
-                                    <span style="float:left;width:30%;margin:0 7px;"><input type="text" name="cost_price" value="{$info.cost_price}" class="form-control"></span>
+                                    <span style="float:left;width:30%;margin:0 7px;"><input type="text" name="shipping_price" value="{$info.shipping_price}" class="form-control"></span>
                                     <span style="float:left;">元</span>
                                     
-                                </label>
-                                
-                                <label style="line-height:34px;"><div class="clear"></div>
-                                    <input type="radio" value="2" name="shipping_setting" {if condition="$info.shipping_setting eq 2"} checked {/if} /> 运费模版
                                 </label>
 
                                 <label style="line-height:34px;width: 35%;">
@@ -475,8 +471,8 @@
                         <div class="form-group">
                             <div class="col-sm-4 col-sm-offset-2">
                                 <input type="hidden" name="goods_id" value="{$info.goods_id}" />
-                                <button class="btn btn-white" onclick="javascript:history.back(-1);return false;">取消</button>
                                 <button class="btn btn-primary" type="submit">提交</button>
+                                <button class="btn btn-white" onclick="javascript:history.back(-1);return false;">取消</button>
                             </div>
                         </div>
                     </form>

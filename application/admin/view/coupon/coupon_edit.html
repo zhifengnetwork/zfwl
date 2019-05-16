@@ -129,6 +129,13 @@
                         </div>
 
                         <div class="form-group">
+                            <label class="col-sm-2 control-label">说明</label>
+                            <div class="col-sm-9">
+                                <textarea name="note"  class="form-control" placeholder="说点什么...最少输入0个字符" datatype="*0-100" onkeyup="textarealength(this,100)">{$info.note}</textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
                             <div class="col-sm-4 col-sm-offset-2">
                                 <input type="hidden" name="coupon_id" value="{$info.coupon_id}" />
                                 <button class="btn btn-primary" type="submit">提交</button>
