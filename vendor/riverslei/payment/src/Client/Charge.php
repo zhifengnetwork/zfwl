@@ -55,7 +55,6 @@ class Charge
         } catch (PayException $e) {
             throw $e;
         }
-       
 
         return static::$instance;
     }
@@ -78,7 +77,6 @@ class Charge
             $instance = self::getInstance($channel, $config);
 
             $ret = $instance->charge($metadata);
-        
         } catch (PayException $e) {
             throw $e;
         }
