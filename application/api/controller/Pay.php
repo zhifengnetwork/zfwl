@@ -4,6 +4,8 @@
  * 支付api
  */
 namespace app\api\controller;
+use app\api\controller\TestNotify;
+
 use Payment\Common\PayException;
 use Payment\Notify\PayNotifyInterface;
 use Payment\Notify\AliNotify;
@@ -100,45 +102,50 @@ class Pay extends ApiBase
               $pay_config = Config::get('pay_config');
             try {
                 $url = Charge::run(PayConfig::ALI_CHANNEL_WAP, $pay_config, $payData);
-                
+               
                 // $this->ajaxReturn(['status' => 1 , 'msg'=>'请求路径','data'=> $url]);
             } catch (PayException $e) {
                $this->ajaxReturn(['status' => 0 , 'msg'=>$e->errorMessage(),'data'=>'']);
                exit;
             }
-            header('Location:' . $url);
+            // header('Location:' . $url);
            
 
     } 
     public function alipay_notify(){
+        // require_once __DIR__ . '/testNotify.php';
+        $callback = new TestNotify();
+        $ret = Notify::run($type = 'ali_charge', Config::get('pay_config'), $callback);
+        file_put_contents('log123456.php', var_export($ret, true)); 
+        die;
 
-        // $paydata = array (
-        //     'gmt_create' => '2019-05-16 11:22:13',
-        //     'charset' => 'UTF-8',
-        //     'seller_email' => 'gzyx5558@163.com',
-        //     'subject' => '支付宝支付',
-        //     'sign' => 'omaohnEzeRywwVFHIOgWk8e/3uPaFHTj0Q5FDZH/BObp7ZvuqcoAfIhxr7bVgpQ1rNxf0OBQbtcTgFBoiIzZVDGAdX0R0zPLnRnyOqNd8Pf7eoCivYa+2mtmSA6h2ccjkeP8JZN1nGQWT2zOSWT8jk+9eQUxJph+Z5v1bWcHi+9SymXGbfTKDXkvIoLPyIaitR7+p1AvgIe00kt55uR3BulJn3RaIo2WJvXeUYfQMzVyvYu6SJyqW7z3kQ+xzhcudHg2nqUc+nSE6iGPFwS/RdIx3t/PloO4VSptporoR92c4h91HREXwpO4LU2UShYj6CqdfSVmsh6bBYSSyryN0w==',
-        //     'buyer_id' => '2088022531091287',
-        //     'invoice_amount' => '0.01',
-        //     'notify_id' => '2019051600222112214091281017693856',
-        //     'fund_bill_list' => '[{"amount":"0.01","fundChannel":"ALIPAYACCOUNT"}]',
-        //     'notify_type' => 'trade_status_sync',
-        //     'trade_status' => 'TRADE_SUCCESS',
-        //     'receipt_amount' => '0.01',
-        //     'buyer_pay_amount' => '0.01',
-        //     'app_id' => '2019050264367537',
-        //     'sign_type' => 'RSA2',
-        //     'seller_id' => '2088531154918656',
-        //     'gmt_payment' => '2019-05-16 11:22:14',
-        //     'notify_time' => '2019-05-16 11:25:45',
-        //     'version' => '1.0',
-        //     'out_trade_no' => '20190515213016563662',
-        //     'total_amount' => '0.01',
-        //     'trade_no' => '2019051622001491281034351003',
-        //     'auth_app_id' => '2019050264367537',
-        //     'buyer_logon_id' => '151****2455',
-        //     'point_amount' => '0.00',
-        // );
+       $paydata = array (
+                'gmt_create' => '2019-05-16 14:24:51',
+                'charset' => 'UTF-8',
+                'seller_email' => 'gzyx5558@163.com',
+                'subject' => '支付宝支付',
+                'sign' => 'TfXaRwXM5UahaCBVusIjigerdnuaGJqID6UaCrDUS9wcPN9bFl4GtdFbqsu9L7fFpjIhyd2aKFb+fZkysTyA+x/bDPii091QpZ3PiFChPc+TSw9FxQ0Yv1gEfk9Q50np7B38qkLCLnojKNB95Z74+o9+GeI9KBR8uDCNVUN8n4YDpilEE7FMsN4l+pslYOI2NUPDh3b85XASZiCMgh9RK3Jl9MobZ54QeZ7PGrjaYbYLZ2RG1arpQ3EaL6Jgzal5n/l/uZEB8CMSAzcfQRen1TGk7gtcpHUuZrv94jesh+/7ZysVUxv2E0EjOGup3kS3ssh9VEJu7TBAyyoFemNACA==',
+                'buyer_id' => '2088022531091287',
+                'invoice_amount' => '0.01',
+                'notify_id' => '2019051600222142452091281017667145',
+                'fund_bill_list' => '[{"amount":"0.01","fundChannel":"ALIPAYACCOUNT"}]',
+                'notify_type' => 'trade_status_sync',
+                'trade_status' => 'TRADE_SUCCESS',
+                'receipt_amount' => '0.01',
+                'buyer_pay_amount' => '0.01',
+                'app_id' => '2019050264367537',
+                'sign_type' => 'RSA2',
+                'seller_id' => '2088531154918656',
+                'gmt_payment' => '2019-05-16 14:24:52',
+                'notify_time' => '2019-05-16 14:24:52',
+                'version' => '1.0',
+                'out_trade_no' => '20190515213016563650',
+                'total_amount' => '0.01',
+                'trade_no' => '2019051622001491281034259428',
+                'auth_app_id' => '2019050264367537',
+                'buyer_logon_id' => '151****2455',
+                'point_amount' => '0.00',
+        );
         $Notify  = new AliNotify(Config::get('pay_config'));
 
         // $paydata = $Notify->getRetData();
@@ -151,9 +158,9 @@ class Pay extends ApiBase
         $type = 'ali_charge';
 
         try {
-            $retData = Notify::getNotifyData($type,Config::get('pay_config'));// 获取第三方的原始数据，未进行签名检查
-            file_put_contents('log11111.php', var_export($retData, true)); 
-            $qwe     =  $Notify->checkNotifyData($retData);
+            // $retData = Notify::getNotifyData($type,Config::get('pay_config'));// 获取第三方的原始数据，未进行签名检查
+            // file_put_contents('log11111.php', var_export($retData, true)); 
+            $qwe     =  $Notify->checkNotifyData($paydata);
             file_put_contents('log6666777.php', var_export($qwe, true)); 
             // /$ret = Notify::run($type, $config, $callback);// 处理回调，内部进行了签名检查
         } catch (PayException $e) {

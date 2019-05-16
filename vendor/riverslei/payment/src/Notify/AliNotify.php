@@ -180,6 +180,7 @@ class AliNotify extends NotifyStrategy
         $values = ArrayUtil::paraFilter($values);
         // 3. 对待签名参数数组排序
         $values = ArrayUtil::arraySort($values);
+      
         // 4. 将排序后的参数与其对应值，组合成“参数=参数值”的格式,用&字符连接起来
         $preStr = ArrayUtil::createLinkstring($values);
         

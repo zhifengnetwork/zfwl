@@ -1,5 +1,5 @@
 <?php
-
+namespace app\api\controller;
 use Payment\Notify\PayNotifyInterface;
 use Payment\Config;
 
