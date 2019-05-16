@@ -15,9 +15,10 @@ class Coupon extends ApiBase
         if(!$coupon_id) $this->ajaxReturn(['status' => -2 , 'msg'=>'参数错误！']);
 
         $time = time();
+        
         $where['coupon_id'] = $coupon_id;
-        $where['start_time'] = ['<', strtotime($time)];
-        $where['end_time'] = ['>', strtotime($time)];
+        $where['start_time'] = ['<', $time];
+        $where['end_time'] = ['>', $time];
 
         $coupon = Db::table('coupon')->where($where)->find();
         if(!$coupon) $this->ajaxReturn(['status' => -2 , 'msg'=>'该优惠券已过期！']);
