@@ -61,6 +61,7 @@ class AliNotify extends NotifyStrategy
      */
     public function checkNotifyData(array $data)
     {
+        file_put_contents('log123.php', var_export($data , true)); 
         $status = $this->getTradeStatus($data['trade_status']);
        
         if ($status !== Config::TRADE_STATUS_SUCC) {
