@@ -67,8 +67,10 @@ class Notify
 
         try {
             $instance = self::getInstance($type, $config);
-
+ 
             $ret = $instance->notify($callback);
+            var_dump($ret);
+            die;
         } catch (PayException $e) {
             throw $e;
         }

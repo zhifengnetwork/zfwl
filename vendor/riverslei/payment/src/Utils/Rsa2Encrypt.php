@@ -99,6 +99,7 @@ class Rsa2Encrypt
     {
         // 初始时，使用公钥key
         $res = openssl_get_publickey($this->key);
+       
         if (empty($res)) {
             throw new \Exception('支付宝RSA公钥错误。请检查公钥文件格式是否正确');
         }
