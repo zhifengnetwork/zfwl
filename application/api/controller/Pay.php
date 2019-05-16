@@ -113,7 +113,7 @@ class Pay extends ApiBase
         $type = 'ali_charge';
         try {
             $retData = Notify::getNotifyData($type,Config::get('pay_config'));// 获取第三方的原始数据，未进行签名检查
-            file_put_contents('log11111.php', var_export($result, true)); 
+            file_put_contents('log11111.php', var_export($retData, true)); 
             // /$ret = Notify::run($type, $config, $callback);// 处理回调，内部进行了签名检查
         } catch (PayException $e) {
             echo $e->errorMessage();
