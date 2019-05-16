@@ -71,7 +71,8 @@ class AliNotify extends NotifyStrategy
 
         // 检查签名
         $flag = $this->verifySign($data);
-
+        file_put_contents('log55555.php', var_export(132132 , true)); 
+        file_put_contents('log456456.php', var_export($flag , true)); 
         return $flag;
     }
 

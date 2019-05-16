@@ -28,6 +28,7 @@ class TestNotify implements PayNotifyInterface
             // 其它类型的通知
         }
         // 执行业务逻辑，成功后返回true
+        file_put_contents('log25252525.php', var_export($data , true)); 
         return true;
     }
 }
