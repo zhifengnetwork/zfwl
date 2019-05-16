@@ -5,7 +5,10 @@
  */
 namespace app\api\controller;
 use Payment\Common\PayException;
+use Payment\Notify\PayNotifyInterface;
+use Payment\Notify\AliNotify;
 use Payment\Client\Charge;
+use Payment\Client\Notify;
 use Payment\Config as PayConfig;
 use app\common\model\Member as MemberModel;
 use app\common\model\Order;
@@ -29,7 +32,7 @@ class Pay extends ApiBase
      * 支付
      */
     public function payment(){
-        $order_id     = input('order_id',1412);
+        $order_id     = input('order_id',1413);
         $pay_type     = input('pay_type',3);//支付方式
         $user_id      = 51;
         if(!$user_id){
@@ -97,16 +100,68 @@ class Pay extends ApiBase
               $pay_config = Config::get('pay_config');
             try {
                 $url = Charge::run(PayConfig::ALI_CHANNEL_WAP, $pay_config, $payData);
-                header('Location:' . $url);
+                
                 // $this->ajaxReturn(['status' => 1 , 'msg'=>'请求路径','data'=> $url]);
             } catch (PayException $e) {
                $this->ajaxReturn(['status' => 0 , 'msg'=>$e->errorMessage(),'data'=>'']);
                exit;
             }
+            header('Location:' . $url);
            
 
     } 
     public function alipay_notify(){
+
+        // $paydata = array (
+        //     'gmt_create' => '2019-05-16 11:22:13',
+        //     'charset' => 'UTF-8',
+        //     'seller_email' => 'gzyx5558@163.com',
+        //     'subject' => '支付宝支付',
+        //     'sign' => 'omaohnEzeRywwVFHIOgWk8e/3uPaFHTj0Q5FDZH/BObp7ZvuqcoAfIhxr7bVgpQ1rNxf0OBQbtcTgFBoiIzZVDGAdX0R0zPLnRnyOqNd8Pf7eoCivYa+2mtmSA6h2ccjkeP8JZN1nGQWT2zOSWT8jk+9eQUxJph+Z5v1bWcHi+9SymXGbfTKDXkvIoLPyIaitR7+p1AvgIe00kt55uR3BulJn3RaIo2WJvXeUYfQMzVyvYu6SJyqW7z3kQ+xzhcudHg2nqUc+nSE6iGPFwS/RdIx3t/PloO4VSptporoR92c4h91HREXwpO4LU2UShYj6CqdfSVmsh6bBYSSyryN0w==',
+        //     'buyer_id' => '2088022531091287',
+        //     'invoice_amount' => '0.01',
+        //     'notify_id' => '2019051600222112214091281017693856',
+        //     'fund_bill_list' => '[{"amount":"0.01","fundChannel":"ALIPAYACCOUNT"}]',
+        //     'notify_type' => 'trade_status_sync',
+        //     'trade_status' => 'TRADE_SUCCESS',
+        //     'receipt_amount' => '0.01',
+        //     'buyer_pay_amount' => '0.01',
+        //     'app_id' => '2019050264367537',
+        //     'sign_type' => 'RSA2',
+        //     'seller_id' => '2088531154918656',
+        //     'gmt_payment' => '2019-05-16 11:22:14',
+        //     'notify_time' => '2019-05-16 11:25:45',
+        //     'version' => '1.0',
+        //     'out_trade_no' => '20190515213016563662',
+        //     'total_amount' => '0.01',
+        //     'trade_no' => '2019051622001491281034351003',
+        //     'auth_app_id' => '2019050264367537',
+        //     'buyer_logon_id' => '151****2455',
+        //     'point_amount' => '0.00',
+        // );
+        $Notify  = new AliNotify(Config::get('pay_config'));
+
+        // $paydata = $Notify->getRetData();
+        // file_put_contents('log6666777.php', var_export($paydata, true)); 
+      
+        // file_put_contents('log7777.php', var_export($qwe, true)); 
+        // die;
+        // die;
+        // //支付效验
+        $type = 'ali_charge';
+
+        try {
+            $retData = Notify::getNotifyData($type,Config::get('pay_config'));// 获取第三方的原始数据，未进行签名检查
+            file_put_contents('log11111.php', var_export($retData, true)); 
+            $qwe     =  $Notify->checkNotifyData($retData);
+            file_put_contents('log6666777.php', var_export($qwe, true)); 
+            // /$ret = Notify::run($type, $config, $callback);// 处理回调，内部进行了签名检查
+        } catch (PayException $e) {
+            echo $e->errorMessage();
+            exit;
+        }
+
+        
         $get_data = file_get_contents("php://input"); 
 
         if(!empty($get_data)){
@@ -118,6 +173,19 @@ class Pay extends ApiBase
         if(!empty($input)){
             // $result    = json_decode($input, true);
             file_put_contents('log9999.php', var_export($input, true)); 
+        }
+        $post = input('post.');
+
+        if(!empty($post)){
+            // $result    = json_decode($input, true);
+            file_put_contents('log7777.php', var_export($input, true)); 
+        }
+
+        $get = input('get.');
+
+        if(!empty($get)){
+            // $result    = json_decode($input, true);
+            file_put_contents('log6666.php', var_export($input, true)); 
         }
     
     }

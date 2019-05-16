@@ -62,6 +62,7 @@ class AliNotify extends NotifyStrategy
     public function checkNotifyData(array $data)
     {
         $status = $this->getTradeStatus($data['trade_status']);
+       
         if ($status !== Config::TRADE_STATUS_SUCC) {
             // 如果不是交易成功状态，直接返回错误，
             return false;
@@ -171,6 +172,7 @@ class AliNotify extends NotifyStrategy
     {
         $signType = strtoupper($data['sign_type']);
         $sign = $data['sign'];
+       
 
         // 1. 剔除sign与sign_type参数
         $values = ArrayUtil::removeKeys($data, ['sign', 'sign_type']);
@@ -180,14 +182,12 @@ class AliNotify extends NotifyStrategy
         $values = ArrayUtil::arraySort($values);
         // 4. 将排序后的参数与其对应值，组合成“参数=参数值”的格式,用&字符连接起来
         $preStr = ArrayUtil::createLinkstring($values);
-
+        
         if ($signType === 'RSA') {// 使用rsa方式
             $rsa = new RsaEncrypt($this->config->rsaAliPubKey);
-
             return $rsa->rsaVerify($preStr, $sign);
         } elseif ($signType === 'RSA2') {
             $rsa = new Rsa2Encrypt($this->config->rsaAliPubKey);
-
             return $rsa->rsaVerify($preStr, $sign);
         } else {
             return false;
