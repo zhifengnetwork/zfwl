@@ -248,6 +248,11 @@ class Order extends ApiBase
             }
             unset($order_goods[$key]['less_stock_type']);
         }
+
+        //添加使用优惠券记录
+        if($coupon_price){
+            Db::table('coupon')->where('coupon_id',$coupon_id)->update(['is_use'=>1,'use_time'=>time()]);
+        }
         
         $res = Db::table('order_goods')->insertAll($order_goods);
         if (!empty($res)) {
@@ -360,8 +365,8 @@ class Order extends ApiBase
             'o.twon',//街道
             'o.address',//地址
             'o.coupon_price',//优惠券抵扣
-            'o.order_amount',//应付款金额
-            'o.total_amount',//订单总价
+            'o.order_amount',//订单总价
+            'o.total_amount',//应付款金额
             'o.add_time',//下单时间
             'o.shipping_name',//物流名称
             'o.shipping_price',//物流费用
