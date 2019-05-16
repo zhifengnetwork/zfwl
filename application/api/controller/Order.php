@@ -90,9 +90,11 @@ class Order extends ApiBase
                     ->where('c.goods_id','in',$goods_ids)
                     ->where('cg.user_id',$user_id)
                     ->where('cg.is_use',0)
+                    ->where('c.start_time','<',time())
+                    ->where('c.end_time','>',time())
                     ->select();
         $data['coupon'] = $coupon;
-    
+
         $this->ajaxReturn(['status' => 1 , 'msg'=>'成功','data'=>$data]);
     }
 
@@ -113,9 +115,10 @@ class Order extends ApiBase
         }
         $cart_str = input("cart_id");
         $addr_id = input("address_id");
-        $pay_type = input("pay_type",2);
+        $coupon_id = input("coupon_id");
+        $pay_type = input("pay_type");
         $user_note = input("user_note", '', 'htmlspecialchars');
-        
+
         // 查询地址是否存在
         $AddressM = model('UserAddr');
 
@@ -143,7 +146,10 @@ class Order extends ApiBase
         $shipping_price = '0'; //订单运费
         $i = 0;
         $cart_ids = ''; //提交成功后删掉购物车
+        $goods_ids = '';//商品IDS
         foreach($cart_res as $key=>$value){
+            $goods_ids .= ',' . $value['goods_id'];
+
             //处理运费
             $goods_res = Db::table('goods')->field('shipping_setting,shipping_price,delivery_id,less_stock_type')->where('goods_id',$value['goods_id'])->find();
             if($goods_res['shipping_setting'] == 1){
@@ -179,6 +185,27 @@ class Order extends ApiBase
                 $i++;
             }
         }
+
+        $coupon_price = 0;
+        $goods_ids = ltrim($goods_ids,',');
+        if($coupon_id){
+            $couponRes = Db::table('coupon_get')->alias('cg')
+                    ->join('coupon c','c.coupon_id=cg.coupon_id','LEFT')
+                    ->field('c.coupon_id,c.title,c.price,c.start_time,c.end_time')
+                    ->where('c.goods_id','in',$goods_ids)
+                    ->where('cg.user_id',$user_id)
+                    ->where('cg.is_use',0)
+                    ->where('c.start_time','<',time())
+                    ->where('c.end_time','>',time())
+                    ->select();
+            if($couponRes){
+                foreach($couponRes as $key=>$value){
+                    if($value['coupon_id'] = $coupon_id){
+                        $coupon_price = $value['price'];
+                    }
+                }
+            }
+        }
         
         $cart_ids = ltrim($cart_ids,',');
         
@@ -199,11 +226,17 @@ class Order extends ApiBase
         $orderInfoData['mobile'] = $addr_res['mobile'];
         $orderInfoData['user_note'] = $user_note;       //备注
         $orderInfoData['add_time'] = time();
+        $orderInfoData['coupon_price'] = $coupon_price;     //优惠金额
         $orderInfoData['shipping_price'] = $shipping_price;     //物流费(待完善)
         $orderInfoData['order_amount'] = $order_amount;     //订单金额
-        $orderInfoData['total_amount'] = $order_amount;       //总金额(实付金额)
-        $orderInfoData['coupon_price'] = 0;              //优惠金额
         
+        if($coupon_price){
+            $orderInfoData['coupon_id'] = $coupon_id;
+            $orderInfoData['total_amount'] = sprintf("%.2f",$order_amount - $coupon_price);;       //总金额(实付金额)
+        }else{
+            $orderInfoData['total_amount'] = $order_amount;       //总金额(实付金额)
+        }
+
         $order_id = Db::table('order')->insertGetId($orderInfoData);
         
         // 添加订单商品
