@@ -2,7 +2,7 @@
 namespace app\api\controller;
 use think\Db;
 
-class Coupon extends Common
+class Coupon extends ApiBase
 {   
 
     public function get_coupon(){
