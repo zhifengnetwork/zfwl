@@ -107,7 +107,7 @@ class Pay extends ApiBase
     } 
     public function alipay_notify(){
         // $get_data = file_get_contents("php://input"); 
-        $$get_data = input('');
+        $get_data = input('');
         $result    = json_decode($get_data, true);
         file_put_contents('log999.php', var_export($result, true)); 
     }
