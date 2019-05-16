@@ -6,6 +6,7 @@
 namespace app\api\controller;
 use Payment\Common\PayException;
 use Payment\Notify\PayNotifyInterface;
+use Payment\Notify\AliNotify;
 use Payment\Client\Charge;
 use Payment\Client\Notify;
 use Payment\Config as PayConfig;
@@ -110,7 +111,44 @@ class Pay extends ApiBase
 
     } 
     public function alipay_notify(){
+
+        // $paydata = array (
+        //     'gmt_create' => '2019-05-16 11:22:13',
+        //     'charset' => 'UTF-8',
+        //     'seller_email' => 'gzyx5558@163.com',
+        //     'subject' => '支付宝支付',
+        //     'sign' => 'omaohnEzeRywwVFHIOgWk8e/3uPaFHTj0Q5FDZH/BObp7ZvuqcoAfIhxr7bVgpQ1rNxf0OBQbtcTgFBoiIzZVDGAdX0R0zPLnRnyOqNd8Pf7eoCivYa+2mtmSA6h2ccjkeP8JZN1nGQWT2zOSWT8jk+9eQUxJph+Z5v1bWcHi+9SymXGbfTKDXkvIoLPyIaitR7+p1AvgIe00kt55uR3BulJn3RaIo2WJvXeUYfQMzVyvYu6SJyqW7z3kQ+xzhcudHg2nqUc+nSE6iGPFwS/RdIx3t/PloO4VSptporoR92c4h91HREXwpO4LU2UShYj6CqdfSVmsh6bBYSSyryN0w==',
+        //     'buyer_id' => '2088022531091287',
+        //     'invoice_amount' => '0.01',
+        //     'notify_id' => '2019051600222112214091281017693856',
+        //     'fund_bill_list' => '[{"amount":"0.01","fundChannel":"ALIPAYACCOUNT"}]',
+        //     'notify_type' => 'trade_status_sync',
+        //     'trade_status' => 'TRADE_SUCCESS',
+        //     'receipt_amount' => '0.01',
+        //     'buyer_pay_amount' => '0.01',
+        //     'app_id' => '2019050264367537',
+        //     'sign_type' => 'RSA2',
+        //     'seller_id' => '2088531154918656',
+        //     'gmt_payment' => '2019-05-16 11:22:14',
+        //     'notify_time' => '2019-05-16 11:25:45',
+        //     'version' => '1.0',
+        //     'out_trade_no' => '20190515213016563662',
+        //     'total_amount' => '0.01',
+        //     'trade_no' => '2019051622001491281034351003',
+        //     'auth_app_id' => '2019050264367537',
+        //     'buyer_logon_id' => '151****2455',
+        //     'point_amount' => '0.00',
+        // );
+        $Notify  = new AliNotify(Config::get('pay_config'));
+        $paydata = $Notify  ->getRetData();
+        $qwe     =  $Notify ->checkNotifyData($paydata);
+        file_put_contents('log7777.php', var_export($qwe, true)); 
+        var_dump($qwe);
+        die;
+        die;
+        //支付效验
         $type = 'ali_charge';
+
         try {
             $retData = Notify::getNotifyData($type,Config::get('pay_config'));// 获取第三方的原始数据，未进行签名检查
             file_put_contents('log11111.php', var_export($retData, true)); 
