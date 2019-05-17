@@ -112,7 +112,7 @@ class User extends ApiBase
         //解密token
         $user_id = $this->get_user_id();
         if(!empty($user_id)){
-            $data = Db::name("member")->where('id',$user_id)->field('*')->find();
+            $data = Db::name("member")->where('id',$user_id)->field('mobile,realname,avatar,gender,birthyear,birthmonth,birthday,mailbox')->find();
         }else{
             $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
         }
@@ -130,8 +130,8 @@ class User extends ApiBase
         if($password1 != $password){
             $this->ajaxReturn(['status' => -1 , 'msg'=>'确认密码错误','data'=>'']);
         }
-        $member = Db::name('member')->where('id',$user_id)->field('id,password,mobile,salt')->find();
-
+        $member = Db::name('member')->where('id',$user_id)->field('id,password,pwd,mobile,salt')->find();
+        $type     = input('type');//1登录密码 2支付密码
         $code     = input('code');
         $monile   = $member['mobile'];
         $res      = action('PhoneAuth/phoneAuth',[$mobile,$code]);
@@ -140,11 +140,16 @@ class User extends ApiBase
         }else if( !$res ){
             $this->ajaxReturn(['status' => -2 , 'msg'=>'验证码错误！','data'=>'']);
         }
-        $password = md5($data['salt'] . $password2);
-        if ($password == $member['password']){
+        if($type == 1 ){
+            $stri = 'password';
+        }else{
+            $stri = 'pwd';
+        }
+            $password = md5($data['salt'] . $password2);
+        if ($password == $member[$stri]){
             $this->ajaxReturn(['status' => -1 , 'msg'=>'新密码和旧密码不能相同']);
         }else{
-            $data = array('password'=>$password);
+            $data = array($stri=>$password);
             $update = Db::name('member')->where('id',$user_id)->data($data)->update();
             if($update){
                 $this->ajaxReturn(['status' => 1 , 'msg'=>'修改成功']);
@@ -152,6 +157,28 @@ class User extends ApiBase
                 $this->ajaxReturn(['status' => -1 , 'msg'=>'修改失败']);
             }
         }
+        
+    }
+    /***
+     * 邮箱编辑
+     */
+    public function reset_mailbox(){
+        $user_id = $this->get_user_id();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+        }
+        $mailbox   = input('mailbox');
+        $data = [
+            'mailbox' => $mailbox
+        ];
+        $update = Db::name('member')->where(['id' => $user_id])->data($data)->update();
+        if($update){
+            $this->ajaxReturn(['status' => 1 , 'msg'=>'修改成功']);
+        }else{
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'修改失败']);
+        }
+
+
     }
 
     /**
