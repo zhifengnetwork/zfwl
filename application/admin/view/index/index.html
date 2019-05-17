@@ -367,8 +367,9 @@
 			/*调用轮播插件*/
 			carousel(_res){
 		      for(let l=0;l<_res.length;l++){
-		      	console.log('调用轮播插件:',_res[l].data.id);
-		        if(l==_res[l].key){
+//		      	console.log('调用轮播插件:',_res[l].data.id);
+//				console.log(_res[l].key);
+				console.log(l,66666666666666);
 		          new Swiper('.'+_res[l].data.id+_res[l].key, {
 		            autoplay: {
 					   //自动播放
@@ -396,7 +397,6 @@
 		              }
 		            }
 		          }); 
-		        }
 		      } 
 		    },
 			/*删除，对应-页面data*/
