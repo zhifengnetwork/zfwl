@@ -182,7 +182,7 @@ class Order extends ApiBase
             //处理运费
             $goods_res = Db::table('goods')->field('shipping_setting,shipping_price,delivery_id,less_stock_type')->where('goods_id',$value['goods_id'])->find();
             if($goods_res['shipping_setting'] == 1){
-                $shipping_price = sprintf("%.2f",$shipping_price + $goods_res['shipping_price']);   //计算该订单的总价
+                $shipping_price = sprintf("%.2f",$shipping_price + $goods_res['shipping_price']);   //计算该订单的物流费用
             }else if($goods_res['shipping_setting'] == 2){
                 if( !$goods_res['delivery_id'] ){
                     $deliveryWhere['is_default'] = 1;
@@ -193,12 +193,12 @@ class Order extends ApiBase
                 if( $delivery ){
                     if($delivery['type'] == 2){
                         //件数
-                        $shipping_price = sprintf("%.2f",$shipping_price + $delivery['firstprice']);   //计算该订单的总价
+                        $shipping_price = sprintf("%.2f",$shipping_price + $delivery['firstprice']);   //计算该订单的物流费用
                         $number = $value['goods_num'] - $delivery['firstweight'];
                         if($number > 0){
                             $number = ceil( $number / $delivery['secondweight'] );  //向上取整
                             $xu = sprintf("%.2f",$delivery['secondprice'] * $number );   //续价
-                            $shipping_price = sprintf("%.2f",$shipping_price + $xu);   //计算该订单的总价
+                            $shipping_price = sprintf("%.2f",$shipping_price + $xu);   //计算该订单的物流费用
                         }
                     }else{
                         //重量的待处理

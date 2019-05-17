@@ -21,15 +21,28 @@ class Cart extends ApiBase
         if(!$user_id){
             $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
         }
-        $q = input('q');
 
         $cart_where['user_id'] = $user_id;
         $cartM = model('Cart');
         $cart_res = $cartM->cartList1($cart_where);
-        
+
         $this->ajaxReturn(['status' => 1 , 'msg'=>'成功','data'=>$cart_res]);
     }
 
+    /**
+     * 购物车总数
+     */
+    public function cart_sum(){
+        $user_id = $this->get_user_id();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+        }
+
+        $cart_where['user_id'] = $user_id;
+        $num = Db::table('cart')->where($cart_where)->sum('goods_num');
+
+        $this->ajaxReturn(['status' => 1 , 'msg'=>'成功','data'=>$num]);
+    }
 
     /**
      * 加入 | 修改 购物车
