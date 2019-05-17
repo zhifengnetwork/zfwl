@@ -496,9 +496,16 @@ class Order extends ApiBase
     * 订单商品评论
     */
     public function order_comment(){
-        $s = input('s');
-        $s = json_decode($s);
-        pred($s);
+        $user_id = $this->get_user_id();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+        }
+
+        $comments = input('comments','[{"order_id":"1404","goods_id":18,"sku_id":18,"content":"sadsadsadsadsadas","star_rating":1,"img":["21321321321","23213213213","213123213213"]}]');
+        $comments = json_decode($comments ,true);
+
+
+        pred($comments);
         $this->ajaxReturn(['status' => 1 , 'msg'=>'成功！','data'=>'']);
 
         $order_id = input('order_id');
@@ -528,7 +535,7 @@ class Order extends ApiBase
                             ->join('goods_img gi','gi.goods_id=og.goods_id')
                             ->where('gi.main',1)
                             ->where('og.order_id',$order_id)
-                            ->field('og.goods_id,og.sku_id,og.goods_name,og.goods_num,og.spec_key_name')
+                            ->field('og.goods_id,og.sku_id,og.goods_name,og.goods_num,og.spec_key_name,gi.picture img')
                             ->select();
             $this->ajaxReturn(['status' => 1 , 'msg'=>'成功！','data'=>$order_goods]);
         }else{
