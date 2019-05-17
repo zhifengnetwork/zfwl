@@ -501,10 +501,13 @@ class Order extends ApiBase
             $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
         }
 
-        $comments = input('comments','[{"order_id":"1401","goods_id":18,"sku_id":18,"content":"sadsadsadsadsadas","star_rating":1,"img":["21321321321","23213213213","213123213213"]}]');
+        $comments = input('comments');
         $comments = json_decode($comments ,true);
 
         $order_id = $comments[0]['order_id'];
+
+        $res = Db::table('goods_comment')->where('order_id',$order_id)->find();
+        if($res) $this->ajaxReturn(['status' => -2 , 'msg'=>'此订单您已评论过！','data'=>'']);
 
         $order = Db::table('order')->where('order_id',$order_id)->where('user_id',$user_id)->field('order_status,pay_status,shipping_status')->find();
         if(!$order) $this->ajaxReturn(['status' => -2 , 'msg'=>'订单不存在！','data'=>'']);
@@ -523,7 +526,7 @@ class Order extends ApiBase
             if($order_goods[$key]['goods_id'] == $comments[$key]['goods_id'] && $order_goods[$key]['sku_id'] == $comments[$key]['sku_id']){
                 if(!empty($comments[$key]['img'])){
                     foreach ($comments[$key]['img'] as $k => $val) {
-
+                        $val = explode(',',$val)[1];
                         $saveName = request()->time().rand(0,99999) . '.png';
 
                         $img=base64_decode($val);

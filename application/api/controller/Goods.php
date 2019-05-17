@@ -165,7 +165,7 @@ class Goods extends ApiBase
         $goods_id = input('goods_id');
 
         $comment = Db::table('goods_comment')->alias('gc')
-                ->join('member m','m.id=gc.uid','LEFT')
+                ->join('member m','m.id=gc.user_id','LEFT')
                 ->field('m.mobile,gc.*')
                 ->where('gc.goods_id',$goods_id)
                 ->select();
