@@ -130,10 +130,10 @@ class User extends ApiBase
         if($password1 != $password2){
             $this->ajaxReturn(['status' => -1 , 'msg'=>'确认密码错误','data'=>'']);
         }
-        $member = Db::name('member')->where('id',$user_id)->field('id,password,pwd,mobile,salt')->find();
+        $member = Db::name('member')->where(['id' => $user_id])->field('id,password,pwd,mobile,salt')->find();
         $type     = input('type');//1登录密码 2支付密码
         $code     = input('code');
-        $monile   = $member['mobile'];
+        $mobile   = $member['mobile'];
         $res      = action('PhoneAuth/phoneAuth',[$mobile,$code]);
         if( $res === '-1' ){
             $this->ajaxReturn(['status' => -2 , 'msg'=>'验证码已过期！','data'=>'']);
