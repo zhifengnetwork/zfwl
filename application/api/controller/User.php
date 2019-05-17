@@ -127,7 +127,7 @@ class User extends ApiBase
         }
         $password1   = input('password1');
         $password2   = input('password2');
-        if($password1 != $password){
+        if($password1 != $password2){
             $this->ajaxReturn(['status' => -1 , 'msg'=>'确认密码错误','data'=>'']);
         }
         $member = Db::name('member')->where('id',$user_id)->field('id,password,pwd,mobile,salt')->find();
