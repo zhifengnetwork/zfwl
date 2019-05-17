@@ -29,18 +29,14 @@ class Index extends Common
 
 
     public function page_edit(){
-        $HTTP_REFERER = $_SERVER['HTTP_REFERER'];
         $id  = request()->param('id',0,'intval');
         $this->assign('id',$id);
         $this->assign('meta_title', '页面编辑');
-        $this->assign('HTTP_REFERER',$HTTP_REFERER);
         return $this->fetch();
     }
 
 
     public function page_add(){
-        $HTTP_REFERER = $_SERVER['HTTP_REFERER'];
-        $this->assign('HTTP_REFERER',$HTTP_REFERER);
         $this->assign('meta_title', '页面新增');
         return $this->fetch();
     }
