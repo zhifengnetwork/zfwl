@@ -497,6 +497,7 @@ class Order extends ApiBase
     */
     public function order_comment(){
         $s = input('s');
+        $s = json_decode($s);
         pred($s);
         $this->ajaxReturn(['status' => 1 , 'msg'=>'成功！','data'=>'']);
 
