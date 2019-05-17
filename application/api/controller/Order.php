@@ -506,6 +506,9 @@ class Order extends ApiBase
 
         $order_id = $comments[0]['order_id'];
 
+        $res = Db::table('goods_comment')->where('order_id',$order_id)->find();
+        if(!$res) $this->ajaxReturn(['status' => -2 , 'msg'=>'此订单您已评论过！','data'=>'']);
+
         $order = Db::table('order')->where('order_id',$order_id)->where('user_id',$user_id)->field('order_status,pay_status,shipping_status')->find();
         if(!$order) $this->ajaxReturn(['status' => -2 , 'msg'=>'订单不存在！','data'=>'']);
         
