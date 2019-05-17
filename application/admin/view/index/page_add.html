@@ -1586,6 +1586,7 @@
                 var that = this;
                 var f = even.target.files[0];
                 console.log(f, even.target.files);
+                console.log('当前元素：', even.path[0]);
                 if(f) {
                     fileType = f.type;
                     if(/image\/\w+/.test(fileType)) {
@@ -1608,6 +1609,8 @@
                                     /*图片=>base64、name*/
                                     that.upImages['name'] = f['name'];
                                     that.upImages['baseUrl'] = newImageData;
+                                    /*清空file的值=>相同的图片（重复上传）*/
+                                    even.path[0].value = '';
                                     console.log('压缩:', that.upImages);
                                 }
                             } else {
@@ -1615,6 +1618,7 @@
                                 image.onload = function() {
                                     that.upImages['name'] = f['name'];
                                     that.upImages['baseUrl'] = result;
+                                    even.path[0].value = '';
                                     console.log('未-压缩:', that.upImages);
                                 }
                             }
