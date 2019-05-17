@@ -11,7 +11,7 @@
 // [ 应用入口文件 ]
 define('HTTP_HOST', $_SERVER['HTTP_HOST']);
 
-//http://zfwl.zhifengwangluo.c3w.cc/
+// //http://zfwl.zhifengwangluo.c3w.cc/
 if (preg_match("/(.*)\.(.*)\.c3w\.cc/i", HTTP_HOST, $matches)) {
     $partner = $matches[1];
     $key     = $matches[2];
