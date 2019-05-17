@@ -95,7 +95,7 @@
                                     <div class="form-group">
                                         <label class="control-label" for="status">　</label>
                                         <div>
-                                            <a class="btn btn-primary" href="{:url('admin/order/export')}">导出Excel</a>
+                                            <a class="btn btn-primary" href="{:url('member/index', $exportParam)}">导出Excel</a>
                                         </div>
                                     </div>
                             </div>
@@ -147,7 +147,7 @@
                                         
                             </td>
                             
-                            <td><a href="" title="会员详情" style="color: #376fd5;">
+                            <td><a href="{:url('member/member_edit',['id' => $vo['id']])}" title="会员详情" style="color: #376fd5;">
                                 {if !empty($vo['avatar'])}
                                     <img src='{$vo['avatar']}' style='width:30px;height:30px;padding1px;border:1px solid #ccc' />
                                 {/if}
@@ -160,24 +160,35 @@
                                 <br/>{if empty($vo['groupname'])}无分组{else/}{$vo['groupname']}{/if}
                             </td>
                             <td>{$vo['createtime']|date="y-m-d H:i:s",###}</td>
-                            <td>{$vo['balance']}</td>
-                            <td>{$vo['balance1']}</td>
+                            <td>
+                                {if $vo['balance'] == null}
+                                  0
+                                {else/}
+                                  {$vo['balance']}
+                                {/if}
+                            </td>
+                            <td>
+                                  {if $vo['balance1'] == null}
+                                    0
+                                  {else/}
+                                    {$vo['balance1']}
+                                  {/if}
+                            </td>
                             <td>{$vo['ordercount']}</td>
                             <td>{:floatval($vo['ordermoney'])}</td>
                             
                             <td>
                                 {if $vo['isblack']==1}
                                 <span class="label label-default" style='color:#fff;background:black'>黑名单</span>
-                                {else}
+                                {else/}
                                     {if !($vo.followed)}
                                         {if empty($vo['uid'])}
-                                        <label class='label label-default'>未关注</label>
+                                            <label class='label label-default'>未关注</label>
                                         {else/}
-                                        
-                                        <label class='label label-warning'>取消关注</label>
+                                            <label class='label label-warning'>取消关注</label>
                                         {/if}
                                     {else/}
-                                    <label class='label label-success'>已关注</label>    
+                                        <label class='label label-success'>已关注</label>    
                                     {/if}
                                 {/if}
                             </td>

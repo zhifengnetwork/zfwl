@@ -142,6 +142,7 @@ class Index extends Common
             $set['alipay']['appid']        =  $data['alipay']['appid'];
             $set['alipay']['public_key']   =  $data['alipay']['public_key'];
             $set['alipay']['private_key']  =  $data['alipay']['private_key'];
+            $set['alipay']['notify_url']   =  $data['alipay']['notify_url'];
             $update['sets']  = serialize($set);
             $res = Db::table('sysset')->where(['id' => $sysset['id']])->update($update);
             if($res !== false ){
