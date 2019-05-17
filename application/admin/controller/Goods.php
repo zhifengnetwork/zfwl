@@ -1323,7 +1323,7 @@ class Goods extends Common
         
 
         $list = Db::table('goods_comment')->alias('gc')
-                ->join('member m','m.id=gc.uid','LEFT')
+                ->join('member m','m.id=gc.user_id','LEFT')
                 ->field('gc.*,m.mobile')
                 ->where($where)
                 ->paginate(10,false,$pageParam);
