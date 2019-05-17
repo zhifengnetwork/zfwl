@@ -1972,6 +1972,7 @@
              * id=> 后台获取绑定。
              * **/
             that.backData['page_id'] = {$id};
+            console.log({$HTTP_REFERER},66666);
             console.log('编辑id:',that.backData['page_id']);
             /*axios=>请求-页面数据*/
 			axios.post("{:url('shop/getShopData')}", {
