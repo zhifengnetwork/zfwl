@@ -182,7 +182,7 @@ class Order extends ApiBase
             //处理运费
             $goods_res = Db::table('goods')->field('shipping_setting,shipping_price,delivery_id,less_stock_type')->where('goods_id',$value['goods_id'])->find();
             if($goods_res['shipping_setting'] == 1){
-                $shipping_price = sprintf("%.2f",$shipping_price + $goods_res['shipping_price']);   //计算该订单的总价
+                $shipping_price = sprintf("%.2f",$shipping_price + $goods_res['shipping_price']);   //计算该订单的物流费用
             }else if($goods_res['shipping_setting'] == 2){
                 if( !$goods_res['delivery_id'] ){
                     $deliveryWhere['is_default'] = 1;
@@ -193,12 +193,12 @@ class Order extends ApiBase
                 if( $delivery ){
                     if($delivery['type'] == 2){
                         //件数
-                        $shipping_price = sprintf("%.2f",$shipping_price + $delivery['firstprice']);   //计算该订单的总价
+                        $shipping_price = sprintf("%.2f",$shipping_price + $delivery['firstprice']);   //计算该订单的物流费用
                         $number = $value['goods_num'] - $delivery['firstweight'];
                         if($number > 0){
                             $number = ceil( $number / $delivery['secondweight'] );  //向上取整
                             $xu = sprintf("%.2f",$delivery['secondprice'] * $number );   //续价
-                            $shipping_price = sprintf("%.2f",$shipping_price + $xu);   //计算该订单的总价
+                            $shipping_price = sprintf("%.2f",$shipping_price + $xu);   //计算该订单的物流费用
                         }
                     }else{
                         //重量的待处理
@@ -454,7 +454,7 @@ class Order extends ApiBase
 
         $order['address'] = $order['province'].$order['city'].$order['district'].$order['twon'].$order['address'];
         unset($order['province'],$order['city'],$order['district'],$order['twon']);
-
+        // pred($order);
         $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$order]);
     }
 
@@ -491,4 +491,57 @@ class Order extends ApiBase
 
         $this->ajaxReturn(['status' => 1 , 'msg'=>'成功！','data'=>'']);
     }
+
+    /**
+    * 订单商品评论
+    */
+    public function order_comment(){
+        $user_id = $this->get_user_id();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+        }
+
+        $comments = input('comments','[{"order_id":"1404","goods_id":18,"sku_id":18,"content":"sadsadsadsadsadas","star_rating":1,"img":["21321321321","23213213213","213123213213"]}]');
+        $comments = json_decode($comments ,true);
+
+
+        pred($comments);
+        $this->ajaxReturn(['status' => 1 , 'msg'=>'成功！','data'=>'']);
+
+        $order_id = input('order_id');
+        $goods_id = input('goods_id');
+        $sku_id = input('sku_id');
+        $content = input('content');
+        $star_rating = input('star_rating');
+        $img = input('img');
+    }
+
+    /**
+    * 获取订单商品评论列表
+    */
+    public function order_comment_list(){
+        $user_id = $this->get_user_id();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+        }
+
+        $order_id = input('order_id');
+
+        $order = Db::table('order')->where('order_id',$order_id)->where('user_id',$user_id)->field('order_status,pay_status,shipping_status')->find();
+        if(!$order) $this->ajaxReturn(['status' => -2 , 'msg'=>'订单不存在！','data'=>'']);
+
+        if( $order['order_status'] == 4 && $order['pay_status'] == 1 && $order['shipping_status'] == 3 ){
+            $order_goods = Db::table('order_goods')->alias('og')
+                            ->join('goods_img gi','gi.goods_id=og.goods_id')
+                            ->where('gi.main',1)
+                            ->where('og.order_id',$order_id)
+                            ->field('og.goods_id,og.sku_id,og.goods_name,og.goods_num,og.spec_key_name,gi.picture img')
+                            ->select();
+            $this->ajaxReturn(['status' => 1 , 'msg'=>'成功！','data'=>$order_goods]);
+        }else{
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'参数错误！','data'=>'']);
+        }
+
+    }
+
 }

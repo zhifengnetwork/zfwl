@@ -911,7 +911,7 @@
                     /*(初始页面:false)出现=>编辑模板box*/
                     hide_edit_box: false,
                 },
-
+				
                 /*限制用户axios的连续请求*/
                 axios_state: true,
                 /*选择商品-搜索结果空(提示)*/
@@ -1983,9 +1983,9 @@
         mounted: function() {
         	var that = this;
             /*防止页面未渲染完成--vue的{{变量名}},v-cloak不管用*/
-            this.pageState['hide_var'] = true;
+            that.pageState['hide_var'] = true;
             /**赋值对应的id，用来=>保存对应-页面模板
-             * id=> 后台获取绑定。
+             * id=> 后台获取绑定(默认:0)。
              * **/
             that.backData['page_id'] = {$id};
             console.log('编辑id:',that.backData['page_id']);

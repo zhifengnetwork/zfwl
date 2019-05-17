@@ -1281,7 +1281,7 @@
                 this.dragging = item;
             },
             handleDragEnd(e, item) {
-                this.dragging = null
+                this.dragging = null;
             },
             //首先把div变成可以放置的元素，即重写dragenter/dragover
             handleDragOver(e) {
@@ -1349,8 +1349,7 @@
             scroll_bottom(_ele, _idName) {
                 var that = this;
                 console.log('那个滚动条位置:', _ele);
-                that.$nextTick(() => {
-                    
+                that.$nextTick(() => {                  
                     if(_ele == 'html_box_new') {
                         /*（渲染）滚动条-到达底部*/
                         let phoneH = document.getElementsByClassName('html_box_new')[0];
