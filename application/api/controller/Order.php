@@ -496,7 +496,8 @@ class Order extends ApiBase
     * 订单商品评论
     */
     public function order_comment(){
-        $this->ajaxReturn(['status' => 1 , 'msg'=>'成功！','data'=>'']);;
+        
+        $this->ajaxReturn(['status' => 1 , 'msg'=>'成功！','data'=>'']);
 
         $order_id = input('order_id');
         $goods_id = input('goods_id');
@@ -504,6 +505,34 @@ class Order extends ApiBase
         $content = input('content');
         $star_rating = input('star_rating');
         $img = input('img');
+    }
+
+    /**
+    * 获取订单商品评论列表
+    */
+    public function order_comment_list(){
+        $user_id = $this->get_user_id();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+        }
+
+        $order_id = input('order_id');
+
+        $order = Db::table('order')->where('order_id',$order_id)->where('user_id',$user_id)->field('order_status,pay_status,shipping_status')->find();
+        if(!$order) $this->ajaxReturn(['status' => -2 , 'msg'=>'订单不存在！','data'=>'']);
+
+        if( $order['order_status'] == 4 && $order['pay_status'] == 1 && $order['shipping_status'] == 3 ){
+            $order_goods = Db::table('order_goods')->alias('og')
+                            ->join('goods_img gi','gi.goods_id=og.goods_id')
+                            ->where('gi.main',1)
+                            ->where('og.order_id',$order_id)
+                            ->field('og.goods_id,og.sku_id,og.goods_name,og.goods_num,og.spec_key_name')
+                            ->select();
+            $this->ajaxReturn(['status' => 1 , 'msg'=>'成功！','data'=>$order_goods]);
+        }else{
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'参数错误！','data'=>'']);
+        }
+
     }
 
 }
