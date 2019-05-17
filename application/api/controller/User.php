@@ -112,7 +112,7 @@ class User extends ApiBase
         //解密token
         $user_id = $this->get_user_id();
         if(!empty($user_id)){
-            $data = Db::name("menber")->where('id',$user_id)->field('*')->find();
+            $data = Db::name("member")->where('id',$user_id)->field('*')->find();
         }else{
             $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
         }
