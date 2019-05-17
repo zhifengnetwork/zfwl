@@ -371,7 +371,7 @@ class Order extends ApiBase
                 }
             }
         }
-        // pred($order_list);
+        pred($order_list);
         $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$order_list]);
     }
 
@@ -454,7 +454,7 @@ class Order extends ApiBase
 
         $order['address'] = $order['province'].$order['city'].$order['district'].$order['twon'].$order['address'];
         unset($order['province'],$order['city'],$order['district'],$order['twon']);
-
+        pred($order);
         $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$order]);
     }
 
@@ -491,4 +491,19 @@ class Order extends ApiBase
 
         $this->ajaxReturn(['status' => 1 , 'msg'=>'成功！','data'=>'']);
     }
+
+    /**
+    * 订单商品评论
+    */
+    public function order_comment(){
+        $this->ajaxReturn(['status' => 1 , 'msg'=>'成功！','data'=>'']);;
+
+        $order_id = input('order_id');
+        $goods_id = input('goods_id');
+        $sku_id = input('sku_id');
+        $content = input('content');
+        $star_rating = input('star_rating');
+        $img = input('img');
+    }
+
 }
