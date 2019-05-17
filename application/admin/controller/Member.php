@@ -65,16 +65,63 @@ class Member extends Common
     public function index()
     {
         
+     
+
+        $begin_time      = input('begin_time', '');
+        $end_time        = input('end_time', '');
+        $id              = input('mid','');
+        $kw              = input('realname', '');
+        $followed        = input('followed','');
+        $isblack         = input('isblack', '');
+        $level           = input('level','');
+        $groupid         = input('groupid','');
+        $where = [];
+        if (!empty($id)) {
+            $where['dm.id']    = $id;
+        }
+        if (!empty($followed)) {
+            $where['f.state']   = $followed;
+        }
+        if(!empty($isblack)){
+            $where['dm.isblack'] = $isblack;
+        }
+        if(!empty($level)){
+            $where['dm.level'] = $level;
+        }
+        if(!empty($groupid)){
+            $where['dm.groupid'] = $groupid;
+        }
+
+        if(!empty($kw)){
+            is_numeric($kw)?$where['dm.mobile'] = $kw:$where['dm.realname'] = $kw;
+        }
+        if ($begin_time && $end_time) {
+            $where['dm.createtime'] = [['EGT', strtotime($begin_time)], ['LT', strtotime($end_time)]];
+        } elseif ($begin_time) {
+            $where['dm.createtime'] = ['EGT', strtotime($begin_time)];
+        } elseif ($end_time) {
+            $where['dm.createtime'] = ['LT', strtotime($end_time)];
+        }
         //携带参数
-        $where            = $this->get_where();
-        $list       = MemberModel::alias('dm')
-                        ->field('dm.*,l.levelname,g.groupname,dm.realname,dm.realname as username,dm.nickname as agentnickname,dm.avatar as agentavatar')
-                        ->join("member_group g",'dm.groupid=g.id','LEFT')
-                        ->join("member_level l",'dm.level =l.id','LEFT')
-                        ->join("user f",'f.openid=dm.openid','LEFT')
-                        ->where($where)
-                        ->order('createtime desc')
-                        ->paginate(10, false, ['query' => $where]);
+        $carryParameter = [
+            'kw'               => $kw,
+            'begin_time'       => $begin_time,
+            'end_time'         => $end_time,
+            'mid'              => $id,
+            'followed'         => $followed,
+            'isblack'          => $isblack,
+            'level'            => $level,
+            'groupid'          => $groupid,
+        ];
+        
+        $list  = MemberModel::alias('dm')
+                ->field('dm.*,l.levelname,g.groupname,dm.realname,dm.realname as username,dm.nickname as agentnickname,dm.avatar as agentavatar')
+                ->join("member_group g",'dm.groupid=g.id','LEFT')
+                ->join("member_level l",'dm.level =l.id','LEFT')
+                ->join("user f",'f.openid=dm.openid','LEFT')
+                ->where($where)
+                ->order('createtime desc')
+                ->paginate(10, false, ['query' => $carryParameter]);
                        
         foreach ($list as &$row) {
             $row['levelname']  = empty($row['levelname']) ?  '普通会员' : $row['levelname'];
@@ -86,13 +133,43 @@ class Member extends Common
             $row['balance1']   = MemberModel::getBalance($row['id'],1);//积分
         }
         unset($row);
-        $groups  =  MemberModel::getGroups();
-        $levels  =  MemberModel::getLevels();
-        $this->assign('groups', $groups);
-        $this->assign('levels', $levels);
-        $this->assign('list', $list);
-        $this->assign('meta_title', '会员管理');
-        return $this->fetch();
+
+        // 导出
+        $exportParam            = $carryParameter;
+        $exportParam['tplType'] = 'export';
+        $tplType                = input('tplType', '');
+        if ($tplType == 'export') {
+            $list  = MemberModel::alias('dm')
+                ->field('dm.*,l.levelname,g.groupname,dm.realname,dm.realname as username,dm.nickname as agentnickname,dm.avatar as agentavatar')
+                ->join("member_group g",'dm.groupid=g.id','LEFT')
+                ->join("member_level l",'dm.level =l.id','LEFT')
+                ->join("user f",'f.openid=dm.openid','LEFT')
+                ->where($where)
+                ->order('createtime desc')
+                ->select();
+            $str = "会员id,会员名称\n";
+
+            foreach ($list as $key => $val) {
+                $str .= $val['id'] . ',' . $val['username'] . ',' ;
+                $str .= "\n";
+            }
+            export_to_csv($str, '用户列表', $exportParam);
+        }
+        return $this->fetch('',[ 
+            'levels'         => MemberModel::getLevels(),
+            'groups'         => MemberModel::getGroups(),
+            'list'           => $list,
+            'groupid'        => $groupid,
+            'level'          => $level,
+            'kw'             => $kw,
+            'isblack'        => $isblack,
+            'followed'       => $followed,
+            'id'             => $id,
+            'exportParam'    => $exportParam,
+            'begin_time'     => empty($begin_time)?date('Y-m-d'):$begin_time,
+            'end_time'       => empty($end_time)?date('Y-m-d'):$end_time,
+            'meta_title'     => '会员管理',
+        ]);
     }
 
     private function &get_where()

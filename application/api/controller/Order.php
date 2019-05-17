@@ -371,7 +371,7 @@ class Order extends ApiBase
                 }
             }
         }
-        pred($order_list);
+        
         $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$order_list]);
     }
 
@@ -454,7 +454,7 @@ class Order extends ApiBase
 
         $order['address'] = $order['province'].$order['city'].$order['district'].$order['twon'].$order['address'];
         unset($order['province'],$order['city'],$order['district'],$order['twon']);
-        pred($order);
+        
         $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$order]);
     }
 
@@ -496,14 +496,92 @@ class Order extends ApiBase
     * 订单商品评论
     */
     public function order_comment(){
-        $this->ajaxReturn(['status' => 1 , 'msg'=>'成功！','data'=>'']);;
+        $user_id = $this->get_user_id();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+        }
+
+        $comments = input('comments','[{"order_id":"1401","goods_id":18,"sku_id":18,"content":"sadsadsadsadsadas","star_rating":1,"img":["21321321321","23213213213","213123213213"]}]');
+        $comments = json_decode($comments ,true);
+
+        $order_id = $comments[0]['order_id'];
+
+        $order = Db::table('order')->where('order_id',$order_id)->where('user_id',$user_id)->field('order_status,pay_status,shipping_status')->find();
+        if(!$order) $this->ajaxReturn(['status' => -2 , 'msg'=>'订单不存在！','data'=>'']);
+        
+        if( $order['order_status'] != 4 && $order['pay_status'] != 1 && $order['shipping_status'] != 3 ){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'参数错误！','data'=>'']);
+        }
+
+        $order_goods = Db::table('order_goods')
+                            ->where('order_id',$order_id)
+                            ->field('goods_id,sku_id')
+                            ->select();
+        $time = time();        
+        foreach($order_goods as $key=>$value){
+
+            if($order_goods[$key]['goods_id'] == $comments[$key]['goods_id'] && $order_goods[$key]['sku_id'] == $comments[$key]['sku_id']){
+                if(!empty($comments[$key]['img'])){
+                    foreach ($comments[$key]['img'] as $k => $val) {
+
+                        $saveName = request()->time().rand(0,99999) . '.png';
+
+                        $img=base64_decode($val);
+                        //生成文件夹
+                        $names = "comment" ;
+                        $name = "comment/" .date('Ymd',time()) ;
+                        if (!file_exists(ROOT_PATH .Config('c_pub.img').$names)){ 
+                            mkdir(ROOT_PATH .Config('c_pub.img').$names,0777,true);
+                        }
+                        //保存图片到本地
+                        file_put_contents(ROOT_PATH .Config('c_pub.img').$name.$saveName,$img);
+
+                        // unset($comments[$key]['img'][$k]);
+                        $comments[$key]['img'][$k] = $name.$saveName;
+                    }
+                    $comments[$key]['img'] = implode(',',$comments[$key]['img']);
+                }
+            }else{
+                $this->ajaxReturn(['status' => -2 , 'msg'=>'参数错误！','data'=>'']);
+            }
+            $comments[$key]['add_time'] = $time;
+        }
+
+        $res = Db::table('goods_comment')->insertAll($comments);
+
+        if($res){
+            $this->ajaxReturn(['status' => 1 , 'msg'=>'成功！','data'=>'']);
+        }
+
+        $this->ajaxReturn(['status' => -2 , 'msg'=>'提交失败！','data'=>'']);
+    }
+
+    /**
+    * 获取订单商品评论列表
+    */
+    public function order_comment_list(){
+        $user_id = $this->get_user_id();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+        }
 
         $order_id = input('order_id');
-        $goods_id = input('goods_id');
-        $sku_id = input('sku_id');
-        $content = input('content');
-        $star_rating = input('star_rating');
-        $img = input('img');
+
+        $order = Db::table('order')->where('order_id',$order_id)->where('user_id',$user_id)->field('order_status,pay_status,shipping_status')->find();
+        if(!$order) $this->ajaxReturn(['status' => -2 , 'msg'=>'订单不存在！','data'=>'']);
+
+        if( $order['order_status'] == 4 && $order['pay_status'] == 1 && $order['shipping_status'] == 3 ){
+            $order_goods = Db::table('order_goods')->alias('og')
+                            ->join('goods_img gi','gi.goods_id=og.goods_id')
+                            ->where('gi.main',1)
+                            ->where('og.order_id',$order_id)
+                            ->field('og.goods_id,og.sku_id,og.goods_name,og.goods_num,og.spec_key_name,gi.picture img')
+                            ->select();
+            $this->ajaxReturn(['status' => 1 , 'msg'=>'成功！','data'=>$order_goods]);
+        }else{
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'参数错误！','data'=>'']);
+        }
+
     }
 
 }
