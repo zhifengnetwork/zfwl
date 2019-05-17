@@ -536,7 +536,7 @@ class Order extends ApiBase
                         //保存图片到本地
                         file_put_contents(ROOT_PATH .Config('c_pub.img').$name.$saveName,$img);
 
-                        unset($comments[$key]['img'][$k]);
+                        // unset($comments[$key]['img'][$k]);
                         $comments[$key]['img'][$k] = $name.$saveName;
                     }
                     $comments[$key]['img'] = implode(',',$comments[$key]['img']);

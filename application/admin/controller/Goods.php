@@ -1307,7 +1307,7 @@ class Goods extends Common
                 slog($id);
                 jason([],'删除虚拟分类成功！');
             }else{
-                jason([],'删除虚拟分类成功！',0);
+                jason([],'删除虚拟分类失败！',0);
             }
         }
     }
@@ -1333,6 +1333,21 @@ class Goods extends Common
             'list'          =>  $list,
             'meta_title'    =>  '商品评论列表',
         ]);
+    }
+
+    /**
+     * 删除商品评论
+     */
+    public function comment_del(){
+        $goods_id = input('goods_id');
+
+        if( Db::table('goods_comment')->where('id','=',$id)->delete()){
+            //添加操作日志
+            slog($id);
+            jason([],'删除成功！');
+        }else{
+            jason([],'删除失败！',0);
+        }
     }
 
     /**
