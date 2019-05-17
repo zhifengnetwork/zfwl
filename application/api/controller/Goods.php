@@ -105,6 +105,11 @@ class Goods extends ApiBase
      */
     public function goodsDetail()
     {
+        $user_id = $this->get_user_id();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+        }
+
         $goods_id = input('goods_id');
 
         $goodsRes = Db::table('goods')->alias('g')
@@ -125,11 +130,27 @@ class Goods extends ApiBase
 
         $goodsRes['img'] = Db::table('goods_img')->where('goods_id',$goods_id)->field('picture')->order('main DESC')->select();
         
-        $goodsRes['collection'] = Db::table('collection')->where('goods_id',$goods_id)->find();
+        $goodsRes['collection'] = Db::table('collection')->where('user_id',$user_id)->where('goods_id',$goods_id)->find();
         if($goodsRes['collection']){
             $goodsRes['collection'] = 1;
         }else{
             $goodsRes['collection'] = 0;
+        }
+
+        $where = [];
+        $where['start_time'] = ['<', time()];
+        $where['end_time'] = ['>', time()];
+
+        $goodsRes['coupon'] = Db::table('coupon')->where('goods_id',$goods_id)->select();
+        if($goodsRes['coupon']){
+            foreach($goodsRes['coupon'] as $key=>$value){
+                $res = Db::table('coupon_get')->where('coupon_id',$value['coupon_id'])->find();
+                if($res){
+                    $goodsRes['coupon'][$key]['is_lq'] = 1;
+                }else{
+                    $goodsRes['coupon'][$key]['is_lq'] = 0;
+                }
+            }
         }
 
         $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$goodsRes]);

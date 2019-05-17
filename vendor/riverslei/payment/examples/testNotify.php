@@ -26,7 +26,6 @@ class TestNotify implements PayNotifyInterface
         } else {
             // 其它类型的通知
         }
-
         // 执行业务逻辑，成功后返回true
         return true;
     }

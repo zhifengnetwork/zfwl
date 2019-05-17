@@ -32,6 +32,7 @@ class ApiBase extends Controller
             $action_array[] = strtolower('phoneauth/verifycode');
             $action_array[] = strtolower('user/register');
             $action_array[] = strtolower('user/login');
+            $action_array[] = strtolower('pay/alipay_notify');
             if (in_array($action, $action_array)) {
                 return;
             }

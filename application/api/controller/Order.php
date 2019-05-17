@@ -77,7 +77,53 @@ class Order extends ApiBase
         }
 
         $data['pay_type'] = $arr;
-    
+        
+
+        $shipping_price = 0;
+        $goods_ids = '';
+        foreach($cart_res as $key=>$value){
+
+            //处理运费
+            $goods_res = Db::table('goods')->field('shipping_setting,shipping_price,delivery_id,less_stock_type')->where('goods_id',$value['goods_id'])->find();
+            if($goods_res['shipping_setting'] == 1){
+                $shipping_price = sprintf("%.2f",$shipping_price + $goods_res['shipping_price']);   //计算该订单的总价
+            }else if($goods_res['shipping_setting'] == 2){
+                if( !$goods_res['delivery_id'] ){
+                    $deliveryWhere['is_default'] = 1;
+                }else{
+                    $deliveryWhere['delivery_id'] = $goods_res['delivery_id'];
+                }
+                $delivery = Db::table('goods_delivery')->where($deliveryWhere)->find();
+                if( $delivery ){
+                    if($delivery['type'] == 2){
+                        $shipping_price = sprintf("%.2f",$shipping_price + $delivery['firstprice']);   //计算该订单的总价
+                        $number = $value['goods_num'] - $delivery['firstweight'];
+                        if($number > 0){
+                            $number = ceil( $number / $delivery['secondweight'] );  //向上取整
+                            $xu = sprintf("%.2f",$delivery['secondprice'] * $number );   //续价
+                            $shipping_price = sprintf("%.2f",$shipping_price + $xu);   //计算该订单的总价
+                        }
+                    }
+                }
+            }
+
+            $goods_ids .= ',' . $value['goods_id'];
+        }
+        $goods_ids = ltrim($goods_ids,',');
+
+        $data['shipping_price'] = $shipping_price;
+
+        $coupon = Db::table('coupon_get')->alias('cg')
+                    ->join('coupon c','c.coupon_id=cg.coupon_id','LEFT')
+                    ->field('c.coupon_id,c.title,c.price,c.start_time,c.end_time')
+                    ->where('c.goods_id','in',$goods_ids)
+                    ->where('cg.user_id',$user_id)
+                    ->where('cg.is_use',0)
+                    ->where('c.start_time','<',time())
+                    ->where('c.end_time','>',time())
+                    ->select();
+        $data['coupon'] = $coupon;
+
         $this->ajaxReturn(['status' => 1 , 'msg'=>'成功','data'=>$data]);
     }
 
@@ -98,9 +144,10 @@ class Order extends ApiBase
         }
         $cart_str = input("cart_id");
         $addr_id = input("address_id");
-        $pay_type = input("pay_type",2);
+        $coupon_id = input("coupon_id");
+        $pay_type = input("pay_type");
         $user_note = input("user_note", '', 'htmlspecialchars');
-        
+
         // 查询地址是否存在
         $AddressM = model('UserAddr');
 
@@ -122,17 +169,20 @@ class Order extends ApiBase
             $this->ajaxReturn(['status' => -2 , 'msg'=>'购物车商品不存在！','data'=>'']);
         }
         
-        $order_amount = ''; //订单价格
+        $order_amount = '0'; //订单价格
         $order_goods = [];  //订单商品
         $sku_goods = [];  //去库存
-        $shipping_price = ''; //订单运费
+        $shipping_price = '0'; //订单运费
         $i = 0;
         $cart_ids = ''; //提交成功后删掉购物车
+        $goods_ids = '';//商品IDS
         foreach($cart_res as $key=>$value){
+            $goods_ids .= ',' . $value['goods_id'];
+
             //处理运费
             $goods_res = Db::table('goods')->field('shipping_setting,shipping_price,delivery_id,less_stock_type')->where('goods_id',$value['goods_id'])->find();
             if($goods_res['shipping_setting'] == 1){
-                $shipping_price = sprintf("%.2f",$shipping_price + $goods_res['shipping_price']);   //计算该订单的总价
+                $shipping_price = sprintf("%.2f",$shipping_price + $goods_res['shipping_price']);   //计算该订单的物流费用
             }else if($goods_res['shipping_setting'] == 2){
                 if( !$goods_res['delivery_id'] ){
                     $deliveryWhere['is_default'] = 1;
@@ -140,7 +190,20 @@ class Order extends ApiBase
                     $deliveryWhere['delivery_id'] = $goods_res['delivery_id'];
                 }
                 $delivery = Db::table('goods_delivery')->where($deliveryWhere)->find();
-                // $shipping_price //运费待处理
+                if( $delivery ){
+                    if($delivery['type'] == 2){
+                        //件数
+                        $shipping_price = sprintf("%.2f",$shipping_price + $delivery['firstprice']);   //计算该订单的物流费用
+                        $number = $value['goods_num'] - $delivery['firstweight'];
+                        if($number > 0){
+                            $number = ceil( $number / $delivery['secondweight'] );  //向上取整
+                            $xu = sprintf("%.2f",$delivery['secondprice'] * $number );   //续价
+                            $shipping_price = sprintf("%.2f",$shipping_price + $xu);   //计算该订单的物流费用
+                        }
+                    }else{
+                        //重量的待处理
+                    }
+                }
 
             }
 
@@ -164,10 +227,33 @@ class Order extends ApiBase
                 $i++;
             }
         }
+
+        $coupon_price = 0;
+        $goods_ids = ltrim($goods_ids,',');
+        if($coupon_id){
+            $couponRes = Db::table('coupon_get')->alias('cg')
+                    ->join('coupon c','c.coupon_id=cg.coupon_id','LEFT')
+                    ->field('c.coupon_id,c.title,c.price,c.start_time,c.end_time')
+                    ->where('c.goods_id','in',$goods_ids)
+                    ->where('cg.user_id',$user_id)
+                    ->where('cg.is_use',0)
+                    ->where('c.start_time','<',time())
+                    ->where('c.end_time','>',time())
+                    ->select();
+            if($couponRes){
+                foreach($couponRes as $key=>$value){
+                    if($value['coupon_id'] = $coupon_id){
+                        $coupon_price = $value['price'];
+                    }
+                }
+            }
+        }
         
         $cart_ids = ltrim($cart_ids,',');
         
         Db::startTrans();
+        $goods_price = $order_amount;
+        $order_amount = sprintf("%.2f",$order_amount + $shipping_price);    //商品价格+物流价格=订单金额
 
         $orderInfoData['order_sn'] = date('YmdHis',time()) . mt_rand(10000000,99999999);
         $orderInfoData['user_id'] = $user_id;
@@ -184,11 +270,18 @@ class Order extends ApiBase
         $orderInfoData['mobile'] = $addr_res['mobile'];
         $orderInfoData['user_note'] = $user_note;       //备注
         $orderInfoData['add_time'] = time();
+        $orderInfoData['coupon_price'] = $coupon_price;     //优惠金额
         $orderInfoData['shipping_price'] = $shipping_price;     //物流费(待完善)
+        $orderInfoData['goods_price'] = $goods_price;     //商品价格
         $orderInfoData['order_amount'] = $order_amount;     //订单金额
-        $orderInfoData['total_amount'] = $order_amount;       //总金额(实付金额)
-        $orderInfoData['coupon_price'] = 0;              //优惠金额
         
+        if($coupon_price){
+            $orderInfoData['coupon_id'] = $coupon_id;
+            $orderInfoData['total_amount'] = sprintf("%.2f",$order_amount - $coupon_price);       //总金额(实付金额)
+        }else{
+            $orderInfoData['total_amount'] = $order_amount;       //总金额(实付金额)
+        }
+
         $order_id = Db::table('order')->insertGetId($orderInfoData);
         
         // 添加订单商品
@@ -199,6 +292,11 @@ class Order extends ApiBase
                 Db::table('goods_sku')->where('sku_id',$value['sku_id'])->setDec('inventory',$value['goods_num']);
             }
             unset($order_goods[$key]['less_stock_type']);
+        }
+
+        //添加使用优惠券记录
+        if($coupon_price){
+            Db::table('coupon')->where('coupon_id',$coupon_id)->update(['is_use'=>1,'use_time'=>time()]);
         }
         
         $res = Db::table('order_goods')->insertAll($order_goods);
@@ -234,7 +332,7 @@ class Order extends ApiBase
         if ($type=='dfh')$where = array('order_status' => 1 ,'pay_status'=>1 ,'shipping_status' =>0); //待发货
         if ($type=='dsh')$where = array('order_status' => 1 ,'pay_status'=>1 ,'shipping_status' =>1); //待收货
         if ($type=='dpj')$where = array('order_status' => 4 ,'pay_status'=>1 ,'shipping_status' =>3); //待评价
-        if ($type=='yqx')$where = array('order_status' => 3 ,'pay_status'=>0 ,'shipping_status' =>0); //已取消
+        if ($type=='yqx')$where = array('order_status' => 3); //已取消
 
 
         $where['o.user_id'] = $user_id;
@@ -259,12 +357,21 @@ class Order extends ApiBase
                     $value['status'] = 3;   //待收货
                 }else if( $value['order_status'] == 4 && $value['pay_status'] == 1 && $value['shipping_status'] == 3 ){
                     $value['status'] = 4;   //待评价
+                    
+                    //是否评价
+                    $comment = Db::table('goods_comment')->where('order_id',$value['order_id'])->find();
+                    if($comment){
+                        $value['comment'] = 1;
+                    }else{
+                        $value['comment'] = 0; 
+                    }
+
                 }else if( $value['order_status'] == 3 && $value['pay_status'] == 0 && $value['shipping_status'] == 0 ){
                     $value['status'] = 5;   //已取消
                 }
             }
         }
-
+        // pred($order_list);
         $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$order_list]);
     }
 
@@ -303,8 +410,8 @@ class Order extends ApiBase
             'o.twon',//街道
             'o.address',//地址
             'o.coupon_price',//优惠券抵扣
-            'o.order_amount',//应付款金额
-            'o.total_amount',//订单总价
+            'o.order_amount',//订单总价
+            'o.total_amount',//应付款金额
             'o.add_time',//下单时间
             'o.shipping_name',//物流名称
             'o.shipping_price',//物流费用
@@ -363,7 +470,7 @@ class Order extends ApiBase
         $order_id = input('order_id');
         $status = input('status');
 
-        if($status != 1 || $status != 3){
+        if($status != 1 && $status != 3 && $status != 4){
             $this->ajaxReturn(['status' => -2 , 'msg'=>'参数错误！','data'=>'']);
         }
 
@@ -377,6 +484,9 @@ class Order extends ApiBase
         }else if( $order['order_status'] == 1 && $order['pay_status'] == 1 && $order['shipping_status'] == 1 ){
             if($status != 3) $this->ajaxReturn(['status' => -2 , 'msg'=>'参数错误！','data'=>'']);
             $res = Db::table('order')->update(['order_id'=>$order_id,'order_status'=>4,'shipping_status'=>3]);
+        }else if( $order['order_status'] == 4 && $order['pay_status'] == 1 && $order['shipping_status'] == 3 ){
+            if($status != 4) $this->ajaxReturn(['status' => -2 , 'msg'=>'参数错误！','data'=>'']);
+            $res = Db::table('order')->where('order_id',$order_id)->delete();
         }
 
         $this->ajaxReturn(['status' => 1 , 'msg'=>'成功！','data'=>'']);
