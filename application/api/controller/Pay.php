@@ -36,7 +36,7 @@ class Pay extends ApiBase
     public function payment(){
         $order_id     = input('order_id',1413);
         $pay_type     = input('pay_type',3);//支付方式
-        $user_id      = 51;
+        $user_id      = $this->get_user_id();
         if(!$user_id){
             $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
         }
@@ -79,12 +79,34 @@ class Pay extends ApiBase
             if($balance_info['balance'] < $order_info['order_amount']){
                 $this->ajaxReturn(['status' => 0 , 'msg'=>'余额不足','data'=>'']);
             }
+            // 启动事务
+            Db::startTrans();
+
             //扣除用户余额
             $balance = [
                 'balance'            =>  Db::raw('balance-'.$amount.''),
             ];
-            Db::table('member_balance')->where(['user_id' => $user_id,'balance_type' => 0])->update($balance);
-            
+            $res =  Db::table('member_balance')->where(['user_id' => $user_id,'balance_type' => 0])->update($balance);
+            if(!$res){
+                Db::rollback();
+            }
+
+            //余额记录
+            $balance_log = [
+                'user_id'      => $user_id,
+                'balance'      => $balance_info['balance'] - $order_info['order_amount'],
+                'balance_type' => $balance_info['balance_type'],
+                'source_type'  => 0,
+                'log_type'     => 0,
+                'source_id'    => $order_info['order_sn'],
+                'note'         => '商品订单消费',
+                'create_time'  => time(),
+                'old_balance'  => $balance_info['balance']
+            ];
+            $res2 = Db::table('menber_balance_log')->insert($balance_log);
+            if(!$res2){
+                Db::rollback();
+            }
             //修改订单状态
             $update = [
                 'order_status' => 1,
@@ -94,8 +116,11 @@ class Pay extends ApiBase
             ];
             $reult = Order::where(['order_id' => $order_id])->update($update);
             if($reult){
+                // 提交事务
+                Db::commit();
                 $this->ajaxReturn(['status' => 1 , 'msg'=>'余额支付成功!','data'=>'']);
             }else{
+                 Db::rollback();
                 $this->ajaxReturn(['status' => 0 , 'msg'=>'余额支付失败','data'=>'']);
             }
         }
@@ -106,6 +131,7 @@ class Pay extends ApiBase
         }elseif($pay_type == 2){//微信
 
         }
+        
         try {
             $this->ajaxReturn(['status' => 1 , 'msg'=>'请求路径','data'=> $url]);
         } catch (PayException $e) {

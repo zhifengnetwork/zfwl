@@ -19,34 +19,98 @@ class Order extends Common
      */
     public function index()
     {
-
-        $params_key       = ['order_status', 'pay_status', 'pay_code', 'kw', 'order_id','invoice_no'];
-
-        //携带参数
-        $where            = $this->get_where($params_key, $param_arr);
-
-       
-        $list             = OrderModel::alias('uo')->field('uo.*,d.order_id as order_idd,d.invoice_no,a.realname')
+        $begin_time        = input('begin_time', '');
+        $end_time          = input('end_time', '');
+        $order_id          = input('order_id', '');
+        $invoice_no        = input('invoice_no', '');
+        $orderstatus       = input('orderstatus',-1);
+        $kw                = input('kw', '');
+        $paycode           = input('paycode', -1);
+        $paystatus         = input('paystatus',-1);
+        $where = [];
+        if (!empty($order_id)) {
+            $where['uo.order_id']    = $order_id;
+        }
+        if (!empty($invoice_no)) {
+            $where['d.invoice_no']   = $invoice_no;
+        }
+        if($orderstatus >= 0){
+            $where['uo.order_status'] = $orderstatus;
+        }
+        if($paycode >= 0){
+            $where['uo.pay_code'] = $paycode;
+        }
+        if($paystatus >= 0){
+            $where['uo.pay_status'] = $paystatus;
+        }
+        if(!empty($kw)){
+            is_numeric($kw)?$where['uo.mobile'] = $kw:$where['a.realname'] = $kw;
+        }
+         // 携带参数
+        $carryParameter = [
+            'kw'               => $kw,
+            'begin_time'       => $begin_time,
+            'end_time'         => $end_time,
+            'invoice_no'       => $invoice_no,
+            'orderstatus'      => $orderstatus,
+            'paycode'          => $paycode,
+            'paystatus'        => $paystatus,
+        ];
+        $list  = OrderModel::alias('uo')->field('uo.*,d.order_id as order_idd,d.invoice_no,a.realname')
                 ->join("delivery_doc d",'uo.order_id=d.order_id','LEFT')
                 ->join("member a",'a.id=uo.user_id','LEFT')
                 ->where($where)
                 ->order('uo.order_id DESC')
-                ->paginate(10, false, ['query' => $where]);
-        // 导出设置
-        $param_arr['tpl_type'] = 'export';
-        // 模板变量赋值
-        $this->assign('list', $list);
-        //订单状态
-        $this->assign('order_status', config('ORDER_STATUS'));
-        //支付方式
-        $this->assign('pay_type',config('PAY_TYPE'));
-        //支付状态
-        $this->assign('pay_status',config('PAY_STATUS'));
-        
-        $this->assign('param_arr', $param_arr);
+                ->paginate(10, false, ['query' => $carryParameter]);
 
-        $this->assign('meta_title', '订单列表');
-        return $this->fetch();
+        
+        // 模板变量赋值
+        //订单状态
+        $order_status     = config('ORDER_STATUS');
+        $order_status['-1'] = '默认全部';
+        //支付方式
+        $pay_type         = config('PAY_TYPE');
+        $pay_type['-1']     = '默认全部';
+        //支付状态
+        $pay_status         = config('PAY_STATUS');
+        $pay_status['-1']     = '默认全部';
+
+        // 导出
+        $exportParam            = $carryParameter;
+        $exportParam['tplType'] = 'export';
+        $tplType                = input('tplType', '');
+        if ($tplType == 'export') {
+            $list  = OrderModel::alias('uo')->field('uo.*,d.order_id as order_idd,d.invoice_no,a.realname')
+                ->join("delivery_doc d",'uo.order_id=d.order_id','LEFT')
+                ->join("member a",'a.id=uo.user_id','LEFT')
+                ->where($where)
+                ->order('uo.order_id DESC')
+                ->select();
+            $str = "订单ID,用户id,订单金额\n";
+
+            foreach ($list as $key => $val) {
+                $str .= $val['order_id'] . ',' . $val['user_id'] . ',' . $val['order_amount'] . ',';
+                $str .= "\n";
+            }
+            export_to_csv($str, '订单列表', $exportParam);
+        }
+     
+        return $this->fetch('',[ 
+            'list'         => $list,
+            'exportParam'  => $exportParam,
+            'order_status' => $order_status,
+            'pay_type'     => $pay_type,
+            'pay_status'   => $pay_status,
+            'kw'           => $kw,
+            'invoice_no'   => $invoice_no,
+            'paystatus'    => $paystatus,
+            'orderstatus'  => $orderstatus,
+            'paycode'      => $paycode,
+            'order_id'     => $order_id,
+            'begin_time'   => empty($begin_time)?date('Y-m-d'):$begin_time,
+            'end_time'     => empty($end_time)?date('Y-m-d'):$end_time,
+            'meta_title'   => '订单列表',
+        ]);
       
     }
     
@@ -54,9 +118,9 @@ class Order extends Common
      * 订单详情
      */
     public function edit(){
-        $order_id       = input('order_id','');
-        $orderGoodsMdel = new OrdeGoodsModel();
-        $orderModel     = new OrderModel();
+        $order_id       =  input('order_id','');
+        $orderGoodsMdel =  new OrdeGoodsModel();
+        $orderModel     =  new OrderModel();
         $order_info     =  $orderModel->where(['order_id'=>$order_id])->find();
         $orderGoods     =  $orderGoodsMdel::all(['order_id'=>$order_id,'is_send'=>['lt',2]]);
         
@@ -125,78 +189,6 @@ class Order extends Common
         return $this->fetch();
     }
 
-
-
-
-
-
-    /**
-     * 导出订单
-     */
-    public function export()
-    {
-    
-        try {
-             
-            $begin_time = strtotime(input('begin_time'));
-            $end_time   = strtotime(input('end_time'));
-    
-            $where['uo.create_time'] = array('BETWEEN', "$begin_time, $end_time");
-           //每次导出数据量
-           $perNum   = 10000;
-           //总数据量
-           $totalNum =  Db::table('order')->alias('uo')->where($where)->count();
-           //循环取数据次数
-           $times    = ceil($totalNum / $perNum);
-    
-           $fileName = '订单数据详情-' . date('YmdHi', time());
-          
-            
-            header('Content-Type: application/vnd.ms-execl');
-            header('Content-Disposition: attachment;filename="' . $fileName . '.csv"');
-
-            //以写入追加的方式打开php标准输出流
-            $fp     = fopen('php://output', 'a');
-
-            $title  =  ['订单号','商品名称', '订单金额','最终订单金额', '订单状态','支付状态','支付方式','下单时间','支付时间'];
-            $iconvTitle = array_map( function ($v) { return iconv('UTF-8', 'GBK', $v); }, $title);
-
-            fputcsv($fp, $iconvTitle);
-          
-
-            //分批写入文件
-            for ($i = 1; $i <= $times; $i++) {
-                $list = Db::table('order')->alias('uo')
-                    ->field('uo.id,uo.good_name,uo.price,uo.end_price,uo.status,uo.pid,uo.type,uo.create_time,uo.pay_time')
-                    ->where($where)
-                    ->order('uo.id DESC')
-                    ->limit(($i - 1) * $perNum, $perNum)
-                    ->select();
-                   
-                //转码写入
-                foreach ($list as $key => &$item) {
-                    $item['id']               = $item['id'];
-                    $item['good_name']        = mb_convert_encoding($item['good_name'], "GBK", "UTF-8");;
-                    $item['price']            = $item['price'] ;
-                    $item['end_price']        = $item['end_price'] ;
-                    $item['status']           = mb_convert_encoding($item['status'], "GBK", "UTF-8");
-                    $item['pid']              = $item['pid'];
-                    $item['type']             = mb_convert_encoding($item['type'], "GBK", "UTF-8");
-                    $item['create_time']      = date('Y-m-d H:i:s', $item['create_time']) . "\t";
-                    $item['pay_time']         = date('Y-m-d H:i:s', $item['pay_time']) . "\t";
-                    fputcsv($fp, $item);
-                }
-                //刷新缓冲区
-                ob_flush();
-            }
-        } catch (Exception $e) {
-            pft_log('admin/order/explode', json_encode([$where, $e->getMessage()]));
-            $this->error('导出订单错误: ' . $e->getMessage());
-        }
-
-    }
-
-
     /**
      * 获取where条件，一般用于列表或者筛选，整体项目结构统一
      * TODO: 获取的where对应的表前缀可能有点问题，输入变量与筛选字段的区别，...
@@ -204,16 +196,16 @@ class Order extends Common
      * @param  array &$params_arr 结果参数数组，便于调用处使用
      * @return array              $where
      */
-    private function &get_where($params_key, &$params_arr)
+    private function &get_where()
     {
         $begin_time  = input('begin_time', '');
         $end_time    = input('end_time', '');
         $order_id    = input('order_id', '');
         $invoice_no  = input('invoice_no', '');
-        $order_status      = input('order_status/d',-1);
+        $status      = input('order_status','');
         $kw                = input('kw', '');
-        $pay_code          = input('pay_code/d', -1);
-        $pay_status        = input('pay_status/d', -1);
+        $pay_code          = input('pay_code', '');
+        $pay_status        = input('pay_status', '');
         $where = [];
         if (!empty($order_id)) {
             $where['uo.order_id']    = $order_id;
@@ -221,18 +213,17 @@ class Order extends Common
         if (!empty($invoice_no)) {
             $where['d.invoice_no']   = $invoice_no;
         }
-        if($order_status >= 0){
-            $where['uo.order_status'] = $order_status;
+        if(!empty($status)){
+            $where['uo.order_status'] = $status;
         }
-        if($pay_code >=0){
+        if(!empty($pay_code)){
             $where['uo.pay_code'] = $pay_code;
         }
-        if($pay_status >=  0){
+        if(!empty($pay_status)){
             $where['uo.pay_status'] = $pay_status;
         }
-
-
-
+        // var_dump($where);
+        // die;
         if(!empty($kw)){
             is_numeric($kw)?$where['uo.mobile'] = $kw:$where['a.realname'] = $kw;
         }
@@ -245,44 +236,22 @@ class Order extends Common
         // } elseif ($end_time) {
         //     $where['uo.create_time'] = ['LT', $end_time];
         // }
-        $params_arr = array(
-            'begin_time'      => $begin_time,
-            'end_time'        => $end_time,
-        );
+        // $params_arr = array(
+        //     'begin_time'      => $begin_time,
+        //     'end_time'        => $end_time,
+        // );
         $this->assign('kw', $kw);
         $this->assign('invoice_no', $invoice_no);
-        $this->assign('order_status', $order_status);
+        $this->assign('status', $status);
         $this->assign('pay_status', $pay_status);
         $this->assign('pay_code', $pay_code);
         $this->assign('order_id', $order_id);
         $this->assign('begin_time', empty($begin_time)?date('Y-m-d'):$begin_time);
         $this->assign('end_time', empty($end_time)?date('Y-m-d'):$end_time);
-        $this->assign('params_arr', $params_arr);
+        // $this->assign('params_arr', $params_arr);
         
         return $where;
     }
 
-      /**
-     * 判断登录用户是否有退款的权限
-     * @author dwer
-     * @date   2017-11-06
-     *
-     * @return bool
-     */
-    private function _hasRefundAuth()
-    {
-      if (TERRACE_ID == 1006) {
-          return in_array($this->mginfo['mgid'], Config::get('order_refund_mgid')) ? true : false;
-      } else {
-          return in_array($this->_loginRole,  ['super_manager', 'manager']) ? true : false;
-      }
-    }
-
-
-
-
-
-   
-     
    
 }

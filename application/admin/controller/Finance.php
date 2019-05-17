@@ -22,89 +22,16 @@ class Finance extends Common
      */
     public function balance_logs()
     {
-        // $params_key       = ['shipping_status', 'pay_status',  'kw', 'order_id','good_name'];
-
-        //携带参数
-        $where            = $this->get_where();
-        $list  = Db::name('menber_balance_log')->alias('log')
-            ->field('log.id,m.id as mid, m.realname,m.avatar,m.weixin,log.note,log.source_type,m.nickname,m.mobile,g.groupname,log.old_balance,log.balance,log.create_time,l.levelname')
-            ->join("member m",'m.id=log.user_id','LEFT')
-            ->join("member_group g",'m.groupid=g.id','LEFT')
-            ->join("member_level l",'m.level =l.id','LEFT')
-            ->where($where)
-            ->where(['log.balance_type' => 0])
-            ->order('m.createtime DESC')
-            ->paginate(10, false, ['query' => $where]);
-        // 导出设置
-        $param_arr['tpl_type'] = 'export';
-        // 模板变量赋值
-        $this->assign('list', $list);
-        //充值方式
-        $this->assign('pay_status',config('PAY_STATUS'));
-        $groups  =  MemberModel::getGroups();
-        $levels  =  MemberModel::getLevels();
-        $this->assign('groups', $groups);
-        $this->assign('levels', $levels);
-        $this->assign('param_arr', $param_arr);
-        $this->assign('meta_title', '余额记录');
-        return $this->fetch();
-    }
-
-
-    /**
-     * 积分记录
-     */
-    public function integral_logs()
-    {
-
-        $params_key       = ['shipping_status', 'pay_status',  'kw', 'order_id','good_name'];
-
-        //携带参数
-        $where            = $this->get_where();
-        $list  = Db::name('menber_balance_log')->alias('log')
-            ->field('log.id,m.id as mid, m.realname,m.avatar,m.weixin,log.note,log.source_type,m.nickname,m.mobile,g.groupname,log.old_balance,log.balance,log.create_time,l.levelname')
-            ->join("member m",'m.id=log.user_id','LEFT')
-            ->join("member_group g",'m.groupid=g.id','LEFT')
-            ->join("member_level l",'m.level =l.id','LEFT')
-            ->where($where)
-            ->where(['log.balance_type' => 1])
-            ->order('m.createtime DESC')
-            ->paginate(10, false, ['query' => $where]);
-        // 导出设置
-        $param_arr['tpl_type'] = 'export';
-        // 模板变量赋值
-        $this->assign('list', $list);
-        //充值方式
-        $this->assign('pay_status',config('PAY_STATUS'));
-        $groups  =  MemberModel::getGroups();
-        $levels  =  MemberModel::getLevels();
-        $this->assign('groups', $groups);
-        $this->assign('levels', $levels);
-        $this->assign('param_arr', $param_arr);
-        $this->assign('meta_title', '积分记录');
-        return $this->fetch();
-    }
-
-
-    private function &get_where()
-    {
+        
         $begin_time      = input('begin_time', '');
         $end_time        = input('end_time', '');
-        $logno           = input('logno','');
         $kw              = input('realname', '');
-        $status          = input('status','');
-        $rechargetype    = input('rechargetype', '');
+        $source_type     = input('source_type', '');
         $level           = input('level','');
         $groupid         = input('groupid','');
         $where = [];
-        if (!empty($logno)) {
-            $where['log.logno']    = $logno;
-        }
-        if (!empty($status)) {
-            $where['m.status']   = $status;
-        }
-        if(!empty($rechargetype)){
-            $where['m.recharge_type'] = $rechargetype;
+        if(!empty($source_type)){
+            $where['log.source_type'] = $source_type;
         }
         if(!empty($level)){
             $where['m.level'] = $level;
@@ -123,16 +50,151 @@ class Finance extends Common
         } elseif ($end_time) {
             $where['m.createtime'] = ['LT', strtotime($end_time)];
         }
-        $this->assign('kw', $kw);
-        $this->assign('status', $status);
-        $this->assign('logno', $logno);
-        $this->assign('rechargetype', $rechargetype);
-        $this->assign('level', $level);
-        $this->assign('groupid', $groupid);
-        $this->assign('begin_time', empty($begin_time)?date('Y-m-d'):$begin_time);
-        $this->assign('end_time', empty($end_time)?date('Y-m-d'):$end_time);
-        return $where;
+
+        // 携带参数
+        $carryParameter = [
+            'kw'               => $kw,
+            'level'            => $level,
+            'source_type'      => $source_type,
+            'groupid'          => $groupid,
+            'begin_time'       => $begin_time,
+            'end_time'         => $end_time,
+        ];
+
+        $list  = Db::name('menber_balance_log')->alias('log')
+            ->field('log.id,m.id as mid, log.user_id,m.realname,m.avatar,m.weixin,log.note,log.source_type,m.nickname,m.mobile,g.groupname,log.old_balance,log.balance,log.create_time,l.levelname')
+            ->join("member m",'m.id=log.user_id','LEFT')
+            ->join("member_group g",'m.groupid=g.id','LEFT')
+            ->join("member_level l",'m.level =l.id','LEFT')
+            ->where($where)
+            ->where(['log.balance_type' => 1])
+            ->order('m.createtime DESC')
+            ->paginate(10, false, ['query' => $carryParameter]);
+        // 导出
+        $exportParam            = $carryParameter;
+        $exportParam['tplType'] = 'export';
+        $tplType                = input('tplType', '');
+        if ($tplType == 'export') {
+            $list  = OrderModel::alias('uo')->field('uo.*,d.order_id as order_idd,d.invoice_no,a.realname')
+                ->join("delivery_doc d",'uo.order_id=d.order_id','LEFT')
+                ->join("member a",'a.id=uo.user_id','LEFT')
+                ->where($where)
+                ->order('uo.order_id DESC')
+                ->select();
+            $str = "订单ID,用户id,订单金额\n";
+
+            foreach ($list as $key => $val) {
+                $str .= $val['order_id'] . ',' . $val['user_id'] . ',' . $val['order_amount'] . ',';
+                $str .= "\n";
+            }
+            export_to_csv($str, '余额记录', $exportParam);
+        }
+        // 模板变量赋值
+        return $this->fetch('',[ 
+            'list'         => $list,
+            'exportParam'  => $exportParam,
+            'kw'           => $kw,
+            'level'        => $level,
+            'source_type'  => $source_type,
+            'groups'       => MemberModel::getGroups(),
+            'levels'       => MemberModel::getLevels(),
+            'groupid'      => $groupid,
+            'begin_time'   => empty($begin_time)?date('Y-m-d'):$begin_time,
+            'end_time'     => empty($end_time)?date('Y-m-d'):$end_time,
+            'meta_title'   => '余额记录',
+        ]);
     }
+
+
+    /**
+     * 积分记录
+     */
+    public function integral_logs()
+    {
+
+        $begin_time      = input('begin_time', '');
+        $end_time        = input('end_time', '');
+        $kw              = input('realname', '');
+        $source_type     = input('source_type', '');
+        $level           = input('level','');
+        $groupid         = input('groupid','');
+        $where = [];
+        if(!empty($source_type)){
+            $where['log.source_type'] = $source_type;
+        }
+        if(!empty($level)){
+            $where['m.level'] = $level;
+        }
+        if(!empty($groupid)){
+            $where['m.groupid'] = $groupid;
+        }
+
+        if(!empty($kw)){
+            is_numeric($kw)?$where['m.mobile'] = ['like', "%{$kw}%"]:$where['m.realname'] = ['like', "%{$kw}%"];
+        }
+        if ($begin_time && $end_time) {
+            $where['m.createtime'] = [['EGT', strtotime($begin_time)], ['LT', strtotime($end_time)]];
+        } elseif ($begin_time) {
+            $where['m.createtime'] = ['EGT', strtotime($begin_time)];
+        } elseif ($end_time) {
+            $where['m.createtime'] = ['LT', strtotime($end_time)];
+        }
+
+        // 携带参数
+        $carryParameter = [
+            'kw'               => $kw,
+            'level'            => $level,
+            'source_type'      => $source_type,
+            'groupid'          => $groupid,
+            'begin_time'       => $begin_time,
+            'end_time'         => $end_time,
+        ];
+
+        $list  = Db::name('menber_balance_log')->alias('log')
+            ->field('log.id,log.user_id,m.id as mid, m.realname,m.avatar,m.weixin,log.note,log.source_type,m.nickname,m.mobile,g.groupname,log.old_balance,log.balance,log.create_time,l.levelname')
+            ->join("member m",'m.id=log.user_id','LEFT')
+            ->join("member_group g",'m.groupid=g.id','LEFT')
+            ->join("member_level l",'m.level =l.id','LEFT')
+            ->where($where)
+            ->where(['log.balance_type' => 0])
+            ->order('m.createtime DESC')
+            ->paginate(10, false, ['query' => $carryParameter]);
+        // 导出
+        $exportParam            = $carryParameter;
+        $exportParam['tplType'] = 'export';
+        $tplType                = input('tplType', '');
+        if ($tplType == 'export') {
+            $list  = OrderModel::alias('uo')->field('uo.*,d.order_id as order_idd,d.invoice_no,a.realname')
+                ->join("delivery_doc d",'uo.order_id=d.order_id','LEFT')
+                ->join("member a",'a.id=uo.user_id','LEFT')
+                ->where($where)
+                ->order('uo.order_id DESC')
+                ->select();
+            $str = "订单ID,用户id,订单金额\n";
+
+            foreach ($list as $key => $val) {
+                $str .= $val['order_id'] . ',' . $val['user_id'] . ',' . $val['order_amount'] . ',';
+                $str .= "\n";
+            }
+            export_to_csv($str, '余额记录', $exportParam);
+        }
+        // 模板变量赋值
+        return $this->fetch('',[ 
+            'list'         => $list,
+            'exportParam'  => $exportParam,
+            'kw'           => $kw,
+            'level'        => $level,
+            'source_type'  => $source_type,
+            'groups'       => MemberModel::getGroups(),
+            'levels'       => MemberModel::getLevels(),
+            'groupid'      => $groupid,
+            'begin_time'   => empty($begin_time)?date('Y-m-d'):$begin_time,
+            'end_time'     => empty($end_time)?date('Y-m-d'):$end_time,
+            'meta_title'   => '积分记录',
+        ]);
+    }
+
+
     /***
      * 财务数据
      */
