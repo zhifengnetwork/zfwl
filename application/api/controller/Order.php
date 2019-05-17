@@ -526,7 +526,7 @@ class Order extends ApiBase
             if($order_goods[$key]['goods_id'] == $comments[$key]['goods_id'] && $order_goods[$key]['sku_id'] == $comments[$key]['sku_id']){
                 if(!empty($comments[$key]['img'])){
                     foreach ($comments[$key]['img'] as $k => $val) {
-
+                        $val = explode(',',$val)[1];
                         $saveName = request()->time().rand(0,99999) . '.png';
 
                         $img=base64_decode($val);
