@@ -145,7 +145,7 @@ class User extends ApiBase
         }else{
             $stri = 'pwd';
         }
-            $password = md5($data['salt'] . $password2);
+            $password = md5($member['salt'] . $password2);
         if ($password == $member[$stri]){
             $this->ajaxReturn(['status' => -1 , 'msg'=>'新密码和旧密码不能相同']);
         }else{
