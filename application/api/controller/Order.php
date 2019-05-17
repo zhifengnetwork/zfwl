@@ -496,7 +496,8 @@ class Order extends ApiBase
     * 订单商品评论
     */
     public function order_comment(){
-        
+        $s = input('s');
+        pred($s);
         $this->ajaxReturn(['status' => 1 , 'msg'=>'成功！','data'=>'']);
 
         $order_id = input('order_id');
