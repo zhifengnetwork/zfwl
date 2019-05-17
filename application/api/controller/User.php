@@ -100,8 +100,7 @@ class User extends ApiBase
         unset($data['password'],$data['salt']);
         //重写
         $data['token']    = $this->create_token($data['id']);
-        $ewei = Db::name('diy_ewei_shop')->where(['status' => 1])->find();
-        $data['page_id']  = $ewei['id'];
+    
         $this->ajaxReturn(['status' => 1 , 'msg'=>'登录成功！','data'=>$data]);
     }
 
