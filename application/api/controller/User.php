@@ -216,7 +216,7 @@ class User extends ApiBase
      * +---------------------------------
     */
     public function address_list(){
-        $user_id = $this->get_user_id();
+        $user_id =51;
         if(!$user_id){
             $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
         }
@@ -270,7 +270,7 @@ class User extends ApiBase
     public function edit_address()
     {
         $user_id = $this->get_user_id();
-        $id      = input('id/d');
+        $id      = input('address_id/d');
         $address = Db::name('user_address')->where(array('address_id' => $id, 'user_id' => $user_id))->find();
         if(!$address){
             $this->ajaxReturn(['status' => -1 , 'msg'=>'地址id不存在！','data'=>'']);
@@ -289,7 +289,7 @@ class User extends ApiBase
     public function del_address()
     {
         $user_id = $this->get_user_id();
-        $id      = input('id/d');
+        $id      = input('address_id/d');
         $address = Db::name('user_address')->where(["address_id" => $id])->find();
         if(!$address){
             $this->ajaxReturn(['status' => -1 , 'msg'=>'地址id不存在！','data'=>'']);
@@ -305,7 +305,29 @@ class User extends ApiBase
         else
             $this->ajaxReturn(['status' => -1 , 'msg'=>'删除失败','data'=>'']);
     }
-    
+
+
+   /**
+     * +---------------------------------
+     * 验证支付密码
+     * +---------------------------------
+    */
+    public function check_pwd()
+    {
+        $user_id = $this->get_user_id();
+        $pwd     = input('pwd/d');
+        $member = Db::name('member')->where(["id" => $user_id])->find();
+        if(!$member){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在！','data'=>'']);
+        }
+        $password = md5($member['salt'] . $pwd);
+        if($member['pwd'] !== $password){
+            $this->ajaxReturn(['status' => 1 , 'msg'=>'支付密码错误！','data'=>'']);
+        }
+        $this->ajaxReturn(['status' => 1 , 'msg'=>'密码正确！','data'=>'']);
+
+    }
+
   
 
 }
