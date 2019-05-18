@@ -222,7 +222,7 @@ class User extends ApiBase
      * +---------------------------------
     */
     public function get_address(){
-        $user_id = 51;
+        $user_id = $this->get_user_id();
         if(!$user_id){
             $this->ajaxReturn(['status' => -2 , 'msg'=>'用户不存在','data'=>'']);
         }
