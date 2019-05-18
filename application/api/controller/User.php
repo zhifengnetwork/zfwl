@@ -108,15 +108,21 @@ class User extends ApiBase
      * 用户信息
      */
     public function userinfo(){
-        //解密token
+       
         $user_id = $this->get_user_id();
         if(!empty($user_id)){
-            $data = Db::name("member")->where('id',$user_id)->field('mobile,realname,avatar,gender,birthyear,birthmonth,birthday,mailbox')->find();
+            $data = Db::name("member")->alias('m')
+                ->join('user u','m.id=u.uid','LEFT')
+                ->field('m.mobile,m.realname,m.avatar,m.gender,m.birthyear,m.birthmonth,m.birthday,m.mailbox,u.wx_nickname,wx_headimgurl')
+                ->where(['m.id' => $user_id])
+                ->find();
+            if(empty($data['mobile'])){
+                $this->ajaxReturn(['status' => -1 , 'msg'=>'未绑定手机！','data'=>$data]);
+            }
         }else{
             $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
         }
         $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$data]);
-
     }
     
     public function reset_pwd(){//重置密码
@@ -314,9 +320,9 @@ class User extends ApiBase
     */
     public function check_pwd()
     {
-        $user_id = $this->get_user_id();
-        $pwd     = input('pwd/d');
-        $member = Db::name('member')->where(["id" => $user_id])->find();
+        $user_id    = $this->get_user_id();
+        $pwd        = input('pwd/d');
+        $member     = Db::name('member')->where(["id" => $user_id])->find();
         if(!$member){
             $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在！','data'=>'']);
         }
@@ -325,7 +331,6 @@ class User extends ApiBase
             $this->ajaxReturn(['status' => 1 , 'msg'=>'支付密码错误！','data'=>'']);
         }
         $this->ajaxReturn(['status' => 1 , 'msg'=>'密码正确！','data'=>'']);
-
     }
 
   
