@@ -140,7 +140,8 @@ class Goods extends ApiBase
         $where['start_time'] = ['<', time()];
         $where['end_time'] = ['>', time()];
 
-        $goodsRes['coupon'] = Db::table('coupon')->where('goods_id',$goods_id)->select();
+        $goodsRes['coupon'] = Db::table('coupon')->where('goods_id',$goods_id)->whereOr('goods_id',0)->select();
+
         if($goodsRes['coupon']){
             foreach($goodsRes['coupon'] as $key=>$value){
                 $res = Db::table('coupon_get')->where('coupon_id',$value['coupon_id'])->find();
@@ -151,7 +152,7 @@ class Goods extends ApiBase
                 }
             }
         }
-
+        
         $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$goodsRes]);
 
     }
@@ -175,7 +176,7 @@ class Goods extends ApiBase
         
         foreach($comment as $key=>$value ){
 
-            $comment[$key]['mobile'] = substr_cut($value['mobile']);
+            $comment[$key]['mobile'] = $value['mobile'] ? substr_cut($value['mobile']) : '';
 
             if($value['img']){
                 $comment[$key]['img'] = explode(',',$value['img']);

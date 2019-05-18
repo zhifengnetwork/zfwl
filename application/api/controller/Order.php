@@ -177,7 +177,7 @@ class Order extends ApiBase
         $cart_ids = ''; //提交成功后删掉购物车
         $goods_ids = '';//商品IDS
         foreach($cart_res as $key=>$value){
-            $goods_ids .= ',' . $value['goods_id'];
+            $goods_ids .= $value['goods_id'] . ',';
 
             //处理运费
             $goods_res = Db::table('goods')->field('shipping_setting,shipping_price,delivery_id,less_stock_type')->where('goods_id',$value['goods_id'])->find();
@@ -229,7 +229,7 @@ class Order extends ApiBase
         }
 
         $coupon_price = 0;
-        $goods_ids = ltrim($goods_ids,',');
+        $goods_ids = $goods_ids . 0;
         if($coupon_id){
             $couponRes = Db::table('coupon_get')->alias('cg')
                     ->join('coupon c','c.coupon_id=cg.coupon_id','LEFT')
