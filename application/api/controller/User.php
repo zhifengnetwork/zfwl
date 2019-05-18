@@ -396,4 +396,39 @@ class User extends ApiBase
         $this->ajaxReturn(['status' => -2 , 'msg'=>'修改失败','data'=>'']);
     }
 
+
+    /***
+     * 手机号换绑
+     */
+
+    public function change_mobile(){
+
+        $user_id = $this->get_user_id();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -2, 'msg'=>'用户不存在','data'=>'']);
+        }
+       
+        $new_mobile = input('mobile');
+        $res        = action('PhoneAuth/phoneAuth',[$new_mobile,$code]);
+        if( $res === '-1'){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'验证码已过期！','data'=>'']);
+        }else if( !$res ){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'验证码错误！','data'=>'']);
+        }
+        $member = Db::table('member')->where(['id' => $user_id])->find();
+
+        if($member['mobile'] == $new_mobile){
+             $this->ajaxReturn(['status' => -2 , 'msg'=>'手机号不能相同！','data'=>'']);
+        }
+        $res = Db::table('member')->where(['id' => $user_id])->update(['mobile' => $new_mobile]);
+
+        if($res !== false){
+            $this->ajaxReturn(['status' => 1 , 'msg'=>'换绑成功','data'=>'']);
+        }else{
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'换绑失败','data'=>'']);
+        }
+
+    }
+
+
 }
