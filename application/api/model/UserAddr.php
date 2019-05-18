@@ -58,14 +58,21 @@ class UserAddr extends Model
         //检查手机格式
         if($post['consignee'] == '')
             return array('status'=>-2,'msg'=>'收货人不能为空','data'=>'');
-        if (!(($post['province']) > 0)|| !($post['city'] > 0) || !($post['district']>0))
+        if (!($post['district']>0))
             return array('status'=> -2,'msg'=>'所在地区不能为空','data'=>'');
-        if(!$post['address'])
+
+        $district = Db::name('region')->where(['code' => $post['district']])->find();
+        $post['district'] = $regioninfo['area_id'];
+        $city     = Db::name('region')->where(['code' => $district['parent_id']])->find();
+        $post['city']     = $city['area_id'];
+        $province         = Db::name('region')->where(['code' => $city['parent_id']])->find();
+        $post['province'] = $province['area_id'];
+
+
+        if(empty($post['address']))
             return array('status'=>-2,'msg'=>'地址不能为空','data'=>'');
         if(!checkMobile($post['mobile']))
             return array('status'=>-2,'msg'=>'手机号码格式有误','data'=>'');
-            $post['province'] = $post['province']/10000;
-            $post['province'] = $post['city']/100;
 
         //编辑模式
         if($address_id > 0){
