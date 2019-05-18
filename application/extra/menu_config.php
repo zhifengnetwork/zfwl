@@ -792,7 +792,7 @@ return [
                         'id'    => 80201,
                         'title' => '销售统计',
                         'sort'  => 1,
-                        'url'   => '',
+                        'url'   => 'statistics/sales',
                         'hide'  => 1,
                     ],
                     [
