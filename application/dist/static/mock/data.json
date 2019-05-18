@@ -1,0 +1,112 @@
+{
+	"status": 1,
+	"msg": "获取成功",
+	"data": [
+        {
+            "cat_id": 1,
+            "cat_name": "肉类",
+            "pid": 0,
+            "level": 1,
+            "img": "",
+            "is_show": 1,
+            "desc": "",
+            "sort": 1,
+            "children": [{
+                "cat_id": 2,
+                "cat_name": "猪肉",
+                "pid": 1,
+                "level": 2,
+                "img": "category\/20190409155479777888931.png",
+                "is_show": 1,
+                "desc": "",
+                "sort": 1,
+                "children": [{
+                    "cat_id": 8,
+                    "cat_name": "猪头",
+                    "pid": 2,
+                    "level": 3,
+                    "img": "",
+                    "is_show": 1,
+                    "desc": "",
+                    "sort": 1
+                }]
+            }, {
+                "cat_id": 3,
+                "cat_name": "牛肉",
+                "pid": 1,
+                "level": 2,
+                "img": "",
+                "is_show": 1,
+                "desc": "",
+                "sort": 1
+            }, {
+                "cat_id": 4,
+                "cat_name": "羊肉",
+                "pid": 1,
+                "level": 2,
+                "img": "",
+                "is_show": 1,
+                "desc": "",
+                "sort": 1
+            }],
+            "goods": [{
+                "goods_id": 1,
+                "img": "goods\/20190409155479927611857.png",
+                "price": "60.00",
+                "original_price": "80.00",
+                "attr_name": "新上,限时卖",
+                "comment": 2
+            }, {
+                "goods_id": 2,
+                "img": "goods\/20190408155469428273736.png",
+                "price": "50.00",
+                "original_price": "60.00",
+                "attr_name": "热卖,推荐,限时卖",
+                "comment": 3
+            }, {
+                "goods_id": 4,
+                "img": "goods\/20190419155566727664334.png",
+                "price": "30.00",
+                "original_price": "50.00",
+                "attr_name": "包邮,不参与会员折扣",
+                "comment": 5
+            }]
+        }, 
+        {
+            "cat_id": 5,
+            "cat_name": "饮料类",
+            "pid": 0,
+            "level": 1,
+            "img": "",
+            "is_show": 1,
+            "desc": "",
+            "sort": 1,
+            "children": [{
+                "cat_id": 6,
+                "cat_name": "可乐",
+                "pid": 5,
+                "level": 2,
+                "img": "",
+                "is_show": 1,
+                "desc": "",
+                "sort": 1
+            }, {
+                "cat_id": 7,
+                "cat_name": "雪碧",
+                "pid": 5,
+                "level": 2,
+                "img": "",
+                "is_show": 1,
+                "desc": "",
+                "sort": 1
+            }],
+            "goods": [{
+                "goods_id": 3,
+                "img": "goods\/20190408155470939451806.png",
+                "price": "4.00",
+                "original_price": "5.00",
+                "attr_name": "不参与会员折扣,热卖,推荐,促销,新上",
+                "comment": 7
+            }]
+        }]
+}

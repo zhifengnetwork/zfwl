@@ -1,0 +1,103 @@
+@charset "utf-8";
+/*页面底部颜色*/
+body {
+	background-color: #eeeeee;
+}
+/*头部 标题（无背景颜色）*/
+.headWrap {
+	position: relative;
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 9;
+	padding: 0 .3rem;
+	box-sizing: border-box;
+	width: 100%;
+	height: 1.15rem;
+	font: .40rem/1.15rem "微软雅黑";
+	text-align: center;
+	letter-spacing: .03rem;
+	color: #fff;
+	/*background-color: #2284d3;*/
+}
+/*头部背景颜色 =>blue(蓝色)*/
+.headWrapColor {
+	background-color: #1e82d2;
+}
+/*头部背景颜色 =>white(白色)*/
+.headWrapColorWhite {
+	color: #333;
+	background-color: #fff;
+	border-bottom: .02rem solid #f5f5f5;
+}
+/*头部背景颜色 =>white(白色),无底部线*/
+.headWrapColorWhiteNoBorder {
+	color: #333;
+	background-color: #fff;
+}
+/*头部背景颜色 =>orange(橙色)*/
+.headWrapColorOrange {
+	background-color: #ff6038;
+}
+/*头部背景颜色 =>Golden(金色)*/
+.headWrapColorGolden {
+	background-color: #fae6b8;
+}
+/*头部背景颜色 =>green(绿色)*/
+.headWrapColorGreen {
+	background-color: #33af96;
+}
+/*头部Title 模糊度*/
+.headWrapBoxShadow {
+	box-shadow: 0 .03rem .6rem #eee;
+}
+
+/*后退键 '<'*/			
+.returnImg {
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 10;
+	padding: .45rem 0 0 .3rem;
+	box-sizing: border-box;
+	width: .88rem;
+	height: .88rem;
+}
+.returnImg img {
+	float: left;
+	display: block;
+	width: .18rem;
+	height: .31rem;
+}
+/*右边的按钮 绝对定位(最多3个字)*/
+.hangSellButton {
+	padding-right: .3rem;
+	box-sizing: border-box;
+	position: absolute;
+	right: 0;
+	width: 1.25rem;
+	height: .88rem;
+	font: .27rem/.88rem "微软雅黑";
+	color: #dfe9f6;
+	letter-spacing: .02rem;
+	text-align: right;
+	
+}
+/*右边的按钮 绝对定位(最多4个字)*/
+.hangSellButFourFont {
+	width: 1.6rem;
+}
+/*橙色 背景的font的color*/
+.orangeFont {
+	color: #ffdbd4;
+}
+
+/*去除input中type="number" 的上下按钮*/
+input::-webkit-outer-spin-button,input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}
+/*去掉苹果input=>默认样式*/
+input[type="button"], input[type="submit"], input[type="reset"] {
+    -webkit-appearance: none;
+}
+textarea {  -webkit-appearance: none;};

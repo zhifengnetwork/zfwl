@@ -1,0 +1,193 @@
+@charset "utf-8";
+* {
+	margin: 0;
+	padding: 0;
+}
+
+
+/*蒙版,弹框*/
+.maskWrap {
+	/*display: none;*/
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 100;
+	width: 7.5rem;
+	height: auto;
+	/*height: 11.82rem;*/
+	background-color: rgba(118, 121, 128, .6);
+}
+/*对话框*/
+.maskWrap .signOutBox {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	margin: 40% auto 0;
+	/*padding-left: .25rem;
+	box-sizing: border-box;*/
+	width: 6.11rem;
+	height: 3.66rem;
+	border-radius: .25rem;
+	text-align: center;
+	letter-spacing: .02rem;
+	background: #fff;
+}
+
+.signOutBox-text {
+	padding-top: .8rem;
+	box-sizing: border-box;
+	width: 6.11rem;
+	height: 2.41rem;
+	font-size: .28rem;
+	color: #666;
+	/*font-weight: bold;*/
+	}
+
+/*提示文本*/
+.alertBoxTipsText {
+	width: 6.11rem;
+	height: .52rem;
+	font: .28rem/.52rem "微软雅黑";
+	color: #666;
+	text-align: center;
+}
+
+/*数值*/
+.numericalValue {
+	width: 6.11rem;
+	height: .86rem;
+	font: .44rem/.86rem "微软雅黑";
+	color: #000;
+	text-align: center;
+	font-weight: bold;
+}
+.signOutBox-button {
+	padding: 0 .4rem;
+	box-sizing: border-box;
+	width: 6.11rem;
+	height: 1.25rem;
+}
+
+/*取消，确认*/
+.signOut-cancel,
+.signOut-confirm {
+	border-radius: .15rem;
+	width: 2.55rem;
+	height: .82rem;
+	font: .27rem/.82rem "微软雅黑";
+}
+/*'取消' 按钮*/
+.signOut-cancel {
+	float: left;
+	background: #fff;
+	color: #999;
+	border: .02rem solid #eee;
+}
+
+/*'确定' 按钮*/
+.signOut-confirm {
+	float: right;
+	background: #3d73f9;
+	color: #fff;
+}
+
+/*确定对话框=>确定*/
+.sure-middle {
+	float: none;
+	margin: 0 auto;
+}
+/*padding:1rem;*/
+.paddingOneRem {
+	padding-top: 1rem;
+	box-sizing: border-box;
+}
+/*font-size:字体*/
+/*font-size:.3rem;*/
+.fontSizieThree {
+	font-size:.3rem;
+}
+
+/*'√'和'×'的图标Wrap*/
+.maskWrap .rightAndWrongWrap {
+	position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: 50% auto 0;
+   	width: 5.4rem;
+    height: 3.14rem;
+    border-radius: .25rem;
+    text-align: center;
+    letter-spacing: .02rem;
+    background: #fff;
+}
+
+/*'√'和'×'的图标box*/
+.rightAndWrongBox {
+	width: 5.4rem;
+    height: 2.25rem;
+    font-size: .22rem;
+    color: #333;
+    border-top-left-radius: .25rem;
+    border-top-right-radius: .25rem;
+    border-bottom: .01rem solid #d2d2d2;
+}
+/*'√'和'×'的图标box=>top*/
+.rAndWBoxTop {
+	padding-top: .34rem;
+	box-sizing: border-box;
+	width: 5.4rem;
+	height: auto;
+}
+/*'√'和'×'的图标box=>top=>图标 icon*/
+.rAndWBoxTopIcon {
+	display: block;
+	margin: 0 auto;
+	width: .6rem;
+	height: .6rem;
+}
+/*'√'和'×'的图标box=>title*/
+.rAndWBoxTitle {
+	padding-top: .2rem;
+	box-sizing: border-box;
+	width: 5.4rem;
+	height: auto;
+	font: .3rem/.3rem "微软雅黑";
+}
+/*'√'和'×'的图标box=>text，font-size:.22rem;*/
+.rAndWBoxText {
+	padding-top: .15rem;
+	box-sizing: border-box;
+	font-size: .22rem;
+}
+/*'√'和'×'的图标wrap=>按钮
+ * 一个按钮的时候，使用该标签。
+ * */
+.rightAndWrongWrap-buttonWrap {
+	width: 5.4rem;
+	height: .88rem;
+    font: .3rem/.88rem "微软雅黑";
+    color: #333;
+    border-bottom-left-radius: .25rem;
+    border-bottom-right-radius: .25rem;
+}
+/*两个按钮'取消'false, '确认'true*/
+
+.rightAndWrongWrap-buttonFalse,.rightAndWrongWrap-buttonTrue {
+	float:left;
+	width: 50%;
+	height: .88rem;
+}
+/*'取消'false 按钮*/
+.rightAndWrongWrap-buttonFalse {
+	border-bottom-left-radius: .25rem;
+}
+/*'确认'true 按钮*/
+.rightAndWrongWrap-buttonTrue {
+	color: #fff;
+	border-bottom-right-radius: .25rem;
+	background-color: #1e82d2;
+}
