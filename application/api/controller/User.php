@@ -218,11 +218,11 @@ class User extends ApiBase
 
     /**
      * +---------------------------------
-     * 地址原数据
+     * 地址组件原数据
      * +---------------------------------
     */
     public function get_address(){
-        $user_id = $this->get_user_id();
+        $user_id = 51;
         if(!$user_id){
             $this->ajaxReturn(['status' => -2 , 'msg'=>'用户不存在','data'=>'']);
         }
@@ -239,13 +239,13 @@ class User extends ApiBase
         $list  = Db::name('region')->field('*')->select();
         foreach($list as $v){
            if($v['area_type'] == 1){
-              $address_list['province_list'][$v['area_id']]=  $v['area_name'];
+              $address_list['province_list'][$v['code'] * 10000]=  $v['area_name'];
            }
            if($v['area_type'] == 2){
-              $address_list['city_list'][$v['area_id']]=  $v['area_name'];
+              $address_list['city_list'][$v['code'] *100]=  $v['area_name'];
            }
            if($v['area_type'] == 3){
-              $address_list['county_list'][$v['area_id']]=  $v['area_name'];
+              $address_list['county_list'][$v['code']]=  $v['area_name'];
            }
         }
         
@@ -261,7 +261,7 @@ class User extends ApiBase
      * +---------------------------------
     */
     public function address_list(){
-        $user_id = $this->get_user_id();
+        $user_id = 51;
         if(!$user_id){
             $this->ajaxReturn(['status' => -2, 'msg'=>'用户不存在','data'=>'']);
         }

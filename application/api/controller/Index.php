@@ -37,10 +37,9 @@ class Index extends ApiBase
         if(!$user_id){
             $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
         }
-        
         $ewei = Db::name('diy_ewei_shop')->where(['status' => 1])->find();
 
-        $this->ajaxReturn(['status' => -2 , 'msg'=>'获取首页成功！','data'=>$ewei['id']]);
+        $this->ajaxReturn(['status' => 1 , 'msg'=>'获取首页成功！','data'=>$ewei['id']]);
     }
 
     
