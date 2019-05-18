@@ -3,23 +3,6 @@
  * 订单API
  */
 namespace app\api\controller;
-// use app\common\model\Users;
-// use app\common\logic\UsersLogic;
-// use app\common\logic\Integral;
-// use app\common\logic\Pay;
-// use app\common\logic\PlaceOrder;
-// use app\common\logic\PreSellLogic;
-// use app\common\logic\UserAddressLogic;
-// use app\common\logic\CouponLogic;
-// use app\common\logic\CartLogic;
-// use app\common\logic\OrderLogic;
-// use app\common\model\Combination;
-// use app\common\model\PreSell;
-// use app\common\model\Shop;
-// use app\common\model\SpecGoodsPrice;
-// use app\common\model\Goods;
-// use app\common\util\TpshopException;
-use think\Loader;
 use think\Db;
 
 class Order extends ApiBase
@@ -131,13 +114,13 @@ class Order extends ApiBase
         $coupon_arr = [];
         foreach($coupon as $key=>$value){
             if(isset($goods_coupon[$value['goods_id']])){
-                if( $goods_coupon[$value['goods_id']]['subtotal_price'] > $value['threshold'] ){
+                if( $goods_coupon[$value['goods_id']]['subtotal_price'] >= $value['threshold'] ){
                     $coupon_arr[] = $value;
                 }
             }
 
             if($value['goods_id']==0){
-                if( $order_amount > $value['threshold'] ){
+                if( $order_amount >= $value['threshold'] ){
                     $coupon_arr[] = $value;
                 }
             }
@@ -266,7 +249,12 @@ class Order extends ApiBase
                     ->find();
             if($couponRes){
                 if(isset($goods_coupon[$couponRes['goods_id']])){
-                    if( $goods_coupon[$couponRes['goods_id']]['subtotal_price'] > $couponRes['threshold'] ){
+                    if( $goods_coupon[$couponRes['goods_id']]['subtotal_price'] >= $couponRes['threshold'] ){
+                        $coupon_price = $couponRes['price'];
+                    }
+                }
+                if($couponRes['goods_id']==0){
+                    if( $order_amount >= $couponRes['threshold'] ){
                         $coupon_price = $couponRes['price'];
                     }
                 }
