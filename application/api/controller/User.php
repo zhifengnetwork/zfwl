@@ -9,7 +9,6 @@ use think\Db;
 
 class User extends ApiBase
 {
-
     /*
      *  注册接口
      */
@@ -58,7 +57,6 @@ class User extends ApiBase
         if(!$id){
             $this->ajaxReturn(['status' => -2 , 'msg'=>'注册失败，请重试！','data'=>'']);
         }
-
         // Db::table('mc_members')->insert(['uid'=>$id,'mobile'=>$mobile,'createtime'=>time(),'salt'=>$salt,'password'=>$password]);
 
         $data['token'] = $this->create_token($id);
@@ -218,22 +216,37 @@ class User extends ApiBase
 
     /**
      * +---------------------------------
-     * 地址原数据
+     * 地址组件原数据
      * +---------------------------------
     */
     public function get_address(){
-        $user_id = 51;
+        $user_id = $this->get_user_id();
         if(!$user_id){
             $this->ajaxReturn(['status' => -2 , 'msg'=>'用户不存在','data'=>'']);
         }
-        $region_list  =  Db::name('region')->field('*')->column('area_id,area_name,area_type');
-        foreach( $region_list as $key => $val){
-            var_dump($key);
-            var_dump($val);
-            die;
-
+        //第一种方法
+        //$province_list  =  Db::name('region')->field('*')->where(['area_type' => 1])->column('area_id,area_name');
+        // $city_list      =  Db::name('region')->field('*')->where(['area_type' => 2])->column('area_id,area_name');
+        // $county_list    =  Db::name('region')->field('*')->where(['area_type' => 3])->column('area_id,area_name');
+        // $data = [
+        //     'province_list' => $province_list,
+        //     'city_list'     => $city_list,
+        //     'county_list'   => $county_list,
+        // ];
+        //第二种方法
+        $list  = Db::name('region')->field('*')->select();
+        foreach($list as $v){
+           if($v['area_type'] == 1){
+              $address_list['province_list'][$v['code'] * 10000]=  $v['area_name'];
+           }
+           if($v['area_type'] == 2){
+              $address_list['city_list'][$v['code'] *100]=  $v['area_name'];
+           }
+           if($v['area_type'] == 3){
+              $address_list['county_list'][$v['code']]=  $v['area_name'];
+           }
         }
-        $this->ajaxReturn(['status'=>1,'msg'=>'获取地址成功','data'=>$region_list]);
+        $this->ajaxReturn(['status'=>1,'msg'=>'获取地址成功','data'=>$address_list]);
     }
 
 
@@ -249,32 +262,24 @@ class User extends ApiBase
         if(!$user_id){
             $this->ajaxReturn(['status' => -2, 'msg'=>'用户不存在','data'=>'']);
         }
-        // 查询地址
-        $addr_data['ua.user_id'] = $user_id;
-        $addressM = Model('UserAddr');
-        $addr_res = $addressM->getAddressList($addr_data);
-        if($addr_res){
-            foreach($addr_res as $key=>$value){
-                $addr = $value['p_cn'] . $value['c_cn'] . $value['d_cn'] . $value['s_cn'];
-                $addr_res[$key]['address'] = $addr . $addr_res[$key]['address'];
-                unset($addr_res[$key]['p_cn'],$addr_res[$key]['c_cn'],$addr_res[$key]['d_cn'],$addr_res[$key]['s_cn']);
+        $data        =  Db::name('user_address')->where('user_id', $user_id)->select();
+        $region_list =  Db::name('region')->field('*')->column('area_id,area_name');
+        foreach ($data as &$v) {
+            $v['province'] = $region_list[$v['province']];
+            $v['city']     = $region_list[$v['city']];
+            $district      = Db::name('region')->where(['area_id' => $v['district']])->value('code');
+            $v['code']     = $district;
+            $v['district'] = $region_list[$v['district']];
+        
+            if($v['twon'] == 0){
+                $v['twon']     = '';
+            }else{
+                $v['twon'] = $region_list[$v['twon']];
             }
-        }
-        // $data        =  Db::name('user_address')->where('user_id', $user_id)->select();
-        // $region_list =  Db::name('region')->field('*')->column('area_id,area_name');
-        // foreach ($data as &$v) {
-        //     $v['province'] = $region_list[$v['province']];
-        //     $v['city']     = $region_list[$v['city']];
-        //     $v['district'] = $region_list[$v['district']];
-        //     if($v['twon'] == 0){
-        //         $v['twon']     = '';
-        //     }else{
-        //         $v['twon'] = $region_list[$v['twon']];
-        //     }
             
-        // }
-        // unset($v);
-         $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$addr_res]);
+        }
+        unset($v);
+        $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$data]);
     }
 
     /**
@@ -291,7 +296,9 @@ class User extends ApiBase
             $this->ajaxReturn($return);
     }
 
-     /**
+    
+
+    /**
      * +---------------------------------
      * 地址编辑
      * +---------------------------------
@@ -309,6 +316,8 @@ class User extends ApiBase
         $return    = $addressM->add_address($user_id, $id, $post_data);
         $this->ajaxReturn($return);
     }
+
+
 
     /**
      * +---------------------------------
@@ -356,6 +365,70 @@ class User extends ApiBase
         $this->ajaxReturn(['status' => 1 , 'msg'=>'密码正确！','data'=>'']);
     }
 
-  
+    /**
+     * +---------------------------------
+     * 修改生日和昵称
+     * +---------------------------------
+    */
+
+    public function set_reabir()
+    {
+        $user_id    = $this->get_user_id();
+        $birthyear  = input('birthyear');
+        $birthmonth = input('birthmonth');
+        $birthday   = input('birthday');
+        $realname   = input('realname');
+        $type       = input('type',1);
+        if($type == 1){
+            if(empty($realname)){
+                $this->ajaxReturn(['code'=>0,'msg'=>'昵称不能为空','data'=>'']);
+            }
+            $update['realname'] = $realname;
+        }else{
+            $update['birthyear']  = $birthyear;
+            $update['birthmonth'] = $birthmonth;
+            $update['birthday']   = $birthday;
+        }
+        $member     = Db::name('member')->where(["id" => $user_id])->update($update);
+        if($member !== false){
+            $this->ajaxReturn(['status' => 1 , 'msg'=>'修改成功','data'=>'']);
+        }
+        $this->ajaxReturn(['status' => -2 , 'msg'=>'修改失败','data'=>'']);
+    }
+
+
+    /***
+     * 手机号换绑
+     */
+
+    public function change_mobile(){
+
+        $user_id = $this->get_user_id();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -2, 'msg'=>'用户不存在','data'=>'']);
+        }
+       
+        $new_mobile = input('mobile');
+        $res        = action('PhoneAuth/phoneAuth',[$new_mobile,$code]);
+        if( $res === '-1'){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'验证码已过期！','data'=>'']);
+        }else if( !$res ){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'验证码错误！','data'=>'']);
+        }
+        $member = Db::table('member')->where(['id' => $user_id])->find();
+
+        if($member['mobile'] == $new_mobile){
+             $this->ajaxReturn(['status' => -2 , 'msg'=>'手机号不能相同！','data'=>'']);
+        }
+        $res = Db::table('member')->where(['id' => $user_id])->update(['mobile' => $new_mobile]);
+
+        if($res !== false){
+            $this->ajaxReturn(['status' => 1 , 'msg'=>'换绑成功','data'=>'']);
+        }else{
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'换绑失败','data'=>'']);
+        }
+
+    }
+
 
 }

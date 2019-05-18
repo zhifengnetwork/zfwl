@@ -36,9 +36,7 @@ class ApiBase extends Controller
             if (in_array($action, $action_array)) {
                 return;
             }
-
             $user_id = $this->decode_token(input('token'));
-
             if(empty($user_id)) exit(json_encode(['code'=>0,'msg'=>'您未登录，请登录！']));
 
         }

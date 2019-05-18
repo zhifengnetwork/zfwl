@@ -16,9 +16,9 @@ if (preg_match("/(.*)\.(.*)\.c3w\.cc/i", HTTP_HOST, $matches)) {
     $partner = $matches[1];
     $key     = $matches[2];
     $modules = [
-        'zfwl'             => 'admin',
-        'pay'              => 'pay',
-        'api'              => 'api',
+        'zfwl'              => 'admin',
+        'dist'              => 'zf_shop',
+        'api'               => 'api',
     ];
     $module = isset($modules[$partner]) ? $modules[$partner] : 'home';
     define('BIND_MODULE', $module);
@@ -30,7 +30,7 @@ if (preg_match("/(.*)\.(.*)\.c3w\.cc/i", HTTP_HOST, $matches)) {
         '127.0.0.1:10056' => 'api',
         '127.0.0.1:12588' => 'admin',
         '127.0.0.1:12580' => 'admin',
-        'test.com' => 'admin',
+        '127.0.0.1:12580' => 'api',
     ];
     if (!empty($terrace[HTTP_HOST])) {
         $module = $terrace[HTTP_HOST];

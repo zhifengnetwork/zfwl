@@ -53,18 +53,27 @@ class UserAddr extends Model
         {
             $c = $this->where(['user_id' => $user_id])->count();
             if($c >= 20)
-                return array('status'=>-1,'msg'=>'最多只能添加20个收货地址','data'=>'');
+                return array('status'=>-2,'msg'=>'最多只能添加20个收货地址','data'=>'');
         }
         //检查手机格式
         if($post['consignee'] == '')
-            return array('status'=>-1,'msg'=>'收货人不能为空','data'=>'');
-        if (!($post['province'] > 0)|| !($post['city']>0) || !($post['district']>0))
-            return array('status'=>-1,'msg'=>'所在地区不能为空','data'=>'');
-        if(!$post['address'])
-            return array('status'=>-1,'msg'=>'地址不能为空','data'=>'');
-        if(!checkMobile($post['mobile']))
-            return array('status'=>-1,'msg'=>'手机号码格式有误','data'=>'');
+            return array('status'=>-2,'msg'=>'收货人不能为空','data'=>'');
+        if (!($post['district']>0))
+            return array('status'=> -2,'msg'=>'所在地区不能为空','data'=>'');
 
+        $district = Db::name('region')->where(['code' => $post['district']])->find();
+        $post['district'] = $district['area_id'];
+        $city     = Db::name('region')->where(['code' => $district['parent_id']])->find();
+        $post['city']     = $city['area_id'];
+        $province         = Db::name('region')->where(['code' => $city['parent_id']])->find();
+        $post['province'] = $province['area_id'];
+
+
+        if(empty($post['address']))
+            return array('status'=>-2,'msg'=>'地址不能为空','data'=>'');
+        if(!checkMobile($post['mobile']))
+            return array('status'=>-2,'msg'=>'手机号码格式有误','data'=>'');
+        unset($post['token']);
         //编辑模式
         if($address_id > 0){
             $address = $this->where(array('address_id'=>$address_id,'user_id'=> $user_id))->find();
@@ -74,7 +83,7 @@ class UserAddr extends Model
             if($row !== false){
                 return array('status'=>1,'msg'=>'编辑成功','data'=>$address_id);
             }else{
-                return array('status'=>-1,'msg'=>'操作完成','data'=>$address_id);
+                return array('status'=>-2,'msg'=>'操作完成','data'=>$address_id);
             }
 
         }
@@ -86,7 +95,7 @@ class UserAddr extends Model
         if($c == 0)  $post['is_default'] = 1;
         
         $insert_id = $this->insertGetId($post);
-        if(!$insert_id)return array('status'=>-1,'msg'=>'添加失败','data'=>'');
+        if(!$insert_id)return array('status'=>-2,'msg'=>'添加失败','data'=>'');
         //如果设为默认地址
         $map['user_id']    = $user_id;
         $map['address_id'] = array('neq',$insert_id);

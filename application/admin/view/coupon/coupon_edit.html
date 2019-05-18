@@ -87,7 +87,11 @@
                             <div class="col-sm-9">
                                 <div style="line-height:34px;float:left;margin:0 10px 0 0;">
                                     <select class="form-control" name="goods_id">
+                                        {if condition="$goods.goods_id"}
                                         <option value="{$goods.goods_id}" >{$goods.goods_name}</option>
+                                        {else /}
+                                        <option value="0" >默认全部商品可用</option>
+                                        {/if}
                                     </select>
                                 </div>
                             </div>
@@ -97,6 +101,13 @@
                             <label class="col-sm-2 control-label"><span style="color:red;">*</span>优惠券名称</label>
                             <div class="col-sm-4">
                                 <input type="text" name="title" value="{$info.title}" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label"><span style="color:red;">*</span>门槛</label>
+                            <div class="col-sm-4">
+                                <input type="text" name="threshold" value="{$info.threshold}" placeholder="满多少可用（默认无门槛）" class="form-control">
                             </div>
                         </div>
 
@@ -156,12 +167,18 @@
 
 function goods(obj){
     var goods_name = $(obj).val();
+
+    if(goods_name == ''){
+        var option = '<option value="0">默认全部商品可用</option>';
+        $("select[name='goods_id']").html(option);
+        return;
+    }
+
     var option = '';
     $.post("{:url('coupon/goods')}",{'goods_name':goods_name},function(data){
         $(data.data).each(function(k,v){
             option += '<option value="'+v.goods_id+'">'+v.goods_name+'</option>';
         })
-        console.log(option);
         $("select[name='goods_id']").html(option);
     },'json');
     

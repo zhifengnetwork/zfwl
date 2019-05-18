@@ -50,6 +50,7 @@
                             <th>ID</th>
                             <th>优惠券名称</th>
                             <th>商品名称</th>
+                            <th>优惠门槛</th>
                             <th>优惠金额</th>
                             <th>优惠券数量</th>
                             <th>开始时间</th>
@@ -63,7 +64,8 @@
                         <tr>
                             <td>{$vo.coupon_id}</td>
                             <td>{$vo.title}</td>
-                            <td>{$vo.goods_name}</td>
+                            <td>{if condition="$vo.goods_name"}{$vo.goods_name}{else/}全商品通用{/if}</td>
+                            <td>{if condition="$vo.threshold neq '0.00'"}{$vo.threshold}{elseif condition="$vo.threshold eq '0.00'"}无门槛{/if}</td>
                             <td>{$vo.price}</td>
                             <td>{$vo.number}</td>
                             <td>{$vo.start_time|date="Y-m-d H:i:s",###}</td>

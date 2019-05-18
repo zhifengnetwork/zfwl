@@ -140,7 +140,8 @@ class Goods extends ApiBase
         $where['start_time'] = ['<', time()];
         $where['end_time'] = ['>', time()];
 
-        $goodsRes['coupon'] = Db::table('coupon')->where('goods_id',$goods_id)->select();
+        $goodsRes['coupon'] = Db::table('coupon')->where('goods_id',$goods_id)->whereOr('goods_id',0)->select();
+
         if($goodsRes['coupon']){
             foreach($goodsRes['coupon'] as $key=>$value){
                 $res = Db::table('coupon_get')->where('coupon_id',$value['coupon_id'])->find();
@@ -151,7 +152,7 @@ class Goods extends ApiBase
                 }
             }
         }
-
+        
         $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$goodsRes]);
 
     }
@@ -175,14 +176,17 @@ class Goods extends ApiBase
         
         foreach($comment as $key=>$value ){
 
-            $comment[$key]['mobile'] = substr_cut($value['mobile']);
+            $comment[$key]['mobile'] = $value['mobile'] ? substr_cut($value['mobile']) : '';
 
             if($value['img']){
                 $comment[$key]['img'] = explode(',',$value['img']);
             }else{
                 $comment[$key]['img'] = [];
             }
+
+            $comment[$key]['spec'] = $this->get_sku_str($value['sku_id']);
         }
+        
         $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$comment]);
     }
 
@@ -237,10 +241,10 @@ class Goods extends ApiBase
     public function get_sku_str($sku_id)
     {
         $sku_attr = Db::name('goods_sku')->where('sku_id', $sku_id)->value('sku_attr');
-
+        
         $sku_attr = preg_replace("/(\w):/",  '"$1":' ,  $sku_attr);
         $sku_attr = json_decode($sku_attr, true);
-
+        
         foreach($sku_attr as $key=>$value){
             $spec_name = Db::table('goods_spec')->where('spec_id',$key)->value('spec_name');
             $attr_name = Db::table('goods_spec_attr')->where('attr_id',$value)->value('attr_name');
