@@ -396,11 +396,4 @@ class User extends ApiBase
         $this->ajaxReturn(['status' => -2 , 'msg'=>'修改失败','data'=>'']);
     }
 
-
-
-
-
-
-  
-
 }
