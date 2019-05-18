@@ -73,7 +73,7 @@ class UserAddr extends Model
             return array('status'=>-2,'msg'=>'地址不能为空','data'=>'');
         if(!checkMobile($post['mobile']))
             return array('status'=>-2,'msg'=>'手机号码格式有误','data'=>'');
-        unset($post['token']);
+         unset($post['token']);
         //编辑模式
         if($address_id > 0){
             $address = $this->where(array('address_id'=>$address_id,'user_id'=> $user_id))->find();
@@ -83,7 +83,7 @@ class UserAddr extends Model
             if($row !== false){
                 return array('status'=>1,'msg'=>'编辑成功','data'=>$address_id);
             }else{
-                return array('status'=>-2,'msg'=>'操作完成','data'=>$address_id);
+                return array('status'=>-2,'msg'=>'操作失败','data'=>$address_id);
             }
 
         }

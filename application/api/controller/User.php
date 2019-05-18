@@ -306,7 +306,7 @@ class User extends ApiBase
     public function edit_address()
     {
         $user_id = $this->get_user_id();
-        $id      = input('address_id/d');
+        $id      = input('address_id');
         $address = Db::name('user_address')->where(array('address_id' => $id, 'user_id' => $user_id))->find();
         if(!$address){
             $this->ajaxReturn(['status' => -2 , 'msg'=>'地址id不存在！','data'=>'']);
@@ -406,20 +406,23 @@ class User extends ApiBase
         $user_id = $this->get_user_id();
         if(!$user_id){
             $this->ajaxReturn(['status' => -2, 'msg'=>'用户不存在','data'=>'']);
+        } 
+        $new_mobile = input('mobile');
+        $code       = input('code');
+
+        $member = Db::table('member')->where(['id' => $user_id])->find();
+
+        if($member['mobile'] == $new_mobile){
+             $this->ajaxReturn(['status' => -2 , 'msg'=>'手机号不能相同！','data'=>'']);
         }
        
-        $new_mobile = input('mobile');
         $res        = action('PhoneAuth/phoneAuth',[$new_mobile,$code]);
         if( $res === '-1'){
             $this->ajaxReturn(['status' => -2 , 'msg'=>'验证码已过期！','data'=>'']);
         }else if( !$res ){
             $this->ajaxReturn(['status' => -2 , 'msg'=>'验证码错误！','data'=>'']);
         }
-        $member = Db::table('member')->where(['id' => $user_id])->find();
-
-        if($member['mobile'] == $new_mobile){
-             $this->ajaxReturn(['status' => -2 , 'msg'=>'手机号不能相同！','data'=>'']);
-        }
+      
         $res = Db::table('member')->where(['id' => $user_id])->update(['mobile' => $new_mobile]);
 
         if($res !== false){
