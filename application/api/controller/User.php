@@ -267,7 +267,8 @@ class User extends ApiBase
         foreach ($data as &$v) {
             $v['province'] = $region_list[$v['province']];
             $v['city']     = $region_list[$v['city']];
-            $v['code']     = $v['district'];
+            $district      = Db::name('region')->where(['area_id' => $v['district']])->value('code');
+            $v['code']     = $district;
             $v['district'] = $region_list[$v['district']];
         
             if($v['twon'] == 0){
