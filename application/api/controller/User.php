@@ -218,22 +218,38 @@ class User extends ApiBase
 
     /**
      * +---------------------------------
-     * 地址原数据
+     * 地址组件原数据
      * +---------------------------------
     */
     public function get_address(){
-        $user_id = 51;
+        $user_id = $this->get_user_id();
         if(!$user_id){
             $this->ajaxReturn(['status' => -2 , 'msg'=>'用户不存在','data'=>'']);
         }
-        $region_list  =  Db::name('region')->field('*')->column('area_id,area_name,area_type');
-        foreach( $region_list as $key => $val){
-            var_dump($key);
-            var_dump($val);
-            die;
-
+        //第一种方法
+        //$province_list  =  Db::name('region')->field('*')->where(['area_type' => 1])->column('area_id,area_name');
+        // $city_list      =  Db::name('region')->field('*')->where(['area_type' => 2])->column('area_id,area_name');
+        // $county_list    =  Db::name('region')->field('*')->where(['area_type' => 3])->column('area_id,area_name');
+        // $data = [
+        //     'province_list' => $province_list,
+        //     'city_list'     => $city_list,
+        //     'county_list'   => $county_list,
+        // ];
+        //第二种方法
+        $list  = Db::name('region')->field('*')->select();
+        foreach($list as $v){
+           if($v['area_type'] == 1){
+              $address_list['province_list'][$v['code'] * 10000]=  $v['area_name'];
+           }
+           if($v['area_type'] == 2){
+              $address_list['city_list'][$v['code'] *100]=  $v['area_name'];
+           }
+           if($v['area_type'] == 3){
+              $address_list['county_list'][$v['code']]=  $v['area_name'];
+           }
         }
-        $this->ajaxReturn(['status'=>1,'msg'=>'获取地址成功','data'=>$region_list]);
+        
+        $this->ajaxReturn(['status'=>1,'msg'=>'获取地址成功','data'=>$address_list]);
     }
 
 
@@ -245,36 +261,25 @@ class User extends ApiBase
      * +---------------------------------
     */
     public function address_list(){
-        $user_id = $this->get_user_id();
+        $user_id = 51;
         if(!$user_id){
             $this->ajaxReturn(['status' => -2, 'msg'=>'用户不存在','data'=>'']);
         }
-        // 查询地址
-        $addr_data['ua.user_id'] = $user_id;
-        $addressM = Model('UserAddr');
-        $addr_res = $addressM->getAddressList($addr_data);
-        if($addr_res){
-            foreach($addr_res as $key=>$value){
-                $addr = $value['p_cn'] . $value['c_cn'] . $value['d_cn'] . $value['s_cn'];
-                $addr_res[$key]['address'] = $addr . $addr_res[$key]['address'];
-                unset($addr_res[$key]['p_cn'],$addr_res[$key]['c_cn'],$addr_res[$key]['d_cn'],$addr_res[$key]['s_cn']);
+        $data        =  Db::name('user_address')->where('user_id', $user_id)->select();
+        $region_list =  Db::name('region')->field('*')->column('area_id,area_name');
+        foreach ($data as &$v) {
+            $v['province'] = $region_list[$v['province']];
+            $v['city']     = $region_list[$v['city']];
+            $v['district'] = $region_list[$v['district']];
+            if($v['twon'] == 0){
+                $v['twon']     = '';
+            }else{
+                $v['twon'] = $region_list[$v['twon']];
             }
-        }
-        // $data        =  Db::name('user_address')->where('user_id', $user_id)->select();
-        // $region_list =  Db::name('region')->field('*')->column('area_id,area_name');
-        // foreach ($data as &$v) {
-        //     $v['province'] = $region_list[$v['province']];
-        //     $v['city']     = $region_list[$v['city']];
-        //     $v['district'] = $region_list[$v['district']];
-        //     if($v['twon'] == 0){
-        //         $v['twon']     = '';
-        //     }else{
-        //         $v['twon'] = $region_list[$v['twon']];
-        //     }
             
-        // }
-        // unset($v);
-         $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$addr_res]);
+        }
+        unset($v);
+        $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$data]);
     }
 
     /**
