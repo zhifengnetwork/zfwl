@@ -9,7 +9,6 @@ use think\Db;
 
 class User extends ApiBase
 {
-
     /*
      *  注册接口
      */
@@ -58,7 +57,6 @@ class User extends ApiBase
         if(!$id){
             $this->ajaxReturn(['status' => -2 , 'msg'=>'注册失败，请重试！','data'=>'']);
         }
-
         // Db::table('mc_members')->insert(['uid'=>$id,'mobile'=>$mobile,'createtime'=>time(),'salt'=>$salt,'password'=>$password]);
 
         $data['token'] = $this->create_token($id);
@@ -248,7 +246,6 @@ class User extends ApiBase
               $address_list['county_list'][$v['code']]=  $v['area_name'];
            }
         }
-        
         $this->ajaxReturn(['status'=>1,'msg'=>'获取地址成功','data'=>$address_list]);
     }
 
@@ -261,7 +258,7 @@ class User extends ApiBase
      * +---------------------------------
     */
     public function address_list(){
-        $user_id = 51;
+        $user_id = $this->get_user_id();
         if(!$user_id){
             $this->ajaxReturn(['status' => -2, 'msg'=>'用户不存在','data'=>'']);
         }
@@ -270,7 +267,9 @@ class User extends ApiBase
         foreach ($data as &$v) {
             $v['province'] = $region_list[$v['province']];
             $v['city']     = $region_list[$v['city']];
+            $v['code']     = $v['district'];
             $v['district'] = $region_list[$v['district']];
+        
             if($v['twon'] == 0){
                 $v['twon']     = '';
             }else{
@@ -296,7 +295,9 @@ class User extends ApiBase
             $this->ajaxReturn($return);
     }
 
-     /**
+    
+
+    /**
      * +---------------------------------
      * 地址编辑
      * +---------------------------------
@@ -314,6 +315,8 @@ class User extends ApiBase
         $return    = $addressM->add_address($user_id, $id, $post_data);
         $this->ajaxReturn($return);
     }
+
+
 
     /**
      * +---------------------------------
