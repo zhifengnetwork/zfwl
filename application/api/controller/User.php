@@ -365,6 +365,42 @@ class User extends ApiBase
         $this->ajaxReturn(['status' => 1 , 'msg'=>'密码正确！','data'=>'']);
     }
 
+    /**
+     * +---------------------------------
+     * 修改生日和昵称
+     * +---------------------------------
+    */
+
+    public function set_reabir()
+    {
+        $user_id    = $this->get_user_id();
+        $birthyear  = input('birthyear');
+        $birthmonth = input('birthmonth');
+        $birthday   = input('birthday');
+        $realname   = input('realname');
+        $type       = input('type',1);
+        if($type == 1){
+            if(empty($realname)){
+                $this->ajaxReturn(['code'=>0,'msg'=>'昵称不能为空','data'=>'']);
+            }
+            $update['realname'] = $realname;
+        }else{
+            $update['birthyear']  = $birthyear;
+            $update['birthmonth'] = $birthmonth;
+            $update['birthday']   = $birthday;
+        }
+        $member     = Db::name('member')->where(["id" => $user_id])->update($update);
+        if($member !== false){
+            $this->ajaxReturn(['status' => 1 , 'msg'=>'修改成功','data'=>'']);
+        }
+        $this->ajaxReturn(['status' => -2 , 'msg'=>'修改失败','data'=>'']);
+    }
+
+
+
+
+
+
   
 
 }
