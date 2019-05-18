@@ -183,7 +183,10 @@ class Goods extends ApiBase
             }else{
                 $comment[$key]['img'] = [];
             }
+
+            $comment[$key]['spec'] = $this->get_sku_str($value['sku_id']);
         }
+        
         $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$comment]);
     }
 
@@ -238,10 +241,10 @@ class Goods extends ApiBase
     public function get_sku_str($sku_id)
     {
         $sku_attr = Db::name('goods_sku')->where('sku_id', $sku_id)->value('sku_attr');
-
+        
         $sku_attr = preg_replace("/(\w):/",  '"$1":' ,  $sku_attr);
         $sku_attr = json_decode($sku_attr, true);
-
+        
         foreach($sku_attr as $key=>$value){
             $spec_name = Db::table('goods_spec')->where('spec_id',$key)->value('spec_name');
             $attr_name = Db::table('goods_spec_attr')->where('attr_id',$value)->value('attr_name');

@@ -29,14 +29,14 @@ class Coupon extends ApiBase
 
         $res = Db::table('coupon_get')->where($where)->find();
         if($res) $this->ajaxReturn(['status' => -2 , 'msg'=>'您已领取过，请勿重复领取！']);
-
-        $res = Db::table('coupon_get')->where('coupon_id',$coupon_id)->value('number');
+        
+        $res = Db::table('coupon')->where('coupon_id',$coupon_id)->value('number');
         if(!$res) $this->ajaxReturn(['status' => -2 , 'msg'=>'该优惠券已领完！']);
-
+        
         $where['add_time'] = $time;
         $res = Db::table('coupon_get')->insert($where);
-
-        Db::table('coupon_get')->where('coupon_id',$coupon_id)->setDec('number',1);
+        
+        Db::table('coupon')->where('coupon_id',$coupon_id)->setDec('number',1);
 
         if($res) $this->ajaxReturn(['status' => 1 , 'msg'=>'领取成功！' ,'data'=>'']);
     }
