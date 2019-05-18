@@ -117,10 +117,10 @@ class User extends ApiBase
                 ->where(['m.id' => $user_id])
                 ->find();
             if(empty($data['mobile'])){
-                $this->ajaxReturn(['status' => -1 , 'msg'=>'未绑定手机！','data'=>$data]);
+                $this->ajaxReturn(['status' => -2 , 'msg'=>'未绑定手机！','data'=>$data]);
             }
         }else{
-            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'用户不存在','data'=>'']);
         }
         $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$data]);
     }
@@ -128,12 +128,12 @@ class User extends ApiBase
     public function reset_pwd(){//重置密码
         $user_id = $this->get_user_id();
         if(!$user_id){
-            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'用户不存在','data'=>'']);
         }
         $password1   = input('password1');
         $password2   = input('password2');
         if($password1 != $password2){
-            $this->ajaxReturn(['status' => -1 , 'msg'=>'确认密码错误','data'=>'']);
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'确认密码错误','data'=>'']);
         }
         $member = Db::name('member')->where(['id' => $user_id])->field('id,password,pwd,mobile,salt')->find();
         $type     = input('type');//1登录密码 2支付密码
@@ -152,14 +152,14 @@ class User extends ApiBase
         }
             $password = md5($member['salt'] . $password2);
         if ($password == $member[$stri]){
-            $this->ajaxReturn(['status' => -1 , 'msg'=>'新密码和旧密码不能相同']);
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'新密码和旧密码不能相同']);
         }else{
             $data = array($stri=>$password);
             $update = Db::name('member')->where('id',$user_id)->data($data)->update();
             if($update){
                 $this->ajaxReturn(['status' => 1 , 'msg'=>'修改成功']);
             }else{
-                $this->ajaxReturn(['status' => -1 , 'msg'=>'修改失败']);
+                $this->ajaxReturn(['status' => -2 , 'msg'=>'修改失败']);
             }
         }
         
@@ -170,7 +170,7 @@ class User extends ApiBase
     public function reset_mailbox(){
         $user_id = $this->get_user_id();
         if(!$user_id){
-            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'用户不存在','data'=>'']);
         }
         $mailbox   = input('mailbox');
         $data = [
@@ -180,7 +180,7 @@ class User extends ApiBase
         if($update){
             $this->ajaxReturn(['status' => 1 , 'msg'=>'修改成功']);
         }else{
-            $this->ajaxReturn(['status' => -1 , 'msg'=>'修改失败']);
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'修改失败']);
         }
 
 
@@ -208,13 +208,36 @@ class User extends ApiBase
             //保存图片到本地
             $r   = file_put_contents(ROOT_PATH .Config('c_pub.img').$name.$saveName,$imgs);
             if(!$r){
-                $this->ajaxReturn(['code'=>-1,'msg'=>'上传出错','data' =>'']);
+                $this->ajaxReturn(['status'=>-2,'msg'=>'上传出错','data' =>'']);
             }
             Db::name('member')->where(['id' => $user_id])->update(['avatar' => SITE_URL.'/upload/images/'.$name.$saveName]);
 
-            $this->ajaxReturn(['code'=>1,'msg'=>'修改成功','data'=>SITE_URL.'/upload/images/'.$name.$saveName]);
+            $this->ajaxReturn(['status'=>1,'msg'=>'修改成功','data'=>SITE_URL.'/upload/images/'.$name.$saveName]);
            
     }
+
+    /**
+     * +---------------------------------
+     * 地址原数据
+     * +---------------------------------
+    */
+    public function get_address(){
+        $user_id = 51;
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'用户不存在','data'=>'']);
+        }
+        $region_list  =  Db::name('region')->field('*')->column('area_id,area_name,area_type');
+        foreach( $region_list as $key => $val){
+            var_dump($key);
+            var_dump($val);
+            die;
+
+        }
+        $this->ajaxReturn(['status'=>1,'msg'=>'获取地址成功','data'=>$region_list]);
+    }
+
+
+
 
     /**
      * +---------------------------------
@@ -222,9 +245,9 @@ class User extends ApiBase
      * +---------------------------------
     */
     public function address_list(){
-        $user_id =51;
+        $user_id = $this->get_user_id();
         if(!$user_id){
-            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+            $this->ajaxReturn(['status' => -2, 'msg'=>'用户不存在','data'=>'']);
         }
         // 查询地址
         $addr_data['ua.user_id'] = $user_id;
@@ -251,7 +274,7 @@ class User extends ApiBase
             
         // }
         // unset($v);
-         $this->ajaxReturn(['status' => 0 , 'msg'=>'获取成功','data'=>$addr_res]);
+         $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$addr_res]);
     }
 
     /**
@@ -279,7 +302,7 @@ class User extends ApiBase
         $id      = input('address_id/d');
         $address = Db::name('user_address')->where(array('address_id' => $id, 'user_id' => $user_id))->find();
         if(!$address){
-            $this->ajaxReturn(['status' => -1 , 'msg'=>'地址id不存在！','data'=>'']);
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'地址id不存在！','data'=>'']);
         }
         $post_data = input('post.');
         $addressM  = Model('UserAddr');
@@ -295,10 +318,10 @@ class User extends ApiBase
     public function del_address()
     {
         $user_id = $this->get_user_id();
-        $id      = input('address_id/d');
+        $id      = input('address_id/d',86);
         $address = Db::name('user_address')->where(["address_id" => $id])->find();
         if(!$address){
-            $this->ajaxReturn(['status' => -1 , 'msg'=>'地址id不存在！','data'=>'']);
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'地址id不存在！','data'=>'']);
         }
         $row =  Db::name('user_address')->where(array('user_id' => $user_id, 'address_id' => $id))->delete();
         // 如果删除的是默认收货地址 则要把第一个地址设置为默认收货地址
@@ -306,10 +329,10 @@ class User extends ApiBase
             $address2 = Db::name('user_address')->where(["user_id" => $user_id])->find();
             $address2 && Db::name('user_address')->where(["address_id" => $address2['address_id']])->update(array('is_default' => 1));
         }
-        if (!$row)
+        if ($row !== false)
             $this->ajaxReturn(['status' => 1 , 'msg'=>'删除地址成功','data'=>$row]);
         else
-            $this->ajaxReturn(['status' => -1 , 'msg'=>'删除失败','data'=>'']);
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'删除失败','data'=>'']);
     }
 
 
@@ -324,11 +347,11 @@ class User extends ApiBase
         $pwd        = input('pwd/d');
         $member     = Db::name('member')->where(["id" => $user_id])->find();
         if(!$member){
-            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在！','data'=>'']);
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'用户不存在！','data'=>'']);
         }
         $password = md5($member['salt'] . $pwd);
         if($member['pwd'] !== $password){
-            $this->ajaxReturn(['status' => 1 , 'msg'=>'支付密码错误！','data'=>'']);
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'支付密码错误！','data'=>'']);
         }
         $this->ajaxReturn(['status' => 1 , 'msg'=>'密码正确！','data'=>'']);
     }
