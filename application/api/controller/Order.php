@@ -78,15 +78,16 @@ class Order extends ApiBase
 
         $data['pay_type'] = $arr;
         
-
+        $order_amount = '0'; //订单价格
         $shipping_price = 0;
         $goods_ids = '';
+        $goods_coupon = [];
         foreach($cart_res as $key=>$value){
-
+            
             //处理运费
             $goods_res = Db::table('goods')->field('shipping_setting,shipping_price,delivery_id,less_stock_type')->where('goods_id',$value['goods_id'])->find();
             if($goods_res['shipping_setting'] == 1){
-                $shipping_price = sprintf("%.2f",$shipping_price + $goods_res['shipping_price']);   //计算该订单的总价
+                $shipping_price = sprintf("%.2f",$shipping_price + $goods_res['shipping_price']);   //计算该订单的物流费用
             }else if($goods_res['shipping_setting'] == 2){
                 if( !$goods_res['delivery_id'] ){
                     $deliveryWhere['is_default'] = 1;
@@ -96,33 +97,53 @@ class Order extends ApiBase
                 $delivery = Db::table('goods_delivery')->where($deliveryWhere)->find();
                 if( $delivery ){
                     if($delivery['type'] == 2){
-                        $shipping_price = sprintf("%.2f",$shipping_price + $delivery['firstprice']);   //计算该订单的总价
+                        $shipping_price = sprintf("%.2f",$shipping_price + $delivery['firstprice']);   //计算该订单的物流费用
                         $number = $value['goods_num'] - $delivery['firstweight'];
                         if($number > 0){
                             $number = ceil( $number / $delivery['secondweight'] );  //向上取整
                             $xu = sprintf("%.2f",$delivery['secondprice'] * $number );   //续价
-                            $shipping_price = sprintf("%.2f",$shipping_price + $xu);   //计算该订单的总价
+                            $shipping_price = sprintf("%.2f",$shipping_price + $xu);   //计算该订单的物流费用
                         }
                     }
                 }
             }
 
-            $goods_ids .= ',' . $value['goods_id'];
-        }
-        $goods_ids = ltrim($goods_ids,',');
+            $order_amount = sprintf("%.2f",$order_amount + $value['subtotal_price']);   //计算该订单的总价
 
+            $goods_coupon[$value['goods_id']]['subtotal_price'] =  $value['subtotal_price'];
+
+            $goods_ids .= $value['goods_id'] . ',';
+        }
+        $goods_ids = $goods_ids . 0;
+        
         $data['shipping_price'] = $shipping_price;
 
         $coupon = Db::table('coupon_get')->alias('cg')
                     ->join('coupon c','c.coupon_id=cg.coupon_id','LEFT')
-                    ->field('c.coupon_id,c.title,c.price,c.start_time,c.end_time')
+                    ->field('c.coupon_id,c.title,c.threshold,c.price,c.start_time,c.end_time,c.goods_id')
                     ->where('c.goods_id','in',$goods_ids)
                     ->where('cg.user_id',$user_id)
                     ->where('cg.is_use',0)
                     ->where('c.start_time','<',time())
                     ->where('c.end_time','>',time())
                     ->select();
-        $data['coupon'] = $coupon;
+
+        $coupon_arr = [];
+        foreach($coupon as $key=>$value){
+            if(isset($goods_coupon[$value['goods_id']])){
+                if( $goods_coupon[$value['goods_id']]['subtotal_price'] > $value['threshold'] ){
+                    $coupon_arr[] = $value;
+                }
+            }
+
+            if($value['goods_id']==0){
+                if( $order_amount > $value['threshold'] ){
+                    $coupon_arr[] = $value;
+                }
+            }
+        }
+
+        $data['coupon'] = $coupon_arr;
 
         $this->ajaxReturn(['status' => 1 , 'msg'=>'成功','data'=>$data]);
     }
@@ -176,8 +197,10 @@ class Order extends ApiBase
         $i = 0;
         $cart_ids = ''; //提交成功后删掉购物车
         $goods_ids = '';//商品IDS
+        $goods_coupon = [];
         foreach($cart_res as $key=>$value){
             $goods_ids .= $value['goods_id'] . ',';
+            $goods_coupon[$value['goods_id']]['subtotal_price'] =  $value['subtotal_price'];
 
             //处理运费
             $goods_res = Db::table('goods')->field('shipping_setting,shipping_price,delivery_id,less_stock_type')->where('goods_id',$value['goods_id'])->find();
@@ -233,17 +256,18 @@ class Order extends ApiBase
         if($coupon_id){
             $couponRes = Db::table('coupon_get')->alias('cg')
                     ->join('coupon c','c.coupon_id=cg.coupon_id','LEFT')
-                    ->field('c.coupon_id,c.title,c.price,c.start_time,c.end_time')
+                    ->field('c.coupon_id,c.title,c.threshold,c.price,c.start_time,c.end_time,c.goods_id')
                     ->where('c.goods_id','in',$goods_ids)
                     ->where('cg.user_id',$user_id)
                     ->where('cg.is_use',0)
                     ->where('c.start_time','<',time())
                     ->where('c.end_time','>',time())
-                    ->select();
+                    ->where('c.coupon_id','=',$coupon_id)
+                    ->find();
             if($couponRes){
-                foreach($couponRes as $key=>$value){
-                    if($value['coupon_id'] = $coupon_id){
-                        $coupon_price = $value['price'];
+                if(isset($goods_coupon[$couponRes['goods_id']])){
+                    if( $goods_coupon[$couponRes['goods_id']]['subtotal_price'] > $couponRes['threshold'] ){
+                        $coupon_price = $couponRes['price'];
                     }
                 }
             }
@@ -296,7 +320,7 @@ class Order extends ApiBase
 
         //添加使用优惠券记录
         if($coupon_price){
-            Db::table('coupon')->where('coupon_id',$coupon_id)->update(['is_use'=>1,'use_time'=>time()]);
+            Db::table('coupon_get')->where('user_id',$user_id)->where('coupon_id',$coupon_id)->update(['is_use'=>1,'use_time'=>time()]);
         }
         
         $res = Db::table('order_goods')->insertAll($order_goods);
