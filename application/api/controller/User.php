@@ -72,14 +72,14 @@ class User extends ApiBase
     public function login(){
         $mobile   = input('mobile');
         $password = input('password');
-        $code     = input('code');
+        // $code     = input('code');
         
-        $res = action('PhoneAuth/phoneAuth',[$mobile,$code]);
-        if( $res === '-1' ){
-            $this->ajaxReturn(['status' => -2 , 'msg'=>'验证码已过期！','data'=>'']);
-        }else if( !$res ){
-            $this->ajaxReturn(['status' => -2 , 'msg'=>'验证码错误！','data'=>'']);
-        }
+        // $res = action('PhoneAuth/phoneAuth',[$mobile,$code]);
+        // if( $res === '-1' ){
+        //     $this->ajaxReturn(['status' => -2 , 'msg'=>'验证码已过期！','data'=>'']);
+        // }else if( !$res ){
+        //     $this->ajaxReturn(['status' => -2 , 'msg'=>'验证码错误！','data'=>'']);
+        // }
 
         $data = Db::table("member")->where('mobile',$mobile)
             ->field('id,password,mobile,salt')
