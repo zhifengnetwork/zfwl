@@ -130,9 +130,9 @@ class User extends ApiBase
             $this->ajaxReturn(['status' => -2 , 'msg'=>'确认密码不相同！！']);
         }
 
-        if( strlen($password2) < 6 ){
-            $this->ajaxReturn(['status' => -2 , 'msg'=>'密码长度必须大于或6位！','data'=>'']);
-        }
+        // if( strlen($password2) < 6 ){
+        //     $this->ajaxReturn(['status' => -2 , 'msg'=>'密码长度必须大于或6位！','data'=>'']);
+        // }
         $salt     = create_salt();
         $password = md5($salt . $password2);
 
@@ -140,6 +140,7 @@ class User extends ApiBase
         $update['password'] = $password;
 
         $res =  Db::name('member')->where(['mobile' => $mobile])->update($update);
+
 
  
         if ($res == false) {
