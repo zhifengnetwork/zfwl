@@ -101,6 +101,63 @@ class User extends ApiBase
         $this->ajaxReturn(['status' => 1 , 'msg'=>'登录成功！','data'=>$data]);
     }
 
+
+    /*
+     *  找回密码接口
+     */
+    public function zhaohuipwd(){
+        $mobile    = input('mobile');
+        $password1 = input('password1');
+        $password2 = input('password2');
+        $code      = input('code');
+        
+        $res = action('PhoneAuth/phoneAuth',[$mobile,$code]);
+        if( $res === '-1' ){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'验证码已过期！','data'=>'']);
+        }else if( !$res ){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'验证码错误！','data'=>'']);
+        }
+
+        $data = Db::table("member")->where('mobile',$mobile)
+            ->field('id,password,mobile,salt')
+            ->find();
+
+        if(!$data){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'手机不存在或错误！']);
+        }
+
+        if($password1 != $password2){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'确认密码不相同！！']);
+        }
+
+        if( strlen($password2) < 6 ){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'密码长度必须大于或6位！','data'=>'']);
+        }
+        $salt     = create_salt();
+        $password = md5($salt . $password2);
+
+        $update['salt']     = $salt;
+        $update['password'] = $password;
+
+        $res =  Db::name('member')->where(['mobile' => $mobile])->update($update);
+
+ 
+        if ($res == false) {
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'修改密码失败']);
+        }
+
+        $member['token'] = $this->create_token($id);
+        $member['mobile'] = $mobile;
+        $member['id'] = $id;
+    
+        $this->ajaxReturn(['status' => 1 , 'msg'=>'修改密码成功！','data'=>$member]);
+    }
+
+
+
+
+
+
     /**
      * 用户信息
      */

@@ -118,7 +118,7 @@ class Pay extends ApiBase
             if($reult){
                 // 提交事务
                 Db::commit();
-                $this->ajaxReturn(['status' => 1 , 'msg'=>'余额支付成功!','data'=>['order_id' =>$order_info['order_sn'],'order_amount' =>$order_info['order_amount'],'goods_name' => getPayBody($order_info['order_id'])]]);
+                $this->ajaxReturn(['status' => 1 , 'msg'=>'余额支付成功!','data'=>['order_id' =>$order_info['order_id'],'order_amount' =>$order_info['order_amount'],'goods_name' => getPayBody($order_info['order_id']),'order_sn' => $order_info['order_sn'] ]]);
             }else{
                  Db::rollback();
                 $this->ajaxReturn(['status' => -2 , 'msg'=>'余额支付失败','data'=>'']);
