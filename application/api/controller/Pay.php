@@ -59,7 +59,7 @@ class Pay extends ApiBase
         $amount       = $order_info['order_amount'];
         $client_ip    = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '127.0.0.1';
         $payData['order_no']        = $order_info['order_sn'];
-        $payData['body']            = 'ADS大声地说';
+        $payData['body']            = '支付宝支付';
         $payData['timeout_express'] = time() + 600;
         $payData['amount']          = $amount;
         if($pay_type == 3){
@@ -118,10 +118,10 @@ class Pay extends ApiBase
             if($reult){
                 // 提交事务
                 Db::commit();
-                $this->ajaxReturn(['status' => 1 , 'msg'=>'余额支付成功!','data'=>'']);
+                $this->ajaxReturn(['status' => 1 , 'msg'=>'余额支付成功!','data'=>['order_id' =>$order_info['order_sn'],'order_amount' =>$order_info['order_amount'],'goods_name' => getPayBody($order['order_id'])]]);
             }else{
                  Db::rollback();
-                $this->ajaxReturn(['status' => 0 , 'msg'=>'余额支付失败','data'=>'']);
+                $this->ajaxReturn(['status' => -2 , 'msg'=>'余额支付失败','data'=>'']);
             }
         }
         //支付方式不同

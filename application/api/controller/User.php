@@ -49,7 +49,6 @@ class User extends ApiBase
             $agentid = $uid;
             $agenttime = time();
         }
-
         $salt = create_salt();
         $password = md5( $salt . $password);
         
