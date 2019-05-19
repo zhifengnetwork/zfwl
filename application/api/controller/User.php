@@ -147,7 +147,7 @@ class User extends ApiBase
             $this->ajaxReturn(['status' => -2 , 'msg'=>'修改密码失败']);
         }
 
-        $member['token'] = $this->create_token($id);
+        $member['token'] = $this->create_token($data['id']);
         $member['mobile'] = $mobile;
         $member['id'] = $data['id'];
     
