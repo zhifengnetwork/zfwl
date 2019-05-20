@@ -144,7 +144,7 @@ class Goods extends ApiBase
 
         if($goodsRes['coupon']){
             foreach($goodsRes['coupon'] as $key=>$value){
-                $res = Db::table('coupon_get')->where('coupon_id',$value['coupon_id'])->find();
+                $res = Db::table('coupon_get')->where('user_id',$user_id)->where('coupon_id',$value['coupon_id'])->find();
                 if($res){
                     $goodsRes['coupon'][$key]['is_lq'] = 1;
                 }else{

@@ -50,7 +50,7 @@ class PhoneAuth extends ApiBase
 		$data['mobile'] = $mobile;
 		$data['auth_code'] = $code;
 		$data['start_time'] = time();
-		$data['exprie_time'] = time() + 600;
+		$data['exprie_time'] = time() + 60;
 
         $res = Db::table('phone_auth')->insert($data);
         if(!$res){
