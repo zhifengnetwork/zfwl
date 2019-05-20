@@ -69,10 +69,6 @@ class User extends ApiBase
      *  登录接口
      */
     public function login(){
-        header("Access-Control-Allow-Origin:*");
-        header("Access-Control-Allow-Headers:*");
-        header("Access-Control-Allow-Methods:GET, POST, OPTIONS, DELETE");
-        header('Content-Type:application/json; charset=utf-8');
         $mobile   = input('mobile');
         $password = input('password');
         // $code     = input('code');
