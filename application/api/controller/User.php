@@ -13,11 +13,11 @@ class User extends ApiBase
      *  注册接口
      */
     public function register(){
-        $mobile = input('mobile');
-        $email  = input('email');
+        $mobile      = input('mobile');
+        $email       = input('email');
         $password    = input('password');
-        $code   = input('code');
-        $uid    = input('uid',0);
+        $code        = input('code');
+        $uid         = input('uid',0);
 
         $member = Db::table('member')->where('mobile',$mobile)->value('id');
 		

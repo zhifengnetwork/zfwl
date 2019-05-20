@@ -355,12 +355,15 @@ class Order extends ApiBase
                         ->join('goods_img gi','gi.goods_id=og.goods_id','LEFT')
                         ->join('goods g','g.goods_id=og.goods_id','LEFT')
                         ->where($where)
+                        ->where('o.deleted',0)
                         ->group('og.order_id')
                         ->field('o.order_id,o.order_sn,og.goods_name,gi.picture img,og.spec_key_name,og.goods_price,g.original_price,og.goods_num,o.order_status,o.pay_status,o.shipping_status')
                         ->select();
         
         if($order_list){
             foreach($order_list as $key=>&$value){
+
+                $value['comment'] = 0; 
                 if( $value['order_status'] == 1 && $value['pay_status'] == 0 && $value['shipping_status'] == 0 ){
                     $value['status'] = 1;   //待付款
                 }else if( $value['order_status'] == 1 && $value['pay_status'] == 1 && $value['shipping_status'] == 0 ){
@@ -402,7 +405,7 @@ class Order extends ApiBase
         $where['o.user_id'] = $user_id;
         $where['o.order_id'] = $order_id;
 
-        $order = Db::name('order')->alias('o')->where($where)->find();
+        $order = Db::name('order')->alias('o')->where($where)->where('deleted',0)->find();
         if(!$order){
             $this->ajaxReturn(['status' => -2 , 'msg'=>'订单不存在','data'=>'']);
         }
@@ -498,7 +501,7 @@ class Order extends ApiBase
             $res = Db::table('order')->update(['order_id'=>$order_id,'order_status'=>4,'shipping_status'=>3]);
         }else if( $order['order_status'] == 4 && $order['pay_status'] == 1 && $order['shipping_status'] == 3 ){
             if($status != 4) $this->ajaxReturn(['status' => -2 , 'msg'=>'参数错误！','data'=>'']);
-            $res = Db::table('order')->where('order_id',$order_id)->delete();
+            $res = Db::table('order')->update(['order_id'=>$order_id,'deleted'=>1]);
         }
 
         $this->ajaxReturn(['status' => 1 , 'msg'=>'成功！','data'=>'']);
