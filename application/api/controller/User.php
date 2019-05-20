@@ -69,7 +69,7 @@ class User extends ApiBase
      *  登录接口
      */
     public function login(){
-        header("Access-Control-Allow-Origin:*");
+        header("Access-Control-Allow-Origin:http://zf_shop.zhifengwangluo.com");
         header("Access-Control-Allow-Methods:GET, POST, OPTIONS, DELETE");
         header("Access-Control-Allow-Headers:*");
         $mobile   = input('mobile');
