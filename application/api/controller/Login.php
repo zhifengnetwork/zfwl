@@ -33,10 +33,10 @@ class Login extends \think\Controller
         header('Access-Control-Allow-Headers:*');
         header("Access-Control-Allow-Methods:GET, POST, OPTIONS, DELETE");
         header('Content-Type:application/json; charset=utf-8');
-        
-        $mobile = input('mobile');
+
+        $mobile    = input('mobile');
         $password1 = input('password');
-        $password = md5('TPSHOP'.$password1);
+        $password  = md5('TPSHOP'.$password1);
 
         $data = Db::name("users")->where('mobile',$mobile)
             ->field('password,user_id')
@@ -51,7 +51,8 @@ class Login extends \think\Controller
         unset($data['password']);
         //重写
         $data['token'] = $this->create_token($data['user_id']);
-        exit(json_encode(['status' => 0 , 'msg'=>'登录成功','data'=>$data]));
+        
+        exit(json_encode(['status' => 0 , 'msg'=>'登录成功','data'=>$data],JSON_UNESCAPED_UNICODE));
 
     }
 
