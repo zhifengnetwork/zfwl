@@ -41,7 +41,11 @@ class Pay extends ApiBase
             $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
         }
 
-        $order_info   = Db::name('order')->where(['order_id' => $order_id])->find();//订单信息
+        $order_info   = Db::name('order')->where(['order_id' => $order_id])->field('order_id,order_sn,order_amount,pay_type,pay_status,user_id,openid')->find();//订单信息
+        if($order_info){
+            //从订单列表立即付款进来
+            $pay_type     = $order_info['pay_type'];//支付方式
+        }
         $member       = MemberModel::get($user_id);
         //验证是否本人的
         if(!$order_info){
