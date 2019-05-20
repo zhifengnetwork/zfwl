@@ -18,8 +18,9 @@ class ApiBase extends Controller
 
     public function _initialize () {
         header("Access-Control-Allow-Origin:*");
-        header("Access-Control-Allow-Methods:GET, POST, OPTIONS, DELETE");
         header("Access-Control-Allow-Headers:*");
+        header("Access-Control-Allow-Methods:GET, POST, OPTIONS, DELETE");
+        header('Content-Type:application/json; charset=utf-8');
         config((new Config)->getConfig());
         if (session('admin_user_auth')) {
             $this->uid = session('admin_user_auth.uid');
