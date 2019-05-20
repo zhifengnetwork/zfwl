@@ -72,7 +72,7 @@ class TestNotify implements PayNotifyInterface
 
             $order = Db::table('order')->where(['order_sn' => $data['order_no']])->field('order_id,user_id')->find();
 
-            $goods_res = Db::table('order_goods')->field('goods_id,goods_name,goods_num,spec_key_name,goods_price,sku_id')->where('order_id',$order_id)->select();
+            $goods_res = Db::table('order_goods')->field('goods_id,goods_name,goods_num,spec_key_name,goods_price,sku_id')->where('order_id',$order['order_id'])->select();
             $jifen = 0;
             foreach($goods_res as $key=>$value){
                 $goods = Db::table('goods')->where('goods_id',$value['goods_id'])->field('less_stock_type,gift_points')->find();
