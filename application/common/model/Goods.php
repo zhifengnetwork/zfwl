@@ -16,7 +16,7 @@ class Goods extends Model
         $where['is_show'] = 1;
         $where['is_del'] = 0;
         $field = 'goods_id,goods_name,desc,limited_start
-        ,limited_end,goods_spec,price,original_price,stock';
+        ,limited_end,goods_spec,price,original_price,stock,img';
         if (!empty($keyword)){
             //商品搜索
             $where['goods_name'] = ['like','%'.str_replace(" ",'',$keyword).'%'];
