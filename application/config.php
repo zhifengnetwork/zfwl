@@ -292,6 +292,10 @@ return [
         6 => '发票问题',
         7 => '卖家发错货',
     ),
+    'REFUND_TYPE' => array(
+        0 => '支付原路退回',
+        1 => '退到用户余额',
+    ),
     'PAY_TYPE' => array(
         'credit' => ['pay_type'=>1,'pay_name'=>'余额支付'],
         'weixin' => ['pay_type'=>2,'pay_name'=>'微信支付'],
