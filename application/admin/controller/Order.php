@@ -149,27 +149,65 @@ class Order extends Common
      * 退换货列表
      */
     public function order_refund(){
-        $refund_status  = input('refund_status',-1);
+        $refundstatus  = input('refundstatus',-1);
         $order_id       = input('order_id','');
+        $where = array();
         if(!empty($order_id)){
-            $where['uo.order_id']       = $order_id;
+            $where['order_sn']       = $order_id;
         }
 
-        if($refund_status >= 0){
-            $where['uo.refund_status']   = $refund_status;
+        if($refundstatus >= 0){
+            $where['uo.refund_status']   = $refundstatus;
         }
 
-        $list  = Db::name('order_refund')->alias('uo')->field('uo.*')
-                ->join("order_id d",'uo.order_id=d.order_id','LEFT')
-                ->join("member a",'a.id=uo.user_id','LEFT')
+        $list  = Db::name('order_refund')->alias('uo')->field('uo.*,order_sn,order_amount')
+                ->join("order d",'uo.order_id=d.order_id','LEFT')
                 ->where($where)
                 ->order('uo.id DESC')
                 ->paginate(10, false, ['query' => [
-                    'refund_status' => $refund_status,
+                    'refundstatus' => $refundstatus,
                     'order_id'      => $order_id,
                 ]]);
+        //退换货状态
+       
+        $refund_status           = config('REFUND_STATUS');
+        $refund_status['-1']     = '默认全部';
+        //退货原因
+        $refund_reason           = config('REFUND_REASON');
+        return $this->fetch('',[
+            'meta_title'    => '退换货列表', 
+            'list'          => $list, 
+            'refund_reason' => $refund_reason,
+            'refund_status' => $refund_status,
+            'order_id'      => $order_id,
+            'refundstatus'  => $refundstatus,
+        ]);
+    }
+    /**
+     *退换货详情
+     */
+    public function refund_edit(){
+        $id = input('id');
+        $info  = Db::name('order_refund')->alias('uo')->field('uo.*,order_sn,order_amount,realname')
+        ->join("order d",'uo.order_id=d.order_id','LEFT')
+        ->join("member m",'uo.user_id=m.id','LEFT')
+        ->where(['uo.id' => $id])
+        ->find();
+        $img = empty($info['img'])?'': explode(",", $info['img']);
+        return $this->fetch('',[
+            'img'           => $img,
+            'meta_title'    => '退换货详情', 
+            'info'          => $info, 
+            'refund_reason' => config('REFUND_REASON'), //退货原因
+            'refund_status' => config('REFUND_STATUS'),//退换货状态
+        ]);
 
-        return $this->fetch();
+    }
+    /***
+     * 发货单列表
+     */
+    public function  delivery_list(){
+
     }
 
 
@@ -184,6 +222,7 @@ class Order extends Common
     public function senduser(){
         $where      = array();
         $list       = Db::table('exhelper_senduser')->field('*')
+        
                     ->where($where)
                     ->order('id')
                     ->paginate(10, false, ['query' => $where]);
