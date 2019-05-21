@@ -19,7 +19,7 @@ class Goods extends ApiBase
     * 商品分类接口
     */
     public function categoryList(){
-        $list = Db::name('category')->where('is_show',1)->field('cat_id,cat_name,pid')->order('sort DESC,cat_id DESC')->select();
+        $list = Db::name('category')->where('is_show',1)->field('cat_id,cat_name,pid,img')->order('sort DESC,cat_id DESC')->select();
         $list  = getTree1($list);
         
         if($list){
