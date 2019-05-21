@@ -15,32 +15,47 @@ use think\Db;
 class Goods extends ApiBase
 {
 
-   /**
+    /**
     * 商品分类接口
     */
-    public function categoryList()
-    {
-        
-        $list = Db::name('category')->where('is_show',1)->order('sort DESC,cat_id ASC')->select();
+    public function categoryList(){
+        $list = Db::name('category')->where('is_show',1)->field('cat_id,cat_name,pid')->order('sort DESC,cat_id DESC')->select();
         $list  = getTree1($list);
-        foreach($list as $key=>$value){
-            $list[$key]['goods'] = Db::table('goods')->alias('g')
-                                ->join('goods_attr ga','FIND_IN_SET(ga.attr_id,g.goods_attr)','LEFT')
-                                ->where('cat_id1',$value['cat_id'])
+        
+        if($list){
+            foreach($list as $key=>&$value){
+                //热销
+                $list[$key]['hot'] = Db::table('goods')->alias('g')
+                                        ->join('goods_img gi','gi.goods_id=g.goods_id','LEFT')
+                                        ->where('cat_id1',$value['cat_id'])
+                                        ->where('g.is_show',1)
+                                        ->where('gi.main',1)
+                                        ->where('FIND_IN_SET(3,g.goods_attr)')
+                                        ->field('g.goods_id,goods_name,gi.picture img,price,original_price,g.goods_attr')
+                                        ->select();
+                if(isset($value['children'])){
+                    foreach($value['children'] as $ke=>&$val){
+
+                        $val['goods'] = Db::table('goods')->alias('g')
+                                ->join('goods_img gi','gi.goods_id=g.goods_id','LEFT')
+                                ->where('cat_id2',$val['cat_id'])
                                 ->where('g.is_show',1)
                                 ->where('gi.main',1)
-                                ->group('g.goods_id')
-                                ->join('goods_img gi','gi.goods_id=g.goods_id','LEFT')
-                                ->order('g.goods_id DESC')
-                                ->limit(4)
-                                ->field('g.goods_id,goods_name,gi.picture img,price,original_price,GROUP_CONCAT(ga.attr_name) attr_name,g.cat_id1 comment')
+                                ->field('g.goods_id,goods_name,gi.picture img,price,original_price,g.goods_attr')
                                 ->select();
-            if($list[$key]['goods']){
-                foreach($list[$key]['goods'] as $k=>$v){
-                    if($v['attr_name']){
-                        $list[$key]['goods'][$k]['attr_name'] = explode(',',$v['attr_name']);
-                    }else{
-                        $list[$key]['goods'][$k]['attr_name'] = array();
+                        if($val['goods']){
+                            foreach($val['goods'] as $g=>$v){
+                                if(strpos($v['goods_attr'], '3') !== false){
+                                    $list[$key]['hot'][] = $v;
+                                }
+                            }
+                        }
+                    }
+                }
+                if( $list[$key]['hot'] ){
+                    $list[$key]['hot'] = array_unique($list[$key]['hot'],SORT_REGULAR);
+                    foreach($list[$key]['hot'] as $hot=>$hot_val){
+                        $list[$key]['hot'][$hot]['attr_name'] = Db::table('goods_attr')->where('attr_id','in',$hot_val['goods_attr'])->field('attr_name')->select();
                     }
                 }
             }
@@ -48,6 +63,45 @@ class Goods extends ApiBase
         
         $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$list]);
     }
+
+
+
+
+
+
+   /**
+    * 商品分类接口
+    */
+    // public function categoryList()
+    // {
+        
+    //     $list = Db::name('category')->where('is_show',1)->order('sort DESC,cat_id ASC')->select();
+    //     $list  = getTree1($list);
+    //     foreach($list as $key=>$value){
+    //         $list[$key]['goods'] = Db::table('goods')->alias('g')
+    //                             ->join('goods_attr ga','FIND_IN_SET(ga.attr_id,g.goods_attr)','LEFT')
+    //                             ->where('cat_id1',$value['cat_id'])
+    //                             ->where('g.is_show',1)
+    //                             ->where('gi.main',1)
+    //                             ->group('g.goods_id')
+    //                             ->join('goods_img gi','gi.goods_id=g.goods_id','LEFT')
+    //                             ->order('g.goods_id DESC')
+    //                             ->limit(4)
+    //                             ->field('g.goods_id,goods_name,gi.picture img,price,original_price,GROUP_CONCAT(ga.attr_name) attr_name,g.cat_id1 comment')
+    //                             ->select();
+    //         if($list[$key]['goods']){
+    //             foreach($list[$key]['goods'] as $k=>$v){
+    //                 if($v['attr_name']){
+    //                     $list[$key]['goods'][$k]['attr_name'] = explode(',',$v['attr_name']);
+    //                 }else{
+    //                     $list[$key]['goods'][$k]['attr_name'] = array();
+    //                 }
+    //             }
+    //         }
+    //     }
+        
+    //     $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$list]);
+    // }
 
     public function category(){
         $cat_id = input('cat_id');

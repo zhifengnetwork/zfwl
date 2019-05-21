@@ -269,10 +269,10 @@ class Order extends ApiBase
 
         $orderInfoData['order_sn'] = date('YmdHis',time()) . mt_rand(10000000,99999999);
         $orderInfoData['user_id'] = $user_id;
-        $orderInfoData['order_status'] = 1;         //订单状态 0:待确认,1:已确认,2:已收货,3:已取消,4:已完成,5:已作废
-        $orderInfoData['pay_status'] = 0;       //支付状态 0:未支付,1:已支付,2:部分支付,3:已退款,4:拒绝退款
-        $orderInfoData['shipping_status'] = 0;       //商品配送情况;0:未发货,1:已发货,2:部分发货,3:已收货,4:退货
-        $orderInfoData['pay_type'] = $pay_type;    //支付方式 1:余额支付,2:后台付款,4:在线支付,5:微信支付,6:支付宝支付,7:银联支付,7:货到付款
+        $orderInfoData['order_status'] = 1;         //订单状态 0:待确认,1:已确认,2:已收货,3:已取消,4:已完成,5:已作废,6:申请退款,7:已退款
+        $orderInfoData['pay_status'] = 0;       //支付状态 0:未支付,1:已支付,2:部分支付
+        $orderInfoData['shipping_status'] = 0;       //商品配送情况;0:未发货,1:已发货,2:部分发货,3:已收货,4:退货,5:拒绝退款
+        $orderInfoData['pay_type'] = $pay_type;    //支付方式 1:余额支付,2:微信支付,3:支付宝支付,4:货到付款
         $orderInfoData['consignee'] = $addr_res['consignee'];       //收货人
         $orderInfoData['province'] = $addr_res['province'];
         $orderInfoData['city'] = $addr_res['city'];
@@ -357,7 +357,7 @@ class Order extends ApiBase
                         ->where($where)
                         ->where('o.deleted',0)
                         ->group('og.order_id')
-                        ->field('o.order_id,o.order_sn,og.goods_name,gi.picture img,og.spec_key_name,og.goods_price,g.original_price,og.goods_num,o.order_status,o.pay_status,o.shipping_status')
+                        ->field('o.order_id,o.order_sn,og.goods_name,gi.picture img,og.spec_key_name,og.goods_price,g.original_price,og.goods_num,o.order_status,o.pay_status,o.shipping_status,pay_type')
                         ->select();
         
         if($order_list){
@@ -599,7 +599,8 @@ class Order extends ApiBase
         }else{
             $this->ajaxReturn(['status' => -2 , 'msg'=>'参数错误！','data'=>'']);
         }
-
     }
+
+    
 
 }
