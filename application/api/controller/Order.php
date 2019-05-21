@@ -357,6 +357,7 @@ class Order extends ApiBase
                         ->where($where)
                         ->where('o.deleted',0)
                         ->group('og.order_id')
+                        ->order('o.order_id DESC')
                         ->field('o.order_id,o.order_sn,og.goods_name,gi.picture img,og.spec_key_name,og.goods_price,g.original_price,og.goods_num,o.order_status,o.pay_status,o.shipping_status,pay_type')
                         ->select();
         

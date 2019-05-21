@@ -12,7 +12,7 @@ class Search extends ApiBase
 
     /**
      * +---------------------------------
-     * 商品搜索列表页
+     * 搜索列表页
      * +---------------------------------
     */
     public function get_search(){
