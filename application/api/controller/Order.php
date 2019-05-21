@@ -285,13 +285,13 @@ class Order extends ApiBase
         $orderInfoData['coupon_price'] = $coupon_price;     //优惠金额
         $orderInfoData['shipping_price'] = $shipping_price;     //物流费(待完善)
         $orderInfoData['goods_price'] = $goods_price;     //商品价格
-        $orderInfoData['order_amount'] = $order_amount;     //订单金额
+        $orderInfoData['total_amount'] = $order_amount;     //订单金额
         
         if($coupon_price){
             $orderInfoData['coupon_id'] = $coupon_id;
-            $orderInfoData['total_amount'] = sprintf("%.2f",$order_amount - $coupon_price);       //总金额(实付金额)
+            $orderInfoData['order_amount'] = sprintf("%.2f",$order_amount - $coupon_price);       //总金额(实付金额)
         }else{
-            $orderInfoData['total_amount'] = $order_amount;       //总金额(实付金额)
+            $orderInfoData['order_amount'] = $order_amount;       //总金额(实付金额)
         }
 
         $order_id = Db::table('order')->insertGetId($orderInfoData);
