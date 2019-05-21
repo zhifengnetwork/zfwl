@@ -135,6 +135,7 @@ class Pay extends ApiBase
                     $jg = sprintf("%.2f",$value['goods_price'] * $value['goods_num']);
                     $jifen = sprintf("%.2f",$jifen + ($jg * $goods['gift_points']));
                 }else{
+                    $goods['gift_points'] = $goods['gift_points'] ? $goods['gift_points'] : 0;
                     $jifen = sprintf("%.2f",$jifen + ($value['goods_num'] * $goods['gift_points']));
                 }
             }
