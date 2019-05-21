@@ -321,13 +321,47 @@ return [
                         'hide'  => 1,
                     ],
                     [
-                        'id'    => 40106,
-                        'title' => '订单详情',
+                        'id'    => 40102,
+                        'title' => '发货单列表',
+                        'sort'  => 1,
+                        'url'   => 'order/edit',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 40103,
+                        'title' => '发货编辑',
                         'sort'  => 1,
                         'url'   => 'order/edit',
                         'hide'  => 0,
                     ],
-                   
+                    [
+                        'id'    => 40104,
+                        'title' => '发货编辑',
+                        'sort'  => 1,
+                        'url'   => 'order/edit',
+                        'hide'  => 0,
+                    ],
+                    [
+                        'id'    => 40105,
+                        'title' => '退换货管理',
+                        'sort'  => 1,
+                        'url'   => 'order/edit',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 40106,
+                        'title' => '退换货详情',
+                        'sort'  => 1,
+                        'url'   => 'order/edit',
+                        'hide'  => 0,
+                    ],
+                    [
+                        'id'    => 40107,
+                        'title' => '退换货删除',
+                        'sort'  => 1,
+                        'url'   => 'order/edit',
+                        'hide'  => 0,
+                    ],
                 ],
 
             ],
@@ -502,15 +536,6 @@ return [
                     ],
                 ],
             ],
-            [
-                'id'    => 50300,
-                'title' => '客服设置',
-                'sort'  => 3,
-                'url'   => 'config/get_config',
-                'icon'  => 'fa-th-large',
-                'hide'  => 1,
-            ],
-           
         ],
     ],
 

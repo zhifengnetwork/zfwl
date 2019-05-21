@@ -145,6 +145,38 @@ class Order extends Common
         return $this->fetch();
     }
 
+    /***
+     * 退换货列表
+     */
+    public function order_refund(){
+        $refund_status  = input('refund_status',-1);
+        $order_id       = input('order_id','');
+        if(!empty($order_id)){
+            $where['uo.order_id']       = $order_id;
+        }
+
+        if($refund_status >= 0){
+            $where['uo.refund_status']   = $refund_status;
+        }
+
+        $list  = Db::name('order_refund')->alias('uo')->field('uo.*')
+                ->join("order_id d",'uo.order_id=d.order_id','LEFT')
+                ->join("member a",'a.id=uo.user_id','LEFT')
+                ->where($where)
+                ->order('uo.id DESC')
+                ->paginate(10, false, ['query' => [
+                    'refund_status' => $refund_status,
+                    'order_id'      => $order_id,
+                ]]);
+
+        return $this->fetch();
+    }
+
+
+
+
+
+
 
     /***
      * 发货单信息管理

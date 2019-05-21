@@ -6,7 +6,7 @@
 	box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
-	width: 1357px;
+	min-width: 1357px;
 	height: 937px;
 	background-color: #f5f5f5;
 }
