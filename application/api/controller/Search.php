@@ -5,14 +5,6 @@
  * +---------------------------------
 */
 namespace app\api\controller;
-// use app\common\model\Users;
-// use app\common\logic\UsersLogic;
-use app\common\logic\GoodsLogic;
-use app\common\model\GoodsCategory;
-use app\common\model\SpecGoodsPrice;
-use app\common\logic\GoodsPromFactory;
-use think\AjaxPage;
-use think\Page;
 use think\Db;
 
 class Search extends ApiBase
@@ -23,8 +15,42 @@ class Search extends ApiBase
      * 商品搜索列表页
      * +---------------------------------
     */
-    public function search(){
+    public function get_search(){
 
+        $user_id = $this->get_user_id();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+        }
+
+        $hot = Db::table('search')->where('cat_id','>',0)->order('add_time DESC,number DESC')->field('keywords,cat_id')->limit(10)->select();
+        $data['hot'] = array_unique($hot,SORT_REGULAR);
+        $data['history'] = Db::table('search')->where('user_id',$user_id)->order('add_time DESC,number DESC')->field('keywords,cat_id')->limit(10)->select();
+
+        $like = Db::table('search')->where('user_id',$user_id)->where('cat_id','>',0)->order('add_time DESC,number DESC')->field('keywords,cat_id')->limit(10)->select();
+        $like = array_unique($like,SORT_REGULAR);
+        if(isset($like['cat_id'])){
+            $cat_ids = implode(',',$like['cat_id']);
+            $cat = Db::table('category')->where('cat_id','in',$cat_ids)->field('cat_id,pid')->select();
+
+            $pid = [];
+            if($cat){
+                foreach($cat as $key=>$value){
+                    if($value['pid']){
+                        $pid[] = Db::table('category')->where('cat_id',$value['pid'])->value('pid');
+                    }else{
+                        $pid[] = $value['cat_id'];
+                    }
+                }
+            }
+            $pid = implode(',',$pid);
+
+            $like = Db::table('category')->where('pid','in',$pid)->field('cat_id,cat_name')->limit(10)->select();
+            $data['like'] = shuffle($like);
+        }else{
+            $data['like'] = [];
+        }
+
+        $this->ajaxReturn(['status' => 1 , 'msg'=>'成功！','data'=>$data]);
     }
 
 
