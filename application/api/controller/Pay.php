@@ -130,15 +130,15 @@ class Pay extends ApiBase
                 }
                 $baifenbi = strpos($goods['gift_points'] ,'%');
                 if($baifenbi){
-                    echo $goods['gift_points'];die;
-                    $goods['gift_points'] = $goods['gift_points'] / 100;
-                    $jg = sprintf("%.2f",$value['goods_price'] * $value['goods_num']);
-                    $jifen = sprintf("%.2f",$jifen + ($jg * $goods['gift_points']));
+                    echo $goods['gift_points'];echo '---';
+                    // $goods['gift_points'] = $goods['gift_points'] / 100;
+                    // $jg = sprintf("%.2f",$value['goods_price'] * $value['goods_num']);
+                    // $jifen = sprintf("%.2f",$jifen + ($jg * $goods['gift_points']));
                 }else{
                     $jifen = sprintf("%.2f",$jifen + ($value['goods_num'] * $goods['gift_points']));
                 }
             }
-
+            die;
             $res = Db::table('member')->update(['id'=>$user_id,'gouwujifen'=>$jifen]);
 
 
