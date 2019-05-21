@@ -154,7 +154,7 @@ class Goods extends ApiBase
         if($goods_list['data']){
             foreach($goods_list['data'] as $key=>&$value){
                 $value['comment'] = Db::table('goods_comment')->where('goods_id',$value['goods_id'])->count();
-                $value['goods_attr'] = Db::table('goods_attr')->where('attr_id','in',$value['goods_attr'])->column('attr_name');
+                $value['attr_name'] = Db::table('goods_attr')->where('attr_id','in',$value['goods_attr'])->column('attr_name');
             }
         }
         
