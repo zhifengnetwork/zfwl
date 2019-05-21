@@ -164,7 +164,6 @@ class User extends ApiBase
      * 用户信息
      */
     public function userinfo(){
-       
         $user_id = $this->get_user_id();
         if(!empty($user_id)){
             $data = Db::name("member")->alias('m')
@@ -172,9 +171,12 @@ class User extends ApiBase
                 ->field('m.id,m.mobile,m.realname,m.pwd,m.avatar,m.gender,m.birthyear,m.birthmonth,m.birthday,m.mailbox,u.wx_nickname,wx_headimgurl')
                 ->where(['m.id' => $user_id])
                 ->find();
+            if(empty( $data)){
+                $this->ajaxReturn(['status' => -2 , 'msg'=>'会员不存在！','data'=>‘’]);
+            }    
             $data['is_pwd'] = !empty($data['pwd'])?1:0;
 
-            $res = Db::table("user_address")->where('user_id',$data['id'])
+            $res = Db::table("user_address")->where(['user_id'=>$data['id']])
                     ->field('*')
                     ->find();
             $data['is_address'] = $res?1:0;
