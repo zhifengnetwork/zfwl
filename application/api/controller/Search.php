@@ -56,6 +56,11 @@ class Search extends ApiBase
 
     public function search(){
 
+        $user_id = $this->get_user_id();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+        }
+
         $keywords = input('keywords');
 
         $cat_id = Db::table('category')->where('cat_name',"$keywords")->value('cat_id');

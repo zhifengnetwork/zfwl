@@ -602,6 +602,113 @@ class Order extends ApiBase
         }
     }
 
-    
+    /**
+    * 获取退款信息
+    */
+    public function get_refund(){
+        $user_id = $this->get_user_id();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+        }
+
+        $order_id = input('order_id');
+        $order = Db::table('order')->where('order_id',$order_id)->where('user_id',$user_id)->field('order_id,order_status,pay_status,shipping_status,consignee,mobile')->find();
+        if(!$order) $this->ajaxReturn(['status' => -2 , 'msg'=>'订单不存在！','data'=>'']);
+        if($order['pay_status'] == 0){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'参数错误！','data'=>'']);
+            // $this->ajaxReturn(['status' => -2 , 'msg'=>'该订单还未付款！','data'=>'']);
+        }
+        if( $order['order_status'] > 3 && $order['shipping_status'] > 4 ){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'参数错误！','data'=>'']);
+        }
+
+        $data['consignee'] = $order['consignee'];
+        $data['mobile'] = $order['mobile'];
+        $data['refund_reason'] = config('REFUND_REASON');
+        $data['refund_type'] = config('REFUND_TYPE');
+
+        $this->ajaxReturn(['status' => 1 , 'msg'=>'成功！','data'=>$data]);
+    }
+
+    /**
+    * 申请退款
+    */
+    public function apply_refund(){
+        $user_id = $this->get_user_id();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+        }
+
+        $order_id = input('order_id');
+        $refund_type = input('refund_type');
+        $refund_reason = input('refund_reason');
+        $cancel_remark = input('cancel_remark');
+        $create_time = time();
+        $img = input('img');
+
+        $order = Db::table('order')->where('order_id',$order_id)->where('user_id',$user_id)->field('order_id,order_status,pay_status,shipping_status')->find();
+        if(!$order) $this->ajaxReturn(['status' => -2 , 'msg'=>'订单不存在！','data'=>'']);
+
+        if($order['pay_status'] == 0){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'参数错误！','data'=>'']);
+            // $this->ajaxReturn(['status' => -2 , 'msg'=>'该订单还未付款！','data'=>'']);
+        }
+
+        if( $order['order_status'] > 3 && $order['shipping_status'] > 4 ){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'参数错误！','data'=>'']);
+        }
+
+        $refund = Db::table('order_refund')->where('order_id',$order['order_id'])->find();
+        if($refund){
+            if($refund['refund_status'] == 0){
+                $this->ajaxReturn(['status' => -2 , 'msg'=>'此订单已被拒绝退款！','data'=>'']);
+            }else if($refund['refund_status'] == 1){
+                $this->ajaxReturn(['status' => -2 , 'msg'=>'您已申请退款，待审核中！','data'=>'']);
+            }else if($refund['refund_status'] == 2){
+                $this->ajaxReturn(['status' => -2 , 'msg'=>'该订单已退款！','data'=>'']);
+            }
+        }
+
+        if(!empty($img)){
+            foreach ($img as $k => $val) {
+                $val = explode(',',$val)[1];
+                $saveName = request()->time().rand(0,99999) . '.png';
+
+                $img=base64_decode($val);
+                //生成文件夹
+                $names = "refund" ;
+                $name = "refund/" .date('Ymd',time()) ;
+                if (!file_exists(ROOT_PATH .Config('c_pub.img').$names)){ 
+                    mkdir(ROOT_PATH .Config('c_pub.img').$names,0777,true);
+                }
+                //保存图片到本地
+                file_put_contents(ROOT_PATH .Config('c_pub.img').$name.$saveName,$img);
+
+                // unset($img[$k]);
+                $img[$k] = $name.$saveName;
+            }
+            $img = implode(',',$img);
+        }
+
+        $data['order_id']  = $order_id;
+        $data['refund_type']   = $refund_type;
+        $data['refund_reason'] = $refund_reason;
+        $data['cancel_remark'] = $cancel_remark;
+        $data['create_time']   = $create_time;
+        $data['img']   = $img;
+        $data['refund_status'] = 1;
+        Db::startTrans();
+        $res = Db::table('order_refund')->insert($data);
+
+        Db::table('order')->update(['order_id'=>$order_id,'order_status'=>6,'shipping_status'=>4]);
+
+        if($res){
+            Db::commit();
+            $this->ajaxReturn(['status' => 1 , 'msg'=>'成功！','data'=>'']);
+        }else{
+            Db::rollback();
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'申请退款失败！','data'=>'']);
+        }
+    }
 
 }
