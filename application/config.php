@@ -292,16 +292,9 @@ return [
         6 => '发票问题',
         7 => '卖家发错货',
     ),
-<<<<<<< HEAD
-    'SHIPPING_STATUS' => array(
-        0 => '未发货',
-        1 => '已发货',
-        2 => '部分发货'
-=======
     'REFUND_TYPE' => array(
         0 => '支付原路退回',
         1 => '退到用户余额',
->>>>>>> 6ec8f7c16394bc86aae8b4afc81013a8e700c632
     ),
     'PAY_TYPE' => array(
         'credit' => ['pay_type'=>1,'pay_name'=>'余额支付'],
