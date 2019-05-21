@@ -343,7 +343,7 @@ return [
                     ],
                     [
                         'id'    => 40105,
-                        'title' => '退换货管理',
+                        'title' => '退换货列表',
                         'sort'  => 1,
                         'url'   => 'order/order_refund',
                         'hide'  => 1,
