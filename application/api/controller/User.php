@@ -81,18 +81,13 @@ class User extends ApiBase
         // }
 
         $data = Db::table("member")->where('mobile',$mobile)
-            ->field('id,password,mobile,salt,pwd')
+            ->field('id,password,mobile,salt')
             ->find();
 
         if(!$data){
             $this->ajaxReturn(['status' => -2 , 'msg'=>'手机不存在或错误！']);
         }
-        $data['is_pwd'] = !empty($data['pwd'])?1:0;
-
-        $res = Db::table("user_address")->where('user_id',$data['id'])
-                ->field('*')
-                ->find();
-        $data['is_address'] = $res?1:0;
+       
 
         $password = md5( $data['salt'] . $password);
         
@@ -100,7 +95,7 @@ class User extends ApiBase
             $this->ajaxReturn(['status' => -2 , 'msg'=>'登录密码错误！']);
         }
 
-        unset($data['password'],$data['salt'],$data['pwd']);
+        unset($data['password'],$data['salt']);
         //重写
         $data['token']    = $this->create_token($data['id']);
     
@@ -174,9 +169,16 @@ class User extends ApiBase
         if(!empty($user_id)){
             $data = Db::name("member")->alias('m')
                 ->join('user u','m.id=u.uid','LEFT')
-                ->field('m.mobile,m.realname,m.avatar,m.gender,m.birthyear,m.birthmonth,m.birthday,m.mailbox,u.wx_nickname,wx_headimgurl')
+                ->field('m.mobile,m.realname,m.pwd,m.avatar,m.gender,m.birthyear,m.birthmonth,m.birthday,m.mailbox,u.wx_nickname,wx_headimgurl')
                 ->where(['m.id' => $user_id])
                 ->find();
+            $data['is_pwd'] = !empty($data['pwd'])?1:0;
+
+            $res = Db::table("user_address")->where('user_id',$data['id'])
+                    ->field('*')
+                    ->find();
+            $data['is_address'] = $res?1:0;
+            unset($data['pwd']);
             if(empty($data['mobile'])){
                 $this->ajaxReturn(['status' => -2 , 'msg'=>'未绑定手机！','data'=>$data]);
             }
