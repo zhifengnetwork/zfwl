@@ -70,6 +70,13 @@ class Shop extends Common
         $page    = request()->param('page');
         if($page < 0){ $page = 1;}
         $list    = model('Goods')->getGoodsList($keyword,0,$page);
+
+        if (!empty($list)){
+            foreach ( $list as &$v){
+                $v['img'] = SITE_URL.'/upload/images/'.$v['img'];
+            }
+        }
+
         if (!empty($list)){
             return json(['code'=>1,'msg'=>'','data'=>$list]);
         }else{

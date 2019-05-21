@@ -1238,6 +1238,10 @@
 	width: 120px;
 	height: 120px;
 }
+.edit_shop_img img {
+	width: 100%;
+	height: 100%;
+}
 /*重新选择图片*/
 .edit_img, .edit_img_com {
 	position: relative;
