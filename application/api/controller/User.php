@@ -169,7 +169,7 @@ class User extends ApiBase
         if(!empty($user_id)){
             $data = Db::name("member")->alias('m')
                 ->join('user u','m.id=u.uid','LEFT')
-                ->field('m.mobile,m.realname,m.pwd,m.avatar,m.gender,m.birthyear,m.birthmonth,m.birthday,m.mailbox,u.wx_nickname,wx_headimgurl')
+                ->field('m.id,m.mobile,m.realname,m.pwd,m.avatar,m.gender,m.birthyear,m.birthmonth,m.birthday,m.mailbox,u.wx_nickname,wx_headimgurl')
                 ->where(['m.id' => $user_id])
                 ->find();
             $data['is_pwd'] = !empty($data['pwd'])?1:0;
@@ -178,7 +178,7 @@ class User extends ApiBase
                     ->field('*')
                     ->find();
             $data['is_address'] = $res?1:0;
-            unset($data['pwd']);
+            unset($data['pwd'],$data['id']);
             if(empty($data['mobile'])){
                 $this->ajaxReturn(['status' => -2 , 'msg'=>'未绑定手机！','data'=>$data]);
             }
