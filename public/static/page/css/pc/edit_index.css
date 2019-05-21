@@ -6,7 +6,7 @@
 	box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
-	width: 1357px;
+	min-width: 1357px;
 	height: 937px;
 	background-color: #f5f5f5;
 }
@@ -1237,6 +1237,10 @@
 .edit_addimg .edit_shop_img {
 	width: 120px;
 	height: 120px;
+}
+.edit_shop_img img {
+	width: 100%;
+	height: 100%;
 }
 /*重新选择图片*/
 .edit_img, .edit_img_com {

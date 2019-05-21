@@ -11,22 +11,25 @@ class Goods extends Model
     protected $autoWriteTimestamp = true;
 
     public function getGoodsList ($keyword = '',$cat_id = '',$page = 1) {
+//        dump($_SERVER);die;
         $where = [];
         $where_cat = [];
-        $where['is_show'] = 1;
-        $where['is_del'] = 0;
-        $field = 'goods_id,goods_name,desc,limited_start
-        ,limited_end,goods_spec,price,original_price,stock';
+        $where['a.is_show'] = 1;
+        $where['a.is_del'] = 0;
+        $where['b.main'] = 1;
+        $field = 'a.goods_id,a.goods_name,a.desc,a.limited_start
+        ,a.limited_end,a.goods_spec,a.price,a.original_price,a.stock,b.picture as img';
         if (!empty($keyword)){
             //商品搜索
-            $where['goods_name'] = ['like','%'.str_replace(" ",'',$keyword).'%'];
+            $where['a.goods_name'] = ['like','%'.str_replace(" ",'',$keyword).'%'];
         }
         if (!empty($cat_id)){
-            $list = $this->where($where)->where(function ($query) use ($cat_id) {
-                $query->where('cat_id1', $cat_id)->whereor('cat_id2', $cat_id);})
+            $list = $this->alias('a')->join('goods_img b','b.goods_id = a.goods_id','left')
+                ->where($where)->where(function ($query) use ($cat_id) {
+                $query->where('a.cat_id1', $cat_id)->whereor('a.cat_id2', $cat_id);})
                 ->field($field)->paginate(6,false,['page'=>$page]);
         }else{
-            $list = $this->where($where)->field($field)->paginate(6,false,['page'=> $page]);
+            $list = $this->alias('a')->join('goods_img b','b.goods_id = a.goods_id','left')->where($where)->field($field)->paginate(6,false,['page'=> $page]);
         }
         return $list;
     }

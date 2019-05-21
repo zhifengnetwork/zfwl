@@ -452,7 +452,7 @@
                                         <!--商品组-对应商品 -->
                                         <div class="edit_addimg clearfloat" v-for="(v,i) in backData['data'][puStateObj['key_num']]['data']['msg']">
                                             <div class="edit_img_com edit_shop_img hover_box" @click="two_way_button(i)">
-                                                <img :src="v.imgUrl" alt="">
+                                                <img :src="v.img" alt="">
                                             </div>
                                             <div class="edit_link">
                                                 <div class="edit_shop">商品名称<span>{{v.goods_name}}</span></div>

@@ -119,6 +119,27 @@ class Pay extends ApiBase
                 'pay_time'     => time(),
             ];
             $reult = Order::where(['order_id' => $order_id])->update($update);
+
+            $goods_res = Db::table('order_goods')->field('goods_id,goods_name,goods_num,spec_key_name,goods_price,sku_id')->where('order_id',$order_id)->select();
+            $jifen = 0;
+            foreach($goods_res as $key=>$value){
+                $goods = Db::table('goods')->where('goods_id',$value['goods_id'])->field('less_stock_type,gift_points')->find();
+                //付款减库存
+                if($goods['less_stock_type']==2){
+                    Db::table('goods_sku')->where('sku_id',$value['sku_id'])->setDec('inventory',$value['goods_num']);
+                }
+                $baifenbi = strpos($goods['gift_points'] ,'%');
+                if($baifenbi){
+                    $jg = sprintf("%.2f",$value['goods_price'] * $value['goods_num']);
+                    $jifen = sprintf("%.2f",$jifen + ($jg * $goods['gift_points']));
+                }else{
+                    $jifen = sprintf("%.2f",$jifen + ($value['goods_num'] * $goods['gift_points']));
+                }
+            }
+
+            $res = Db::table('member')->update(['id'=>$user_id,'gouwujifen'=>$jifen]);
+
+
             if($reult){
                 // 提交事务
                 Db::commit();
