@@ -270,7 +270,7 @@
                                         <div class="edit_addimg clearfloat" v-for="(v,i) in backData['data'][puStateObj['key_num']]['data']['images']">
                                             <!--上传图片(弹出遮罩层)=>@click="call_off(i)"-->
                                             <div class="edit_img hover_box" @click="call_off(i)">
-                                                <img class="image_up" :src="v.img" alt="">
+                                                <img class="image_up" :src="v.imgUrl" alt="">
                                             </div>
                                             <div class="edit_link">
                                                 <label>选择链接<input type="text" placeholder="请手动输入链接(请以http://开头)" v-model="v.url"></label><button @click.stop="close_system_box()">系统连接</button>
@@ -454,7 +454,7 @@
                                         <!--商品组-对应商品 -->
                                         <div class="edit_addimg clearfloat" v-for="(v,i) in backData['data'][puStateObj['key_num']]['data']['msg']">
                                             <div class="edit_img_com edit_shop_img hover_box" @click="two_way_button(i)">
-                                                <img :src="v.imgUrl" alt="">
+                                                <img :src="v.img" alt="">
                                             </div>
                                             <div class="edit_link">
                                                 <div class="edit_shop">商品名称<span>{{v.goods_name}}</span></div>
