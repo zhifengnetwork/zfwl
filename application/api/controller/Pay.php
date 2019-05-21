@@ -130,6 +130,7 @@ class Pay extends ApiBase
                 }
                 $baifenbi = strpos($goods['gift_points'] ,'%');
                 if($baifenbi){
+                    $goods['gift_points'] = $goods['gift_points'] / 100;
                     $jg = sprintf("%.2f",$value['goods_price'] * $value['goods_num']);
                     $jifen = sprintf("%.2f",$jifen + ($jg * $goods['gift_points']));
                 }else{
