@@ -75,7 +75,7 @@
                                     <td>{$vo.add_time|date="y-m-d H:i:s",###}</td>
                                     <td>
                                         <a class="btn btn-default" href="{:url('order/edit',['order_id'=>$vo.order_id])}"><i class="fa fa-list"></i> 查看</a>
-                                        <a class="btn btn-default" href="{:url('order/edit',['order_id'=>$vo.order_id])}"><i class="fa fa-list"></i> 删除</a>
+                                        <a class="btn btn-default delete" @click.stop="del_data($event)" attr_url="{:url('index/page_delete',['id'=>$vo.order_id])}" id="{$vo.order_id}" >删除 <i class="fa fa-trash-o" attr_url="{:url('index/page_delete',['id'=>$vo.id])}"></i></a>
                                     </td>
                                 </tr>
                                 {/volist}
