@@ -148,9 +148,16 @@ class Goods extends ApiBase
                         ->where($where)
                         ->where($whereRaw)
                         ->order($order)
-                        ->field('g.goods_id,gi.picture img,goods_name,desc,price,original_price,cat_id1 comment')
+                        ->field('g.goods_id,gi.picture img,goods_name,desc,price,original_price,g.goods_attr')
                         ->paginate(10,false,$pageParam)
                         ->toArray();
+        if($goods_list['data']){
+            foreach($goods_list['data'] as $key=>&$value){
+                $value['comment'] = Db::table('goods_comment')->where('goods_id',$value['goods_id'])->count();
+                $value['attr_name'] = Db::table('goods_attr')->where('attr_id','in',$value['goods_attr'])->column('attr_name');
+            }
+        }
+        
         $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>['cate_list'=>$cate_list,'goods_list'=>$goods_list['data']]]);
 
     }

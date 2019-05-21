@@ -5,14 +5,6 @@
  * +---------------------------------
 */
 namespace app\api\controller;
-// use app\common\model\Users;
-// use app\common\logic\UsersLogic;
-use app\common\logic\GoodsLogic;
-use app\common\model\GoodsCategory;
-use app\common\model\SpecGoodsPrice;
-use app\common\logic\GoodsPromFactory;
-use think\AjaxPage;
-use think\Page;
 use think\Db;
 
 class Search extends ApiBase
@@ -20,15 +12,151 @@ class Search extends ApiBase
 
     /**
      * +---------------------------------
-     * 商品搜索列表页
+     * 搜索列表页
      * +---------------------------------
     */
-    public function search(){
+    public function get_search(){
 
+        $user_id = $this->get_user_id();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+        }
+
+        $hot = Db::table('search')->where('cat_id','>',0)->order('add_time DESC,number DESC')->field('keywords,cat_id')->limit(10)->select();
+        $data['hot'] = array_unique($hot,SORT_REGULAR);
+        $data['history'] = Db::table('search')->where('user_id',$user_id)->order('add_time DESC,number DESC')->field('keywords,cat_id')->limit(10)->select();
+
+        $like = Db::table('search')->where('user_id',$user_id)->where('cat_id','>',0)->order('add_time DESC,number DESC')->field('keywords,cat_id')->limit(10)->select();
+        $like = array_unique($like,SORT_REGULAR);
+        if(isset($like['cat_id'])){
+            $cat_ids = implode(',',$like['cat_id']);
+            $cat = Db::table('category')->where('cat_id','in',$cat_ids)->field('cat_id,pid')->select();
+
+            $pid = [];
+            if($cat){
+                foreach($cat as $key=>$value){
+                    if($value['pid']){
+                        $pid[] = Db::table('category')->where('cat_id',$value['pid'])->value('pid');
+                    }else{
+                        $pid[] = $value['cat_id'];
+                    }
+                }
+            }
+            $pid = implode(',',$pid);
+
+            $like = Db::table('category')->where('pid','in',$pid)->field('cat_id,cat_name')->limit(10)->select();
+            $data['like'] = shuffle($like);
+        }else{
+            $data['like'] = [];
+        }
+
+        $this->ajaxReturn(['status' => 1 , 'msg'=>'成功！','data'=>$data]);
     }
 
 
+    public function search(){
 
+        $keywords = input('keywords');
+
+        $cat_id = Db::table('category')->where('cat_name',"$keywords")->value('cat_id');
+        $cat_id2 = 'cat_id1';
+        $sort = input('sort');
+        $goods_attr = input('goods_attr');
+        $page = input('page',1);
+
+        $where = [];
+        $whereRaw = [];
+        $pageParam = ['query' => []];
+        if($cat_id){
+            $cate_list = Db::name('category')->where('is_show',1)->where('cat_id',$cat_id)->value('pid');
+            if($cate_list){
+                $cate_list = Db::name('category')->where('is_show',1)->where('pid',$cate_list)->select();
+                $cat_id2 = 'cat_id2';
+            }else{
+                $cate_list = Db::name('category')->where('is_show',1)->where('pid',$cat_id)->select();
+            }
+            $where[$cat_id2] = $cat_id;
+            $pageParam['query'][$cat_id2] = $cat_id;
+
+            $cate_list  = getTree1($cate_list);
+
+            if($goods_attr){
+                $whereRaw = "FIND_IN_SET($goods_attr,goods_attr)";
+                $pageParam['query']['goods_attr'] = $goods_attr;
+            }
+
+            if($sort){
+                $order['price'] = $sort;
+            }else{
+                $order['goods_id'] = 'DESC';
+            }
+            
+            $goods_list = Db::name('goods')->alias('g')
+                            ->join('goods_img gi','gi.goods_id=g.goods_id','LEFT')
+                            ->where('gi.main',1)
+                            ->where('is_show',1)
+                            ->where($where)
+                            ->where($whereRaw)
+                            ->order($order)
+                            ->field('g.goods_id,gi.picture img,goods_name,desc,price,original_price,g.goods_attr')
+                            ->paginate(10,false,$pageParam)
+                            ->toArray();
+            if($goods_list['data']){
+                foreach($goods_list['data'] as $key=>&$value){
+                    $value['comment'] = Db::table('goods_comment')->where('goods_id',$value['goods_id'])->count();
+                    $value['attr_name'] = Db::table('goods_attr')->where('attr_id','in',$value['goods_attr'])->column('attr_name');
+                }
+            }
+            
+            //添加搜索记录
+            $where = [];
+            $where['user_id']   =   $user_id;
+            $where['keywords']  =   $keywords;
+            $where['cat_id']    =   $cat_id;
+            $id = Db::table('search')->where($where)->value('id');
+            if($id){
+                Db::table('search')->where('id',$id)->setInc('number',1);
+            }else{
+                $where['number'] = 1;
+                $where['add_time'] = time();
+                Db::table('search')->insert($where);
+            }
+
+            $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>['cate_list'=>$cate_list,'goods_list'=>$goods_list['data']]]);
+        }else{
+
+            $goods_list = Db::table('goods')->alias('g')
+                        ->join('goods_img gi','gi.goods_id=g.goods_id','LEFT')
+                        ->where('gi.main',1)
+                        ->where('is_show',1)
+                        ->where('g.goods_name','like',"%{$keywords}%")
+                        ->field('g.goods_id,gi.picture img,goods_name,desc,price,original_price,g.goods_attr')
+                        ->paginate(10,false,$pageParam)
+                        ->toArray();
+            if($goods_list['data']){
+                foreach($goods_list['data'] as $key=>&$value){
+                    $value['comment'] = Db::table('goods_comment')->where('goods_id',$value['goods_id'])->count();
+                    $value['attr_name'] = Db::table('goods_attr')->where('attr_id','in',$value['goods_attr'])->column('attr_name');
+                }
+            }
+            
+            //添加搜索记录
+            $where = [];
+            $where['user_id']   =   $user_id;
+            $where['keywords']  =   $keywords;
+            $where['cat_id']    =   0;
+            $id = Db::table('search')->where($where)->value('id');
+            if($id){
+                Db::table('search')->where('id',$id)->setInc('number',1);
+            }else{
+                $where['number'] = 1;
+                $where['add_time'] = time();
+                Db::table('search')->insert($where);
+            }
+
+            $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>['cate_list'=>[],'goods_list'=>$goods_list['data']]]);
+        }
+    }
 
 
     // public function Search()
