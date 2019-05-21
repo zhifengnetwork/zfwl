@@ -186,7 +186,7 @@ class Distribution extends Common
             $data = input('post.');
 
             $data['updatelevel'] = json_encode($data['updatelevel']);
-            $data['authority']   = serialize($data['authority']);
+            $data['authority']   = isset($data['authority']) ? serialize($data['authority']) : serialize(array());
 
             if($id){
                 //添加操作日志
