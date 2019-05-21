@@ -171,6 +171,12 @@ class User extends ApiBase
                 ->field('m.mobile,m.realname,m.avatar,m.gender,m.birthyear,m.birthmonth,m.birthday,m.mailbox,u.wx_nickname,wx_headimgurl')
                 ->where(['m.id' => $user_id])
                 ->find();
+            if(!empty($data['pwd'])){
+                $data['is_pwd'] =  1;
+            }else{
+                $data['is_pwd'] =  0;
+            }   
+            unset($data['pwd']); 
             if(empty($data['mobile'])){
                 $this->ajaxReturn(['status' => -2 , 'msg'=>'未绑定手机！','data'=>$data]);
             }
