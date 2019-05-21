@@ -101,6 +101,7 @@
                                 </tr>
                             </thead> 
                             <tbody>
+                                {notempty name="list"}
                                 {volist name="list" id="vo"}
                                 <tr>
                                     <td>{$vo.order_sn}</td>
@@ -113,6 +114,7 @@
                                     <td>{$vo.add_time|date="y-m-d H:i:s",###}</td>
                                     <td>
                                         <a class="btn btn-default" href="{:url('order/edit',['order_id'=>$vo.order_id])}"><i class="fa fa-list"></i> 查看订单</a>
+                                        <a class="btn btn-default" href="{:url('order/edit',['order_id'=>$vo.order_id])}"><i class="fa fa-list"></i> </a>
                                     </td>
                                 </tr>
                                 {/volist}
