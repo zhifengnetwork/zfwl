@@ -324,14 +324,14 @@ return [
                         'id'    => 40102,
                         'title' => '发货单列表',
                         'sort'  => 1,
-                        'url'   => 'order/edit',
+                        'url'   => 'order/delivery_list',
                         'hide'  => 1,
                     ],
                     [
                         'id'    => 40103,
                         'title' => '发货编辑',
                         'sort'  => 1,
-                        'url'   => 'order/edit',
+                        'url'   => 'order/delivery_info',
                         'hide'  => 0,
                     ],
                     [

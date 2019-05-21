@@ -292,6 +292,11 @@ return [
         6 => '发票问题',
         7 => '卖家发错货',
     ),
+    'SHIPPING_STATUS' => array(
+        0 => '未发货',
+        1 => '已发货',
+        2 => '部分发货'
+    ),
     'PAY_TYPE' => array(
         'credit' => ['pay_type'=>1,'pay_name'=>'余额支付'],
         'weixin' => ['pay_type'=>2,'pay_name'=>'微信支付'],

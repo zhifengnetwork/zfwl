@@ -3,6 +3,7 @@ namespace app\common\model;
 
 use think\helper\Time;
 use think\Model;
+use think\Db;
 
 class Order extends Model
 {
@@ -59,6 +60,21 @@ class Order extends Model
     {
         $config = config('SHIPPING_STATUS');
         return $config[$data['shipping_status']];
+    }
+
+     /**
+     * 订单详细收货地址
+     * @param $value
+     * @param $data
+     * @return string
+     */
+    public function getFullAddressAttr($value, $data)
+    {
+        $province = Db::name('region')->where(['area_id' => $data['province']])->value('area_name');
+        $city     = Db::name('region')->where(['area_id' => $data['city']])->value('area_name');
+        $district = Db::name('region')->where(['area_id' => $data['district']])->value('area_name');
+        $address = $province . '，' . $city . '，' . $district . '，' . $data['address'];
+        return $address;
     }
 
     /***
