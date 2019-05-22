@@ -63,6 +63,11 @@ class Search extends ApiBase
 
         $keywords = input('keywords');
 
+        $keywords = trim($keywords);
+        if(!$keywords){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'搜索关键字不能为空！','data'=>'']);
+        }
+
         $cat_id = Db::table('category')->where('cat_name',"$keywords")->value('cat_id');
         $cat_id2 = 'cat_id1';
         $sort = input('sort');
