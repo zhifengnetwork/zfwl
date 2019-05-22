@@ -354,18 +354,19 @@ class Order extends ApiBase
         if ($type=='dfh')$where = array('order_status' => 1 ,'pay_status'=>1 ,'shipping_status' =>0); //待发货
         if ($type=='dsh')$where = array('order_status' => 1 ,'pay_status'=>1 ,'shipping_status' =>1); //待收货
         if ($type=='dpj')$where = array('order_status' => 4 ,'pay_status'=>1 ,'shipping_status' =>3); //待评价
+        if ($type=='tk')$where = array('order_status' => [['=',6],['=',7],'or'] ,'pay_status'=>1 ,'shipping_status' =>[['=',4],['=',5],'or']); //退款/售后
         if ($type=='yqx')$where = array('order_status' => 3); //已取消
 
 
         $where['o.user_id'] = $user_id;
         $where['gi.main'] = 1;
+        $where['o.deleted'] = 0;
 
         $order_list = Db::table('order')->alias('o')
                         ->join('order_goods og','og.order_id=o.order_id','LEFT')
                         ->join('goods_img gi','gi.goods_id=og.goods_id','LEFT')
                         ->join('goods g','g.goods_id=og.goods_id','LEFT')
                         ->where($where)
-                        ->where('o.deleted',0)
                         ->group('og.order_id')
                         ->order('o.order_id DESC')
                         ->field('o.order_id,o.order_sn,og.goods_name,gi.picture img,og.spec_key_name,og.goods_price,g.original_price,og.goods_num,o.order_status,o.pay_status,o.shipping_status,pay_type')
@@ -394,6 +395,12 @@ class Order extends ApiBase
 
                 }else if( $value['order_status'] == 3 && $value['pay_status'] == 0 && $value['shipping_status'] == 0 ){
                     $value['status'] = 5;   //已取消
+                }else if( $value['order_status'] == 6 && $value['pay_status'] == 1 && $value['shipping_status'] == 4 ){
+                    $value['status'] = 6;   //待退款
+                }else if( $value['order_status'] == 7 && $value['pay_status'] == 1 && $value['shipping_status'] == 4 ){
+                    $value['status'] = 7;   //已退款
+                }else if( $value['order_status'] == 7 && $value['pay_status'] == 1 && $value['shipping_status'] == 5 ){
+                    $value['status'] = 8;   //拒绝退款
                 }
             }
         }
