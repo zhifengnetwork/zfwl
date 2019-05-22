@@ -670,6 +670,7 @@ class Order extends ApiBase
         }
 
         if(!empty($img)){
+            $img = json_decode($img,true);
             foreach ($img as $k => $val) {
                 $val = explode(',',$val)[1];
                 $saveName = request()->time().rand(0,99999) . '.png';
@@ -698,7 +699,6 @@ class Order extends ApiBase
         $data['create_time']   = $create_time;
         $data['img']   = $img;
         $data['refund_status'] = 1;
-        pred($data);
         Db::startTrans();
         $res = Db::table('order_refund')->insert($data);
 
