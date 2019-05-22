@@ -142,6 +142,7 @@ class Search extends ApiBase
                         ->where('is_show',1)
                         ->where('g.goods_name','like',"%{$keywords}%")
                         ->field('g.goods_id,gi.picture img,goods_name,desc,price,original_price,g.goods_attr')
+                        ->order($order)
                         ->paginate(10,false,$pageParam)
                         ->toArray();
             if($goods_list['data']){
