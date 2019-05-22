@@ -68,6 +68,10 @@
       margin-left: -20%;
   
     }
+    
+    #goods_table input{
+        width:100% !important;
+    }
   </style>
 
 <div class="wrapper wrapper-content animated fadeInRight">
@@ -103,12 +107,13 @@
                                              <th>规格ID</th>
                                              <th class="th_1"><input type="text" readonly="readonly" style="border: 0px;" name="goods_th[1][]" value="规格"></th>
                                              {volist name='rsts.th' id='data_th'}
-                                             {if condition="($data_th neq '价格') and ($data_th neq '库存') and ($data_th neq '规格') and ($data_th neq '长度') and ($data_th neq '宽度') and ($data_th neq '高度') and ($data_th neq '体积') and ($data_th neq '重量') and ($data_th neq '温藏')"}
+                                             {if condition="($data_th neq '价格') and ($data_th neq '库存') and ($data_th neq '冻结库存') and ($data_th neq '规格') and ($data_th neq '长度') and ($data_th neq '宽度') and ($data_th neq '高度') and ($data_th neq '体积') and ($data_th neq '重量') and ($data_th neq '温藏')"}
                                                  <th class="th_{$key + 1}"><input type="text" readonly="readonly" style="border: 0px;width: 85%;" name="goods_th[{$key+1}][]" value="{$data_th}"><i class="Hui-iconfont Hui-iconfont-close th_close" style="color: #778899;display:none;"></i></th>
                                              {/if}	
                                              {/volist}
                                              <th><input type="text" readonly="readonly" style="border: 0px;" name="pri_th[pri][]" value="本店售价(元)"></th>
                                              <th><input type="text" readonly="readonly" style="border: 0px;" name="goods_th[num][]" value="库存"></th>
+                                             <th>冻结库存</th>
                                              <th style="width: 25px;">操作</th>
                                          </tr>
                                          </thead>
@@ -116,11 +121,14 @@
                                              {volist name='rsts.td' id='data_td'}
                                              <tr {if condition="$key === 0"}class="tr_1"{/if}>
                                                  {volist name='data_td' id='vo'}
-                                                     {if condition="($key !== 'com_price') and ($key !== 'inventory') and ($key !== 'l') and ($key !== 'w') and ($key !== 'h') and ($key !== 'v') and ($key !== 'wg') and ($key !== 'refrigerate') and ($key !== 'sku_id')"}
+                                                     {if condition="($key !== 'com_price') and ($key !== 'inventory') and ($key !== 'frozen_stock') and ($key !== 'l') and ($key !== 'w') and ($key !== 'h') and ($key !== 'v') and ($key !== 'wg') and ($key !== 'refrigerate') and ($key !== 'sku_id')"}
                                                      <td class="td_{$key+1}"><input class="input-text" type="text" name="goods_td[{$key+1}][]" value="{$vo}"></td>
                                                      {/if}
                                                      {if condition="($key === 'inventory')"}
                                                      <td><input class="input-text" type="text" name="goods_td[num][]" value="{$vo}"></td>
+                                                     {/if}
+                                                     {if condition="($key === 'frozen_stock')"}
+                                                     <td style="width: 75px;">{$vo}</td>
                                                      {/if}
                                                      {if condition="($key === 'com_price')"}
                                                      <td>
@@ -505,7 +513,7 @@
 <script type="text/javascript">
 
     var rowCount = $("#goods_table tbody").find("tr").length - 1; //行数
-    var colCount = $("#goods_table thead").find("tr").find("th").length - 4; //列数
+    var colCount = $("#goods_table thead").find("tr").find("th").length - 5; //列数
     
     // 添加行
     function addRow(){

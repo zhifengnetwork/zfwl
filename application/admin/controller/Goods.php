@@ -448,10 +448,12 @@ class Goods extends Common
             }
             
             $spec_info[$key]['inventory'] = $val['inventory'];
+            $spec_info[$key]['frozen_stock'] = $val['frozen_stock'];
         }
         
         $spec_th[] = '价格';
         $spec_th[] = '库存';
+        $spec_th[] = '冻结库存';
         $info['th'] = $spec_th;
         $info['td'] = $spec_info;
         return $info;
