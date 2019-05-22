@@ -309,6 +309,7 @@ class Order extends ApiBase
             //拍下减库存
             if($value['less_stock_type']==1){
                 Db::table('goods_sku')->where('sku_id',$value['sku_id'])->setDec('inventory',$value['goods_num']);
+                Db::table('goods')->where('goods_id',$value['goods_id'])->setDec('stock',$value['goods_num']);
             }else if($value['less_stock_type']==2){
                 //冻结库存
                 Db::table('goods_sku')->where('sku_id',$value['sku_id'])->setDec('frozen_stock',$value['goods_num']);

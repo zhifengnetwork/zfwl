@@ -136,6 +136,7 @@ class Pay extends ApiBase
                 if($goods['less_stock_type']==2){
                     Db::table('goods_sku')->where('sku_id',$value['sku_id'])->setDec('inventory',$value['goods_num']);
                     Db::table('goods_sku')->where('sku_id',$value['sku_id'])->setDec('frozen_stock',$value['goods_num']);
+                    Db::table('goods')->where('goods_id',$value['goods_id'])->setDec('stock',$value['goods_num']);
                 }
                 $baifenbi = strpos($goods['gift_points'] ,'%');
                 if($baifenbi){
