@@ -217,6 +217,13 @@ class Order extends ApiBase
             $order_amount = sprintf("%.2f",$order_amount + $value['subtotal_price']);   //计算该订单的总价
             $cat_id = Db::table('goods')->where('goods_id',$value['goods_id'])->value('cat_id1');
             foreach($value['spec'] as $k=>$v){
+
+                $sku = Db::table('goods_sku')->where('sku_id',$v['sku_id'])->field('inventory,frozen_stock')->find();
+                $sku_num = $sku['inventory'] - $sku['frozen_stock'];
+                if( $v['goods_num'] > $sku_num ){
+                    $this->ajaxReturn(['status' => -2 , 'msg'=>"商品：{$v['goods_name']}规格：{$v['spec_key_name']}数量：剩余{$sku_num}件可购买！",'data'=>'']);
+                }
+
                 $order_goods[$i]['goods_id'] = $v['goods_id'];
                 $order_goods[$i]['user_id'] = $v['user_id'];
                 $order_goods[$i]['less_stock_type'] = $goods_res['less_stock_type'];
@@ -233,7 +240,6 @@ class Order extends ApiBase
                 $i++;
             }
         }
-
         $coupon_price = 0;
         $goods_ids = $goods_ids . 0;
         if($coupon_id){
