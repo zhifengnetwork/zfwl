@@ -657,7 +657,7 @@ class Order extends ApiBase
         if( $order['order_status'] > 3 && $order['shipping_status'] > 4 ){
             $this->ajaxReturn(['status' => -2 , 'msg'=>'参数错误！','data'=>'']);
         }
-
+        pred($img);
         $refund = Db::table('order_refund')->where('order_id',$order['order_id'])->find();
         if($refund){
             if($refund['refund_status'] == 0){
