@@ -671,6 +671,7 @@ class Order extends ApiBase
 
         if(!empty($img)){
             $img = json_decode($img,true);
+            pred($img);
             foreach ($img as $k => $val) {
                 $val = explode(',',$val)[1];
                 $saveName = request()->time().rand(0,99999) . '.png';
