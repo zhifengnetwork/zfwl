@@ -730,10 +730,33 @@ class Order extends ApiBase
     }
 
     /**
-    * 取消退款
+    * 取消申请退款失败
     */
     public function cancel_refund(){
+        $user_id = $this->get_user_id();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+        }
 
+        $order_id = input('order_id');
+
+        $order = Db::table('order')->where('order_id',$order_id)->where('user_id',$user_id)->field('order_id,order_status,pay_status,shipping_status')->find();
+        if(!$order) $this->ajaxReturn(['status' => -2 , 'msg'=>'订单不存在！','data'=>'']);
+
+        if($order['order_status'] != 6){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'参数错误！','data'=>'']);
+        }
+        
+        if($order['shipping_status'] == 0 || $order['shipping_status'] == 1){
+            $res = Db::table('order')->update(['order_id'=>$order_id,'order_status'=>1]);
+        }else if($order['shipping_status'] == 3){
+            $res = Db::table('order')->update(['order_id'=>$order_id,'order_status'=>4]);
+        }
+
+        if($res){
+            $this->ajaxReturn(['status' => 1 , 'msg'=>'取消申请退款成功！','data'=>'']);
+        }else{
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'取消申请退款失败！','data'=>'']);
+        }
     }
-
 }
