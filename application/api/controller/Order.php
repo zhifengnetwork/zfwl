@@ -462,7 +462,9 @@ class Order extends ApiBase
                 $order['pay_type'] = $value;
             }
         }
-
+        
+        $order_refund = 0;
+        $data['order_refund'] = [];
         if( $order['order_status'] == 1 && $order['pay_status'] == 0 && $order['shipping_status'] == 0 ){
             $order['status'] = 1;   //待付款
         }else if( $order['order_status'] == 1 && $order['pay_status'] == 1 && $order['shipping_status'] == 0 ){
@@ -473,6 +475,19 @@ class Order extends ApiBase
             $order['status'] = 4;   //待评价
         }else if( $order['order_status'] == 3 && $order['pay_status'] == 0 && $order['shipping_status'] == 0 ){
             $order['status'] = 5;   //已取消
+        }else if( $order['order_status'] == 6 ){
+            $order['status'] = 6;   //待退款
+            $order_refund = 1;
+        }else if( $order['order_status'] == 7 ){
+            $order['status'] = 7;   //已退款
+            $order_refund = 1;
+        }else if( $order['order_status'] == 8 ){
+            $order['status'] = 8;   //拒绝退款
+            $order_refund = 1;
+        }
+
+        if($order_refund){
+            $order['order_refund'] = Db::table('order_refund')->where('order_id',$order_id)->find();
         }
         
         $order['goods_res'] = Db::table('order_goods')->field('goods_id,goods_name,goods_num,spec_key_name,goods_price')->where('order_id',$order['order_id'])->select();
@@ -710,6 +725,7 @@ class Order extends ApiBase
         }
 
         $data['order_id']  = $order_id;
+        $data['refund_sn'] = 'ZF' . date('YmdHis',time()) . mt_rand(100000,999999);
         $data['refund_type']   = $refund_type;
         $data['refund_reason'] = $refund_reason;
         $data['cancel_remark'] = $cancel_remark;
