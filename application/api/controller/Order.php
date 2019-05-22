@@ -671,12 +671,11 @@ class Order extends ApiBase
 
         if(!empty($img)){
             $img = json_decode($img,true);
-            pre($img);
             foreach ($img as $k => $val) {
                 $val = explode(',',$val)[1];
                 $saveName = request()->time().rand(0,99999) . '.png';
 
-                $img=base64_decode($val);
+                $imga=base64_decode($val);
                 //生成文件夹
                 $names = "refund" ;
                 $name = "refund/" .date('Ymd',time()) ;
@@ -684,12 +683,11 @@ class Order extends ApiBase
                     mkdir(ROOT_PATH .Config('c_pub.img').$names,0777,true);
                 }
                 //保存图片到本地
-                file_put_contents(ROOT_PATH .Config('c_pub.img').$name.$saveName,$img);
+                file_put_contents(ROOT_PATH .Config('c_pub.img').$name.$saveName,$imga);
 
                 // unset($img[$k]);
                 $img[$k] = $name.$saveName;
             }
-            pred($img);
             $img = implode(',',$img);
         }
 
