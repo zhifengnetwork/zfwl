@@ -201,7 +201,7 @@
                             <div class="col-sm-9">
                                     <dd class="upload_area clearfix" style="margin: 0 auto;">
                                         <ul id="imglist" class="post_imglist">
-                                            
+                                            {notempty name="$img"}
                                             {volist name="$img" id="vo"}
                                                 {if condition="$vo"}
                                                 <li style="padding: 10px;" class="li_img"><span imgid="{$vo.id}" class="del"></span>

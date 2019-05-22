@@ -217,6 +217,7 @@ class Order extends ApiBase
             $order_amount = sprintf("%.2f",$order_amount + $value['subtotal_price']);   //计算该订单的总价
             $cat_id = Db::table('goods')->where('goods_id',$value['goods_id'])->value('cat_id1');
             foreach($value['spec'] as $k=>$v){
+                pre($v);
                 $order_goods[$i]['goods_id'] = $v['goods_id'];
                 $order_goods[$i]['user_id'] = $v['user_id'];
                 $order_goods[$i]['less_stock_type'] = $goods_res['less_stock_type'];
@@ -233,7 +234,12 @@ class Order extends ApiBase
                 $i++;
             }
         }
+        pre($cart_res);
+        pred($order_goods);
 
+
+
+        die;
         $coupon_price = 0;
         $goods_ids = $goods_ids . 0;
         if($coupon_id){
@@ -586,7 +592,8 @@ class Order extends ApiBase
 
         $order_id = input('order_id');
 
-        $order = Db::table('order')->where('order_id',$order_id)->where('user_id',$user_id)->field('order_status,pay_status,shipping_status')->find();
+        $order = Db::table('order')->where('order_id',$order_id)->where('user_id',$user_id)->field('order_status,pay_status,shipping_status')->buildSql();
+        echo $order;die;
         if(!$order) $this->ajaxReturn(['status' => -2 , 'msg'=>'订单不存在！','data'=>'']);
 
         if( $order['order_status'] == 4 && $order['pay_status'] == 1 && $order['shipping_status'] == 3 ){
