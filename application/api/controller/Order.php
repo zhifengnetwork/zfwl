@@ -645,7 +645,7 @@ class Order extends ApiBase
         $cancel_remark = input('cancel_remark');
         $create_time = time();
         $img = input('img');
-        pred($img);
+
         $order = Db::table('order')->where('order_id',$order_id)->where('user_id',$user_id)->field('order_id,order_status,pay_status,shipping_status')->find();
         if(!$order) $this->ajaxReturn(['status' => -2 , 'msg'=>'订单不存在！','data'=>'']);
 
