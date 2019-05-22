@@ -217,7 +217,6 @@ class Order extends ApiBase
             $order_amount = sprintf("%.2f",$order_amount + $value['subtotal_price']);   //计算该订单的总价
             $cat_id = Db::table('goods')->where('goods_id',$value['goods_id'])->value('cat_id1');
             foreach($value['spec'] as $k=>$v){
-                pre($v);
                 $order_goods[$i]['goods_id'] = $v['goods_id'];
                 $order_goods[$i]['user_id'] = $v['user_id'];
                 $order_goods[$i]['less_stock_type'] = $goods_res['less_stock_type'];
@@ -234,12 +233,7 @@ class Order extends ApiBase
                 $i++;
             }
         }
-        pre($cart_res);
-        pred($order_goods);
 
-
-
-        die;
         $coupon_price = 0;
         $goods_ids = $goods_ids . 0;
         if($coupon_id){
