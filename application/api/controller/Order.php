@@ -687,6 +687,7 @@ class Order extends ApiBase
                 // unset($img[$k]);
                 $img[$k] = $name.$saveName;
             }
+            pred($img);
             $img = implode(',',$img);
         }
 
