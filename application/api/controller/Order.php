@@ -275,9 +275,9 @@ class Order extends ApiBase
 
         $orderInfoData['order_sn'] = date('YmdHis',time()) . mt_rand(10000000,99999999);
         $orderInfoData['user_id'] = $user_id;
-        $orderInfoData['order_status'] = 1;         //订单状态 0:待确认,1:已确认,2:已收货,3:已取消,4:已完成,5:已作废,6:申请退款,7:已退款
+        $orderInfoData['order_status'] = 1;         //订单状态 0:待确认,1:已确认,2:已收货,3:已取消,4:已完成,5:已作废,6:申请退款,7:已退款,8:拒绝退款
         $orderInfoData['pay_status'] = 0;       //支付状态 0:未支付,1:已支付,2:部分支付
-        $orderInfoData['shipping_status'] = 0;       //商品配送情况;0:未发货,1:已发货,2:部分发货,3:已收货,4:退货,5:拒绝退款
+        $orderInfoData['shipping_status'] = 0;       //商品配送情况;0:未发货,1:已发货,2:部分发货,3:已收货
         $orderInfoData['pay_type'] = $pay_type;    //支付方式 1:余额支付,2:微信支付,3:支付宝支付,4:货到付款
         $orderInfoData['consignee'] = $addr_res['consignee'];       //收货人
         $orderInfoData['province'] = $addr_res['province'];
@@ -395,11 +395,11 @@ class Order extends ApiBase
 
                 }else if( $value['order_status'] == 3 && $value['pay_status'] == 0 && $value['shipping_status'] == 0 ){
                     $value['status'] = 5;   //已取消
-                }else if( $value['order_status'] == 6 && $value['pay_status'] == 1 && $value['shipping_status'] == 4 ){
+                }else if( $value['order_status'] == 6 ){
                     $value['status'] = 6;   //待退款
-                }else if( $value['order_status'] == 7 && $value['pay_status'] == 1 && $value['shipping_status'] == 4 ){
+                }else if( $value['order_status'] == 7 ){
                     $value['status'] = 7;   //已退款
-                }else if( $value['order_status'] == 7 && $value['pay_status'] == 1 && $value['shipping_status'] == 5 ){
+                }else if( $value['order_status'] == 8 ){
                     $value['status'] = 8;   //拒绝退款
                 }
             }
@@ -671,7 +671,7 @@ class Order extends ApiBase
             // $this->ajaxReturn(['status' => -2 , 'msg'=>'该订单还未付款！','data'=>'']);
         }
 
-        if( $order['order_status'] > 3 && $order['shipping_status'] > 4 ){
+        if( $order['order_status'] > 3 ){
             $this->ajaxReturn(['status' => -2 , 'msg'=>'参数错误！','data'=>'']);
         }
 
@@ -718,7 +718,7 @@ class Order extends ApiBase
         Db::startTrans();
         $res = Db::table('order_refund')->insert($data);
 
-        Db::table('order')->update(['order_id'=>$order_id,'order_status'=>6,'shipping_status'=>4]);
+        Db::table('order')->update(['order_id'=>$order_id,'order_status'=>6]);
 
         if($res){
             Db::commit();
@@ -728,5 +728,7 @@ class Order extends ApiBase
             $this->ajaxReturn(['status' => -2 , 'msg'=>'申请退款失败！','data'=>'']);
         }
     }
+
+
 
 }
