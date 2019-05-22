@@ -305,13 +305,13 @@ class Order extends ApiBase
         // 添加订单商品
         foreach($order_goods as $key=>$value){
 
-            //冻结库存
-            Db::table('goods_sku')->where('sku_id',$value['sku_id'])->setDec('frozen_stock',$value['goods_num']);
-
             $order_goods[$key]['order_id'] = $order_id;
             //拍下减库存
             if($value['less_stock_type']==1){
                 Db::table('goods_sku')->where('sku_id',$value['sku_id'])->setDec('inventory',$value['goods_num']);
+            }else if($value['less_stock_type']==2){
+                //冻结库存
+                Db::table('goods_sku')->where('sku_id',$value['sku_id'])->setDec('frozen_stock',$value['goods_num']);
             }
             unset($order_goods[$key]['less_stock_type']);
         }
@@ -729,6 +729,11 @@ class Order extends ApiBase
         }
     }
 
+    /**
+    * 取消退款
+    */
+    public function cancel_refund(){
 
+    }
 
 }
