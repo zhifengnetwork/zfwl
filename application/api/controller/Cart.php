@@ -59,13 +59,13 @@ class Cart extends ApiBase
         $cart_number = Request::instance()->param("cart_number", 1, 'intval');
         $act = input('act');
         
-        $sku_res = Db::name('goods_sku')->where('sku_id', $sku_id)->field('price,inventory,goods_id')->find();
+        $sku_res = Db::name('goods_sku')->where('sku_id', $sku_id)->field('price,inventory,frozen_stock,goods_id')->find();
 
         if (empty($sku_res)) {
             $this->ajaxReturn(['status' => -2 , 'msg'=>'该商品不存在！','data'=>'']);
         }
 
-        if ($cart_number > $sku_res['inventory']) {
+        if ($cart_number > ($sku_res['inventory']-$sku_res['frozen_stock'])) {
             $this->ajaxReturn(['status' => -2 , 'msg'=>'该商品库存不足！','data'=>'']);
         }
 
