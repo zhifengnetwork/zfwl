@@ -343,8 +343,6 @@ class Order extends Common
                 $this->error($res['msg']);
              }
         }else{
-            var_dump($data);
-            die;
              $res = (new OrderModel())->deliveryHandle($data);
              if($res['status'] == 1){
                   $this->success('操作成功',url('order/delivery_list'));
