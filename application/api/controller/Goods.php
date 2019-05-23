@@ -189,6 +189,8 @@ class Goods extends ApiBase
         }
 
         $goodsRes['spec'] = $this->getGoodsSpec($goods_id);
+        $goodsRes['stock'] = $goodsRes['spec']['count_num'];
+        unset($goodsRes['spec']['count_num']);
 
         $goodsRes['img'] = Db::table('goods_img')->where('goods_id',$goods_id)->field('picture')->order('main DESC')->select();
         
@@ -279,10 +281,11 @@ class Goods extends ApiBase
 
         //sku信息
         $skuRes = Db::name('goods_sku')->where('goods_id',$goods_id)->select();
+        $count_num = 0;
         foreach ($skuRes as $sku_k=>$sku_v){
             
             $skuRes[$sku_k]['inventory'] = $skuRes[$sku_k]['inventory'] - $skuRes[$sku_k]['frozen_stock'];
-
+            $count_num += $skuRes[$sku_k]['inventory'];
             $skuRes[$sku_k]['sku_attr'] = preg_replace("/(\w):/",  '"$1":' ,  $sku_v['sku_attr']);
             $str = preg_replace("/(\w):/",  '"$1":' ,  $sku_v['sku_attr']);
             $arr = json_decode($str,true);
@@ -298,7 +301,7 @@ class Goods extends ApiBase
         $specData = array();
         $specData['spec_attr'] = $specRes;
         $specData['goods_sku'] = $skuRes;
-
+        $specData['count_num'] = $count_num;
         return $specData;
     }
 
