@@ -6,6 +6,7 @@ use app\common\model\OrderGoods as OrdeGoodsModel;
 use Overtrue\Wechat\Payment\Business;
 use Overtrue\Wechat\Payment\QueryRefund;
 use Overtrue\Wechat\Payment\Refund;
+use think\Request;
 use \think\Db;
 use think\Exception;
 
@@ -62,7 +63,6 @@ class Order extends Common
                 ->where($where)
                 ->order('uo.order_id DESC')
                 ->paginate(10, false, ['query' => $carryParameter]);
-
         
         // 模板变量赋值
         //订单状态
@@ -187,12 +187,30 @@ class Order extends Common
      *退换货详情
      */
     public function refund_edit(){
-        $id = input('id');
+        $id    = input('id');
         $info  = Db::name('order_refund')->alias('uo')->field('uo.*,order_sn,order_amount,realname')
-        ->join("order d",'uo.order_id=d.order_id','LEFT')
-        ->join("member m",'uo.user_id=m.id','LEFT')
-        ->where(['uo.id' => $id])
-        ->find();
+                ->join("order d",'uo.order_id=d.order_id','LEFT')
+                ->join("member m",'uo.user_id=m.id','LEFT')
+                ->where(['uo.id' => $id])
+                ->find();
+        if( Request::instance()->isPost()){
+
+            $refund_status = input('refund_status/d',0);
+            $handle_remark = input('handle_remark','');
+            $update = [
+                'end_time'        => time(),
+                'handle_remark'   => $handle_remark,
+                'refund_status'   => $refund_status,
+            ]; 
+            $res = Db::name('order_refund')->where(['id' => $id])->update($update);
+
+            if($res !== false){
+                $this->success('审核成功', url('order/refund_edit',['id' => $id]));
+            }
+            $this->error('审核失败');
+
+
+        }
         $img = empty($info['img'])?'': explode(",", $info['img']);
         return $this->fetch('',[
             'img'           => $img,
@@ -207,6 +225,8 @@ class Order extends Common
      * 发货单列表
      */
     public function  delivery_list(){
+
+        
 
         $consignee = input('consignee','');
         $order_sn  = input('order_sn','');
@@ -274,13 +294,65 @@ class Order extends Common
         if($delivery_record){
             $order['invoice_no'] = $delivery_record[count($delivery_record)-1]['invoice_no'];
         }
+        
+       
         $this->assign('order',$order);
         $this->assign('orderGoods',$orderGoods);
         $this->assign('delivery_record',$delivery_record);//发货记录
         $shipping_list = Db::name('shipping')->field('shipping_name,shipping_code')->where('')->select();
         $this->assign('shipping_list',$shipping_list);
         $this->assign('express_switch',0);
+        $this->assign('meta_title','发货单编辑');
         return $this->fetch();    
+    }
+
+
+    /**
+     * 生成发货单
+     */
+    public function deliveryHandle(){
+        $data  = input('post.');
+        $count = 0;
+        if(isset($data['pldelivery'])){
+            foreach($data['order_id'] as $k => $v){
+                $count++;
+                $datas['shipping']      = $data['shipping'][$v];
+                $datas['shipping_code'] = $data['shipping_code'][$v];
+                $datas['send_type']     = $data['send_type'][$v];
+                $datas['invoice_no']    = $data['invoice_no'][$v];
+                $datas['order_id']      = $v;
+                $datas['note']          = $data['note'][$v];
+                $datas['goods']         = $data['goods'][$v];
+                if(!empty($data['shipping_name'][$v])){
+                    $datas['shipping_name'] = $data['shipping_name'][$v];
+                }
+                if(!empty($data['shipping_code'][$v])){
+                    $datas['shipping_code'] = $data['shipping_code'][$v];
+                }
+                if(!empty($data['invoice_no'][$v])){
+                    $datas['invoice_no'] = $data['invoice_no'][$v];
+                }
+                $res =(new OrderModel())->deliveryHandle($datas);
+                if($count == count($data['order_id'])){
+                    break;
+                }
+             }
+             if($res['status'] == 1 && $count == count($data['order_id'])){
+                $this->success('操作成功',url('order/delivery_list'));
+             }else{
+                $this->error($res['msg']);
+             }
+        }else{
+            var_dump($data);
+            die;
+             $res = (new OrderModel())->deliveryHandle($data);
+             if($res['status'] == 1){
+                  $this->success('操作成功',url('order/delivery_list'));
+            }else{
+                $this->success($res['msg']);
+            }
+        }
+		
     }
 
 
