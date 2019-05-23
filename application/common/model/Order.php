@@ -77,10 +77,112 @@ class Order extends Model
         return $address;
     }
 
-    /***
-     * 修改订单支付状态
+    /**
+     *	处理发货单
+     * @param array $data  查询数量
+     * @return array
+     * @throws \think\Exception
      */
-    public function update_order(){
+    public function deliveryHandle($data){
+       
+        $orderObj = $this->where(['order_id'=>$data['order_id']])->find();
+        $order =$orderObj->append(['full_address','orderGoods'])->toArray();
+        $orderGoods= $order['orderGoods'];
+		$selectgoods = $data['goods'];
+        if($data['shipping'] == 1){
+            if (!$this->updateOrderShipping($data,$order)){
+                return array('status'=>0,'msg'=>'操作失败！！');
+            }
+        }
+		$data['order_sn'] = $order['order_sn'];
+		$data['delivery_sn'] = $this->get_delivery_sn();
+		$data['zipcode'] = $order['zipcode'];
+		$data['user_id'] = $order['user_id'];
+		$data['admin_id'] = session('admin_id');
+		$data['consignee'] = $order['consignee'];
+		$data['mobile'] = $order['mobile'];
+		$data['country'] = $order['country'];
+		$data['province'] = $order['province'];
+		$data['city'] = $order['city'];
+		$data['district'] = $order['district'];
+		$data['address'] = $order['address'];
+		$data['shipping_price'] = $order['shipping_price'];
+		$data['create_time'] = time();
+		
+    	if($data['send_type'] == 0 || $data['send_type'] == 3){
+			$did = M('delivery_doc')->add($data);
+		}else{
+			$result = $this->submitOrderExpress($data,$orderGoods);
+			if($result['status'] == 1){
+				$did = $result['did'];
+			}else{
+				return array('status'=>0,'msg'=>$result['msg']);
+			}
+		}
+		$is_delivery = 0;
+		foreach ($orderGoods as $k=>$v){
+			if($v['is_send'] >= 1){
+				$is_delivery++;
+			}			
+			if($v['is_send'] == 0 && in_array($v['rec_id'],$selectgoods)){
+				$res['is_send'] = 1;
+				$res['delivery_id'] = $did;
+				$r = M('order_goods')->where("rec_id=".$v['rec_id'])->save($res);//改变订单商品发货状态
+				$is_delivery++;
+			}
+		}
+		$update['shipping_time'] = time();
+		$update['shipping_code'] = $data['shipping_code'];
+		$update['shipping_name'] = $data['shipping_name'];
+		if($is_delivery == count($orderGoods)){
+			$update['shipping_status'] = 1;
+		}else{
+			$update['shipping_status'] = 2;
+		}
+		M('order')->where("order_id=".$data['order_id'])->save($update);//改变订单状态
+		$s = $this->orderActionLog($order['order_id'],'delivery',$data['note']);//操作日志
+		
+		//商家发货, 发送短信给客户
+		$res = checkEnableSendSms("5");
+		if ($res && $res['status'] ==1) {
+		    $user_id = $data['user_id'];
+		    $users = M('users')->where('user_id', $user_id)->getField('user_id , nickname , mobile' , true);
+		    if($users){
+		        $nickname = $users[$user_id]['nickname'];
+		        $sender = $users[$user_id]['mobile'];
+		        $params = array('user_name'=>$nickname , 'consignee'=>$data['consignee']);
+		        $resp = sendSms("5", $sender, $params,'');
+		    }
+		}
+
+        // 发送微信模板消息通知
+        $wechat = new WechatLogic;
+        $wechat->sendTemplateMsgOnDeliver($data);
+        
+		if($s && $r){
+			return array('status'=>1,'printhtml'=>isset($result['printhtml']) ? $result['printhtml'] : '');
+		}else{
+			return array('status'=>0,'msg'=>'发货失败');
+		}
+     }
+
+    /**
+     * 修改订单发货信息
+     * @param array $data
+     * @param array $order
+     * @return bool|mixed
+     */
+    public function updateOrderShipping($data=[],$order=[]){
+        $updata['shipping_code'] = $data['shipping_code'];
+        $updata['shipping_name'] = $data['shipping_name'];
+        M('order')->where(['order_id'=>$data['order_id']])->save($updata); //改变物流信息
+        $updata['invoice_no'] = $data['invoice_no'];
+        $delivery_res = M('delivery_doc')->where(['order_id'=>$data['order_id']])->save($updata);  //改变售后的信息
+        if ($delivery_res){
+            return $this->orderActionLog($order['order_id'],'订单修改发货信息',$data['note']);//操作日志
+        }else{
+            return false;
+        }
 
     }
 
