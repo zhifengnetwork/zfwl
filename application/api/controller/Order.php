@@ -353,7 +353,7 @@ class Order extends ApiBase
         if ($type=='dfh')$where = array('order_status' => 1 ,'pay_status'=>1 ,'shipping_status' =>0); //待发货
         if ($type=='dsh')$where = array('order_status' => 1 ,'pay_status'=>1 ,'shipping_status' =>1); //待收货
         if ($type=='dpj')$where = array('order_status' => 4 ,'pay_status'=>1 ,'shipping_status' =>3); //待评价
-        if ($type=='tk')$where = array('order_status' => [['=',6],['=',7],'or'] ,'pay_status'=>1 ,'shipping_status' =>[['=',4],['=',5],'or']); //退款/售后
+        if ($type=='tk')$where = array('order_status' => [['=',6],['=',7],['=',8],'or'] ,'pay_status'=>1); //退款/售后
         if ($type=='yqx')$where = array('order_status' => 3); //已取消
 
 
