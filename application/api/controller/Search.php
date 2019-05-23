@@ -63,6 +63,11 @@ class Search extends ApiBase
 
         $keywords = input('keywords');
 
+        $keywords = trim($keywords);
+        if(!$keywords){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'搜索关键字不能为空！','data'=>'']);
+        }
+
         $cat_id = Db::table('category')->where('cat_name',"$keywords")->value('cat_id');
         $cat_id2 = 'cat_id1';
         $sort = input('sort');
@@ -121,6 +126,7 @@ class Search extends ApiBase
             $id = Db::table('search')->where($where)->value('id');
             if($id){
                 Db::table('search')->where('id',$id)->setInc('number',1);
+                Db::table('search')->where('id',$id)->update(['add_time'=>time()]);
             }else{
                 $where['number'] = 1;
                 $where['add_time'] = time();
@@ -130,12 +136,19 @@ class Search extends ApiBase
             $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>['cate_list'=>$cate_list,'goods_list'=>$goods_list['data']]]);
         }else{
 
+            if($sort){
+                $order['price'] = $sort;
+            }else{
+                $order['goods_id'] = 'DESC';
+            }
+
             $goods_list = Db::table('goods')->alias('g')
                         ->join('goods_img gi','gi.goods_id=g.goods_id','LEFT')
                         ->where('gi.main',1)
                         ->where('is_show',1)
                         ->where('g.goods_name','like',"%{$keywords}%")
                         ->field('g.goods_id,gi.picture img,goods_name,desc,price,original_price,g.goods_attr')
+                        ->order($order)
                         ->paginate(10,false,$pageParam)
                         ->toArray();
             if($goods_list['data']){
@@ -160,6 +173,21 @@ class Search extends ApiBase
             }
 
             $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>['cate_list'=>[],'goods_list'=>$goods_list['data']]]);
+        }
+    }
+
+    public function del_search(){
+        $user_id = $this->get_user_id();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+        }
+
+        $res = Db::table('search')->where('user_id',$user_id)->delete();
+
+        if($res){
+            $this->ajaxReturn(['status' => 1 , 'msg'=>'清除成功！','data'=>'']);
+        }else{
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'清除失败！','data'=>'']);
         }
     }
 

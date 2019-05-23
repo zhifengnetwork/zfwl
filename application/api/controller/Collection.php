@@ -49,7 +49,7 @@ class Collection extends ApiBase
 
         if($res){
             $res = Db::table('collection')->where($where)->delete();
-            $this->ajaxReturn(['status' => 1 , 'msg'=>'取消收藏成功！','data'=>'']);
+            $this->ajaxReturn(['status' => 1 , 'msg'=>'取消收藏！','data'=>'']);
         }else{
             $res = Db::table('collection')->insert($where);
             $this->ajaxReturn(['status' => 1 , 'msg'=>'收藏成功！','data'=>'']);
