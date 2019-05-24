@@ -227,9 +227,9 @@ class Order extends Common
     public function  delivery_list(){
 
         
-
-        $consignee = input('consignee','');
-        $order_sn  = input('order_sn','');
+        $shipping_status = input('shipping_status',-1);
+        $consignee       = input('consignee','');
+        $order_sn        = input('order_sn','');
 
         $where = array();
 
@@ -241,16 +241,23 @@ class Order extends Common
             $where['uo.order_sn']   = $order_sn;
         }
 
-        $where['uo.pay_status']   = 1;
-        $where['uo.order_status'] = array('in','0,1,2,4');
+        if($shipping_status >= 0){
+            $where['uo.shipping_status']   = $shipping_status;
+        }
 
+        $where['uo.pay_status']   = 1;
+
+        // $where['uo.pay_status']   = 1;
+
+        // $where['uo.order_status'] = array('in','0,1,2,4');
 
         $list  = OrderModel::alias('uo')->field('uo.*')
                 ->order('uo.order_id DESC')
                 ->where($where)
                 ->paginate(10, false, ['query' => [
-                    'consignee'  => $consignee,
-                    'order_sn'   => $order_sn
+                    'shipping_status' => $shipping_status,
+                    'consignee'       => $consignee,
+                    'order_sn'        => $order_sn
                 ]]);
         return $this->fetch('',[
             'meta_title'  => '发货单列表', 
@@ -263,7 +270,7 @@ class Order extends Common
     }
     
     /***
-     *发货单编辑 
+     *发货单编辑
      */
     public function delivery_info($id=''){
         if($id){
@@ -289,13 +296,14 @@ class Order extends Common
                 $this->error('此订单商品已完成退货或换货');//已经完成售后的不能再发货  
             }
         }
+        
 
         $delivery_record = Db::name('delivery_doc')->alias('d')->where('d.order_id='.$order_id)->select();
-        if($delivery_record){
+        if(!empty($delivery_record)){
             $order['invoice_no'] = $delivery_record[count($delivery_record)-1]['invoice_no'];
+        }else{
+            $order['invoice_no'] = '';
         }
-        
-       
         $this->assign('order',$order);
         $this->assign('orderGoods',$orderGoods);
         $this->assign('delivery_record',$delivery_record);//发货记录
@@ -307,11 +315,61 @@ class Order extends Common
     }
 
 
+        /**
+        *批量发货
+        */
+      public function delivery_batch(){
+            $order_id  = input('order_id','');
+            $order_id  = trim($order_id,',');
+        
+            $orderGoodsMdel = new OrdeGoodsModel();
+            $orderModel     = new OrderModel();
+            $orderObj       = $orderModel->whereIn('order_id',$order_id)->select();//订单
+            $orderGoods     = $orderGoodsMdel::all(['order_id'=>['in',$order_id],'is_send'=>['lt',2]]);
+            //订单商品
+            
+            if ($orderObj){
+                $order = collection($orderObj)->append(['orderGoods','full_address'])->toArray();
+            }
+            if (!$orderGoods){
+                $this->error('此订单商品已完成退货或换货');//已经完成售后的不能再发货  
+            }
+            print_r($order);
+            die;
+            $this->assign('order',$order);
+            $this->assign('orderGoods',$orderGoods);
+            $shipping_list = Db::name('shipping')->field('shipping_name,shipping_code')->where('')->select();
+            $this->assign('shipping_list',$shipping_list);
+            $this->assign('express_switch',0);
+            $this->assign('order_ids',$order_id);
+            return $this->fetch();    
+        
+    }
+
+
     /**
      * 生成发货单
      */
     public function deliveryHandle(){
         $data  = input('post.');
+      
+       
+        if($data['send_type'] == 0 && isset($data['invoice_no']) && empty($data['invoice_no'])){
+            $this->error('请输入配送单号');
+        }
+
+        if($data['send_type'] == 0 && isset($data['invoice_no']) && empty($data['invoice_no'])){
+            $this->error('请输入配送单号');
+        }
+
+        if($data['send_type'] != 3 && isset($data['shipping_code']) && empty($data['shipping_code'])){
+            $this->error('请选择物流');
+        }
+       
+        if(!isset($data['goods']) || $data['shipping']  != 1 && count($data['goods']) < 1) {
+            $this->error('请选择发货商品');
+        }
+       
         $count = 0;
         if(isset($data['pldelivery'])){
             foreach($data['order_id'] as $k => $v){

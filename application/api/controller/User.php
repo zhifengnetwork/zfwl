@@ -434,7 +434,7 @@ class User extends ApiBase
 
     /**
      * +---------------------------------
-     * 修改生日和昵称
+     * 修改生日||昵称||性别
      * +---------------------------------
     */
 
@@ -445,16 +445,19 @@ class User extends ApiBase
         $birthmonth = input('birthmonth');
         $birthday   = input('birthday');
         $realname   = input('realname');
+        $gender     = input('gender',0);
         $type       = input('type',1);
         if($type == 1){
             if(empty($realname)){
                 $this->ajaxReturn(['code'=>0,'msg'=>'昵称不能为空','data'=>'']);
             }
             $update['realname'] = $realname;
-        }else{
+        }else if($type == 2){
             $update['birthyear']  = $birthyear;
             $update['birthmonth'] = $birthmonth;
             $update['birthday']   = $birthday;
+        }else{
+            $update['gender']     = $gender;
         }
         $member     = Db::name('member')->where(["id" => $user_id])->update($update);
         if($member !== false){
