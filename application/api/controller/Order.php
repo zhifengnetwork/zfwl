@@ -386,7 +386,6 @@ class Order extends ApiBase
             $pageParam['query']['order_status'] = 3;
         }
 
-
         $where['o.user_id'] = $user_id;
         $where['gi.main'] = 1;
         $where['o.deleted'] = 0;
