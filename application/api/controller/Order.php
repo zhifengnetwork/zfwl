@@ -347,14 +347,44 @@ class Order extends ApiBase
         $type = input('type');
         if(!$type) $this->ajaxReturn(['status' => -2 , 'msg'=>'参数错误！','data'=>'']);
         
+        $page = input('page',1);
+        
         $where = [];
+        $pageParam = ['query' => []];
 
-        if ($type=='dfk')$where = array('order_status' => 1 ,'pay_status'=>0 ,'shipping_status' =>0); //待付款
-        if ($type=='dfh')$where = array('order_status' => 1 ,'pay_status'=>1 ,'shipping_status' =>0); //待发货
-        if ($type=='dsh')$where = array('order_status' => 1 ,'pay_status'=>1 ,'shipping_status' =>1); //待收货
-        if ($type=='dpj')$where = array('order_status' => 4 ,'pay_status'=>1 ,'shipping_status' =>3); //待评价
-        if ($type=='tk')$where = array('order_status' => [['=',6],['=',7],['=',8],'or'] ,'pay_status'=>1); //退款/售后
-        if ($type=='yqx')$where = array('order_status' => 3); //已取消
+        if ($type=='dfk'){
+            $where = array('order_status' => 1 ,'pay_status'=>0 ,'shipping_status' =>0); //待付款
+            $pageParam['query']['order_status'] = 1;
+            $pageParam['query']['pay_status'] = 0;
+            $pageParam['query']['shipping_status'] = 0;
+        }
+        if ($type=='dfh'){
+            $where = array('order_status' => 1 ,'pay_status'=>1 ,'shipping_status' =>0); //待发货
+            $pageParam['query']['order_status'] = 1;
+            $pageParam['query']['pay_status'] = 1;
+            $pageParam['query']['shipping_status'] = 0;
+        }
+        if ($type=='dsh'){
+            $where = array('order_status' => 1 ,'pay_status'=>1 ,'shipping_status' =>1); //待收货
+            $pageParam['query']['order_status'] = 1;
+            $pageParam['query']['pay_status'] = 1;
+            $pageParam['query']['shipping_status'] = 1;
+        }
+        if ($type=='dpj'){
+            $where = array('order_status' => 4 ,'pay_status'=>1 ,'shipping_status' =>3); //待评价
+            $pageParam['query']['order_status'] = 4;
+            $pageParam['query']['pay_status'] = 1;
+            $pageParam['query']['shipping_status'] = 3;
+        }
+        if ($type=='tk'){
+            $where = array('order_status' => [['=',6],['=',7],['=',8],'or'] ,'pay_status'=>1); //退款/售后
+            $pageParam['query']['order_status'] = [['=',6],['=',7],['=',8],'or'];
+            $pageParam['query']['pay_status'] = 1;
+        }
+        if ($type=='yqx'){
+            $where = array('order_status' => 3); //已取消
+            $pageParam['query']['order_status'] = 3;
+        }
 
 
         $where['o.user_id'] = $user_id;
@@ -369,10 +399,11 @@ class Order extends ApiBase
                         ->group('og.order_id')
                         ->order('o.order_id DESC')
                         ->field('o.order_id,o.order_sn,og.goods_name,gi.picture img,og.spec_key_name,og.goods_price,g.original_price,og.goods_num,o.order_status,o.pay_status,o.shipping_status,pay_type')
-                        ->select();
-        
-        if($order_list){
-            foreach($order_list as $key=>&$value){
+                        ->paginate(10,false,$pageParam)
+                        ->toArray();
+                        
+        if($order_list['data']){
+            foreach($order_list['data'] as $key=>&$value){
 
                 $value['comment'] = 0; 
                 if( $value['order_status'] == 1 && $value['pay_status'] == 0 && $value['shipping_status'] == 0 ){
@@ -404,7 +435,7 @@ class Order extends ApiBase
             }
         }
         
-        $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$order_list]);
+        $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$order_list['data']]);
     }
 
 
