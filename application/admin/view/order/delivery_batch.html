@@ -10,11 +10,14 @@
 
 {block name="content"}
 <div class="ibox" >
-    <div class="ibox-content" style = "width:1000px;margin:auto;border:solid 1px #2cbca3;">
-     <form  action="{:url('order/deliveryHandle')}"  method="post" class="form-horizontal form" enctype="multipart/form-data">
-        <input type="hidden" id="shipping" name="shipping" value="{$order.shipping_status}">
-        <input type="hidden" name="order_id" value="{$order.order_id}">
-        <input type="hidden" id="shipping_name" name="shipping_name" value="{if condition='$order.shipping_status eq 1'}{$order.shipping_name}{else/}{$shipping_list['0']['shipping_name']}{/if}">
+    <form  action="{:url('order/deliveryHandle')}"  method="post" class="form-horizontal form" enctype="multipart/form-data">
+        <input type="hidden" name="order_ids" value="{$order_ids}">
+        <input type="hidden" name="pldelivery" value="">
+     {volist name="order" id="order"}
+     <div class="ibox-content" style = "width:1000px;margin:auto;border:solid 1px #2cbca3">
+        <input type="hidden" name="order_id[{$order.order_id}]" value="{$order.order_id}">
+        <input type="hidden" id="shipping" name="shipping{$order.order_id}" value="{$order.shipping_status}">
+        <input type="hidden" id="shipping_name" name="shipping_name{$order.order_id}" value="{if condition='$order.shipping_status eq 1'}{$order.shipping_name}{else/}{$shipping_list['0']['shipping_name']}{/if}">
         <div class="row">
             <div class="col-lg-12">
                 <div class="m-b-md" style="position:relative;">
@@ -29,7 +32,7 @@
                             <td class="col-lg-2">{$order.add_time|date='Y-m-d H:i',###}</td>
                             <td class="col-lg-1 active text-right">物流公司：</td>
                             <td class="col-lg-2">
-                                <select id="shipping_code" name="shipping_code" onchange="set_shipping_name()">
+                                <select class="shipping_code{$order.order_id}" order_id = "{$order.order_id}" name="shipping_code[{$order.order_id}]" onchange="set_shipping_name()">
                                     <option value="">-请选择-</option>
                                      {volist name="shipping_list" id="shipping"}
                                          <option {if condition="$order.shipping_code eq $shipping.shipping_code"}selected{/if} value="{$shipping.shipping_code}" >{$shipping.shipping_name}</option>
@@ -42,18 +45,18 @@
                             <td class="col-lg-2">{$order.shipping_price}</td>
                             <td class="col-lg-1 active text-right">发货方式：</td>
                             <td class="col-lg-2">
-                                <select id="send_type" name="send_type" onchange="change_send();">
+                                <select class="send_type{$order.order_id}"  order_id = "{$order.order_id}" name="send_type[{$order.order_id}]" onchange="change_send();">
                                     <option value="0">手填物流单号</option>
                                     {if condition="($order['shipping_status'] eq 0) && ($express_switch eq 1)"}
                                     <option value="1">在线预约发货</option>
                                     <option value="2">电子面单发货</option>
                                     {/if}
-                                    <option value="3" >无需物流</option>
+                                    <option value="3">无需物流</option>
                                 </select>
                             </td>
                             <td class="col-lg-1 active text-right invoice">配送单号：</td>
-                            <td class="col-lg-2 invoice">
-                                <input class="input-txt" name="invoice_no" id="invoice_no" value="{$order.invoice_no}" onkeyup="this.value=this.value.replace(/[^\d]/g,'')">
+                            <td class="col-lg-2 invoice{$order.order_id}">
+                                <input class="input-txt invoice_no{$order.order_id}" name="invoice_no[{$order.order_id}]" id="invoice_no" value="{$order.invoice_no}" onkeyup="this.value=this.value.replace(/[^\d]/g,'')">
                             </td>
                         </tr>
                     </tbody>
@@ -135,7 +138,7 @@
                     <div class="form-group form-group-s s"  >
                             <label class="col-xs-12 col-sm-2 control-label">发货单备注</label>
                                 <div class="col-sm-10 col-xs-12">
-                                   <textarea id="note" name="note" style="width:400px" rows="4" maxlength="200" placeholder="请输入操作备注" class="tarea" id="note"></textarea>
+                                   <textarea id="note" name="note[{$order.order_id}]" style="width:400px" rows="4" maxlength="200" placeholder="请输入操作备注" class="tarea" id="note"></textarea>
                                </div>
                     </div>
                     <div class="form-group form-group-s s"  >
@@ -187,27 +190,27 @@
                      </table>
                 </div>
             </div>
-           </form>
         </div>
     </div>
+    {/volist}
 
-
-      
+</form>
 </div>
+
 
 
 {/block}
 
 {block name="script"}
 <script type="text/javascript">
-// $(function(){
-//     if("3" == 3){
-//         $('.invoice').hide();
-//         $('#invoice_no').attr('disabled',true);
-//         $('#shipping_code').attr('disabled',true).hide();
-//         $('#shipping_name').attr('disabled',true);
-//     }
-// })
+$(function(){
+    if("{$delivery_record[0]['send_type']}" == 3){
+        $('.invoice').hide();
+        $('#invoice_no').attr('disabled',true);
+        $('#shipping_code').attr('disabled',true).hide();
+        $('#shipping_name').attr('disabled',true);
+    }
+})
 function dosubmit(obj){
     $(this).prop('disabled',true);
     var shipping = $('input[name="shipping"]').val();
@@ -237,30 +240,38 @@ function dosubmit(obj){
     $('#delivery-form').submit();
 }
 
-function set_shipping_name(){
-    var shipping_name = $("#shipping_code").find("option:selected").text();
-    var shipping_code = $("#shipping_code").find("option:selected").val();
-    $('#shipping_name').val('');
+function set_shipping_name(obj){
+  var className = $(obj).prop("className");
+  var order_id = $(obj).attr("order_id");
+  
+	var shipping_name = $("."+className).find("option:selected").text();
+  console.log(shipping_name);
+  console.log(className);
+	 var shipping_code = $('.'+className).find("option:selected").val();
+   $(".shipping_name"+order_id).val(shipping_name);
+    $('.'+className).val('');
     if (shipping_code != ''){
-        $('#shipping_name').val(shipping_name);
+        $('.'+className).val(shipping_code);
     }
 }
 
-function change_send(){
-    var send_type = $('#send_type').val();
-    $('#invoice_no').removeAttr('disabled')
-    $('#shipping_code').removeAttr('disabled').show();
-    $('#shipping_name').removeAttr('disabled');
-    if(send_type == 0){
-        $('.invoice').show();
-    }else if(send_type == 3){
-        $('.invoice').hide();
-        $('#invoice_no').attr('disabled',true);
-        $('#shipping_code').attr('disabled',true).hide();
-        $('#shipping_name').attr('disabled',true);
+function change_send(obj){
+  var className = $(obj).prop("className");
+  var order_id = $(obj).attr("order_id");
+	var send_type = $('.' + className).val();
+    $('.invoice_no'+order_id).removeAttr('disabled')
+    $('.shipping_code'+order_id).removeAttr('disabled').show();
+    $('.shipping_name'+order_id).removeAttr('disabled');
+	if(send_type == 0){
+		$('.invoice'+order_id).show();
+	}else if(send_type == 3){
+        $('.invoice'+order_id).hide();
+        $('.invoice_no'+order_id).attr('disabled',true);
+        $('.shipping_code'+order_id).attr('disabled',true).hide();
+        $('.shipping_name'+order_id).attr('disabled',true);
     } else{
-        $('.invoice').hide();
-    }
+		$('.invoice'+order_id).hide();
+	}
 }
 </script>
  {/block}

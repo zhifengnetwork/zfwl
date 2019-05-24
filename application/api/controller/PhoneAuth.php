@@ -16,6 +16,7 @@ class PhoneAuth extends ApiBase
 		$mobile = trim(input('mobile'));
         $temp = trim(input('temp'));
         $auth = trim(input('auth'));
+        $type = input('type/d',1);
         
 		if( !$mobile || ($temp != 'sms_forget' && $temp != 'sms_reg' ) || !$auth ){
             $this->ajaxReturn(['status' => -2 , 'msg'=>'参数错误！']);
@@ -25,15 +26,15 @@ class PhoneAuth extends ApiBase
         if( $Md5 != $auth ){
             $this->ajaxReturn(['status' => -2 , 'msg'=>'非法请求！']);
         }
-		
         $member = Db::table('member')->where('mobile',$mobile)->value('id');
-		if (($temp == 'sms_forget') && empty($member)) {
-            $this->ajaxReturn(['status' => -2 , 'msg'=>'此手机号未注册！']);
-		}
-		if (($temp == 'sms_reg') && !(empty($member))) {
-            $this->ajaxReturn(['status' => -2 , 'msg'=>'此手机号已注册，请直接登录！']);
+        if($type == 1){
+            if (($temp == 'sms_forget') && empty($member)) {
+                $this->ajaxReturn(['status' => -2 , 'msg'=>'此手机号未注册！']);
+            }
+            if (($temp == 'sms_reg') && !(empty($member))) {
+                $this->ajaxReturn(['status' => -2 , 'msg'=>'此手机号已注册，请直接登录！']);
+            }
         }
-
         $phone_number = checkMobile($mobile);
         if ($phone_number == false) {
             $this->ajaxReturn(['status' => -2 , 'msg'=>'手机号码格式不对！']);

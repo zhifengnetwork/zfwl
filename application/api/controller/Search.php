@@ -136,12 +136,19 @@ class Search extends ApiBase
             $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>['cate_list'=>$cate_list,'goods_list'=>$goods_list['data']]]);
         }else{
 
+            if($sort){
+                $order['price'] = $sort;
+            }else{
+                $order['goods_id'] = 'DESC';
+            }
+
             $goods_list = Db::table('goods')->alias('g')
                         ->join('goods_img gi','gi.goods_id=g.goods_id','LEFT')
                         ->where('gi.main',1)
                         ->where('is_show',1)
                         ->where('g.goods_name','like',"%{$keywords}%")
                         ->field('g.goods_id,gi.picture img,goods_name,desc,price,original_price,g.goods_attr')
+                        ->order($order)
                         ->paginate(10,false,$pageParam)
                         ->toArray();
             if($goods_list['data']){
