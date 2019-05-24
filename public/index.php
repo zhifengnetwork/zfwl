@@ -24,13 +24,11 @@ if (preg_match("/(.*)\.(.*)\.c3w\.cc/i", HTTP_HOST, $matches)) {
     define('BIND_MODULE', $module);
 } else {
     $terrace = [
-        '127.0.0.1:10059' => 'agent',
-        '127.0.0.1:10058' => 'home',
-        '127.0.0.1:10057' => 'sapi',
-        '127.0.0.1:10056' => 'api',
-        '127.0.0.1:12588' => 'admin',
-        '127.0.0.1:12580' => 'admin',
-        '127.0.0.1:12580' => 'api',
+        'agent.zfwl.local' => 'agent',
+        'www.zfwl.local' => 'home',
+        'sapi.zfwl.local' => 'sapi',
+        'api.zfwl.local' => 'api',
+        'admin.zfwl.local' => 'admin',
     ];
     if (!empty($terrace[HTTP_HOST])) {
         $module = $terrace[HTTP_HOST];
