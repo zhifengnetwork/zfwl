@@ -584,7 +584,7 @@ class Order extends ApiBase
             $res = Db::table('order')->update(['order_id'=>$order_id,'order_status'=>4,'shipping_status'=>3]);
         }else if( ($order['order_status'] == 4 && $order['pay_status'] == 1 && $order['shipping_status'] == 3) || $order['order_status'] == 3 ){
             //删除订单
-            if($status == 4 || $status == 5 ) $this->ajaxReturn(['status' => -2 , 'msg'=>'参数错误！','data'=>'']);
+            if($status != 4 || $status != 5 ) $this->ajaxReturn(['status' => -2 , 'msg'=>'参数错误！','data'=>'']);
             $res = Db::table('order')->update(['order_id'=>$order_id,'deleted'=>1]);
         }
 
