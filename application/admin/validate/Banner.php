@@ -23,9 +23,9 @@ class Banner extends Validate
 
     protected $message = [
 
-        'name.require '       => '标题不能为空',
+        'name.require'       => '标题不能为空',
 
-        'link.require '       => '链接地址不能为空',
+        'link.require'       => '链接地址不能为空',
         'link.url'            => '链接地址不合法',
 
         'description.require' => '描述内容不能为空',

@@ -23,7 +23,7 @@ class User extends Validate
     ];
 
     protected $message = [
-        'nickname.require '       => '昵称不能为空',
+        'nickname.require'       => '昵称不能为空',
 
         'nickname.alphaNum'       => '名称必须是字母、数字',
 
