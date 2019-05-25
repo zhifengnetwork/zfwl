@@ -548,7 +548,7 @@ class Order extends ApiBase
         $order_id = input('order_id');
         $status = input('status');
 
-        if($status != 1 && $status != 3 && $status != 4){
+        if($status != 1 && $status != 3 && $status != 4 && $status != 5){
             $this->ajaxReturn(['status' => -2 , 'msg'=>'参数错误！','data'=>'']);
         }
 
@@ -584,12 +584,8 @@ class Order extends ApiBase
             $res = Db::table('order')->update(['order_id'=>$order_id,'order_status'=>4,'shipping_status'=>3]);
         }else if( ($order['order_status'] == 4 && $order['pay_status'] == 1 && $order['shipping_status'] == 3) || $order['order_status'] == 3 ){
             //删除订单
+            if($status != 4 && $status != 5) $this->ajaxReturn(['status' => -2 , 'msg'=>'参数错误！','data'=>'']);
             $res = Db::table('order')->update(['order_id'=>$order_id,'deleted'=>1]);
-            // if($status == 4 || $status == 5){
-                
-            // }else{
-            //     $this->ajaxReturn(['status' => -2 , 'msg'=>'参数错误！','data'=>'']);
-            // }
         }
 
         $this->ajaxReturn(['status' => 1 , 'msg'=>'成功！','data'=>'']);
