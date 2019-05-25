@@ -43,6 +43,19 @@ class ApiBase extends Controller
         }
     }
 
+    private  static $redis = null;
+    /*获取redis对象*/
+    protected function getRedis(){
+        if(!self::$redis instanceof \Redis){
+            // pred(Config('redis_options'));
+            self::$redis = new \Redis();
+            self::$redis->connect(Config('REDIS_HOST'),Config('REDIS_PORT'));
+            self::$redis->auth(Config('REDIS_AUTH'));
+            self::$redis->select(0);
+        }
+        return self::$redis;
+    }
+
     /*
      *  开放有可能不需登录controller
      */

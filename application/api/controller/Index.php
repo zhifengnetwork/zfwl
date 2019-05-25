@@ -15,6 +15,8 @@ class Index extends ApiBase
     */
     public function index()
     {
+        // $redis = $this->getRedis();
+
         echo 1111;
         exit;
         $user_id = $this->get_user_id();

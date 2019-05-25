@@ -192,14 +192,20 @@ return [
     //     // 缓存保存目录
     //     'path'     => CACHE_PATH,
     //     // 缓存前缀
-    //     'prefix'   => 'zjtest',
+    //     'prefix'   => '',
     //     // 缓存有效期 0表示永久缓存
     //     'expire'   => 0,
-    //     'port'     => 6100,
-    //     'password' => 'sVbV#M8YAbe8',
-    //     'select'   => 1,
-    //     'host'     => '127.0.0.1',
     // ],
+    
+    'DATA_CACHE_PREFIX' => 'Redis_',//缓存前缀
+    'DATA_CACHE_TYPE'=>'Redis',//默认动态缓存为Redis
+    'DATA_CACHE_TIMEOUT' => false,
+    'REDIS_RW_SEPARATE' => true, //Redis读写分离 true 开启
+    'REDIS_HOST'=>'127.0.0.1', //redis服务器ip，多台用逗号隔开；读写分离开启时，第一台负责写，其它[随机]负责读；
+    'REDIS_PORT'=>'6379',//端口号
+    'REDIS_TIMEOUT'=>'300',//超时时间
+    'REDIS_PERSISTENT'=>false,//是否长连接 false=短连接
+    'REDIS_AUTH'=>'11',//AUTH认证密码
     // 文件缓存 (本地使用这个)
     'cache'                  => [
         // 驱动方式
