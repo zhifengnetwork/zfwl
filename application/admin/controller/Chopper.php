@@ -3,7 +3,7 @@ namespace app\admin\controller;
 use think\Loader;
 use think\Db;
 
-class Groupon extends Common
+class Chopper extends Common
 {
     function index(){
         //根据传过来的条件
@@ -32,12 +32,12 @@ class Groupon extends Common
             'is_show'    => $is_show,
             'list'=>$list,
             'page'=>$page,
-            'meta_title'    =>  '团购列表',
+            'meta_title'    =>  '砍一刀列表',
         ]);
 
     }
 
-    //添加团购
+    //添加砍一刀
     function add(){
         if( request()->isPost() ){
             $data = input('post.');
@@ -70,7 +70,7 @@ class Groupon extends Common
         ]);
     }
 
-    //修改团购
+    //修改砍一刀
     function edit(){
         $groupon_id = input('groupon_id');
         if(request()->isPost()){
@@ -95,7 +95,7 @@ class Groupon extends Common
         ]);
     }
 
-    //团购删除
+    //砍一刀删除
     function del(){
 
         $groupon_id = input('groupon_id');

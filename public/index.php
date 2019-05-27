@@ -29,14 +29,8 @@ if (preg_match("/(.*)\.(.*)\.c3w\.cc/i", HTTP_HOST, $matches)) {
         '127.0.0.1:10057' => 'sapi',
         '127.0.0.1:10056' => 'api',
         '127.0.0.1:12588' => 'admin',
-<<<<<<< HEAD
-        '127.0.0.1:12580' => 'api',
-        // '127.0.0.1:12580' => 'api',
-=======
         '127.0.0.1:12580' => 'admin',
-         'test.com' => 'admin',
-        'zfwl.com' => 'admin',
->>>>>>> a9bd52b5ffe89299c60e4daee4c4d0e9a88250df
+        // '127.0.0.1:12580' => 'api',
     ];
     if (!empty($terrace[HTTP_HOST])) {
         $module = $terrace[HTTP_HOST];
