@@ -1395,6 +1395,7 @@ class Goods extends Common
             ->join('goods b','a.goods_id = b.goods_id','left')
             ->where($where)
             ->order('a.id desc')
+            
             ->field($field)
             ->paginate(15,'',['query'=>request()->param()]);
         $this->assign('list',$list);
