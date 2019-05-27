@@ -46,12 +46,25 @@ class OrderRefund extends Model
             $pay_config = Config::get('wx_config');
         }else if($pay_type == 3){//余额退款
             $balance = [
-                'balance'            =>  Db::raw('balance-'.$order_amount.''),
+                'balance'       =>  Db::raw('balance-'.$order_amount.''),
             ];
             $res =  Db::table('member_balance')->where(['user_id' => $data['user_id'],'balance_type' => 0])->update($balance);
             if(!$res){
                 Db::rollback();
             }
+            //改变订单状态
+            $update = [
+                'order_status'  => 7,
+
+            ];
+           $status = Db::name('order')->where(['order_sn' => $order_sn])->update($update);
+
+            if(!$status){
+                Db::rollback();
+            }
+            // 提交事务
+            Db::commit();
+            
         }
         try {
             $ret = Refund::run(Config::ALI_REFUND, $pay_config, $paydata);
@@ -60,7 +73,6 @@ class OrderRefund extends Model
             exit;
         }
         $res = json_encode($ret, JSON_UNESCAPED_UNICODE);
-
                                  
     }
 }

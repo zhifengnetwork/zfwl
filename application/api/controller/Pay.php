@@ -63,12 +63,12 @@ class Pay extends ApiBase
         $amount       = $order_info['order_amount'];
         $client_ip    = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '127.0.0.1';
         $payData['order_no']        = $order_info['order_sn'];
-        $payData['body']            = '支付宝支付';
+        $payData['body']            = '';
         $payData['timeout_express'] = time() + 600;
         $payData['amount']          = $amount;
         if($pay_type == 3){
               $payData['subject']      = '支付宝支付';
-              $payData['goods_type']   = 1;
+              $payData['goods_type']   = 1;//虚拟还是实物
               $payData['return_param'] = '';
               $payData['store_id']     = '';
               $payData['quit_url']     = '';
