@@ -73,86 +73,62 @@
                 <div class="ibox-content">
                     <form method="post" class="form-horizontal" action="">
 
-                        
-
                         <div class="form-group">
-                            <label class="col-sm-2 control-label"></label>
+                            <label class="col-sm-2 control-label"><span style="color:red;">*</span>团购商品名称（不可更改）</label>
                             <div class="col-sm-4">
-                                <input type="text" oninput="goods(this)" value="{$goods.goods_name}" placeholder="搜索商品名称" class="form-control">
+                                <input type="text" oninput="goods(this)" readonly value="{$info.groupon_name}" placeholder="搜索商品名称" class="form-control">
                             </div>
                         </div>
 
+
                         <div class="form-group">
-                            <label class="col-sm-2 control-label"><span style="color:red;">*</span>商品</label>
+                            <label class="col-sm-2 control-label"><span style="color:red;">*</span>目标数量</label>
                             <div class="col-sm-9">
-                                <div style="line-height:34px;float:left;margin:0 10px 0 0;">
-                                    <select class="form-control" name="goods_id">
-                                        {if condition="$goods.goods_id"}
-                                        <option value="{$goods.goods_id}" >{$goods.goods_name}</option>
-                                        {else /}
-                                        <option value="0" >默认全部商品可用</option>
-                                        {/if}
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="col-sm-2 control-label"><span style="color:red;">*</span>优惠券名称</label>
-                            <div class="col-sm-4">
-                                <input type="text" name="title" value="{$info.title}" class="form-control">
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="col-sm-2 control-label"><span style="color:red;">*</span>门槛</label>
-                            <div class="col-sm-4">
-                                <input type="text" name="threshold" value="{$info.threshold}" placeholder="满多少可用（默认无门槛）" class="form-control">
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="col-sm-2 control-label"><span style="color:red;">*</span>优惠金额</label>
-                            <div class="col-sm-4">
-                                <input type="text" name="price" value="{$info.price}" class="form-control">
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="col-sm-2 control-label"><span style="color:red;">*</span>优惠数量</label>
-                            <div class="col-sm-4">
-                                <input type="text" name="number" value="{$info.number}" class="form-control">
+                                <input type="text" name="target_number" value="{$info.target_number}" placeholder="团购达成的数量" class="form-control">
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label class="col-sm-2 control-label"><span style="color:red;">*</span>开始时间</label>
-                            <div class="col-sm-4">
-                                <input type="text" name="start_time" value="{$info.start_time|date='Y-m-d H:i:s',###}" class="form-control timer">
+                            <div class="col-sm-9">
+                                <input type="text" id="start_time" name="start_time" value="{$info.start_time|date='Y-m-d H:i:s',###}" class="form-control">
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label class="col-sm-2 control-label"><span style="color:red;">*</span>结束时间</label>
-                            <div class="col-sm-4">
-                                <input type="text" name="end_time" value="{$info.end_time|date='Y-m-d H:i:s',###}" class="form-control timer">
+                            <div class="col-sm-9">
+                                <input type="text" id="end_time" name="end_time" value="{$info.end_time|date='Y-m-d H:i:s',###}" class="form-control">
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label class="col-sm-2 control-label">说明</label>
+                            <label class="col-sm-2 control-label">排序</label>
                             <div class="col-sm-9">
-                                <textarea name="note"  class="form-control" placeholder="说点什么...最少输入0个字符" datatype="*0-100" onkeyup="textarealength(this,100)">{$info.note}</textarea>
+                                <input type="text" name="sort" value="{$info.sort}" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">上下架</label>
+                            <div class="col-sm-9">
+                                <label style="margin-top:4px; margin-right:20px;">
+                                    <input type="radio" value="1" name="is_show" {if condition="$info.is_show"} checked {/if} /> 上架
+                                </label>
+                                <label>
+                                    <input type="radio" value="0" name="is_show" {if condition="!$info.is_show"} checked {/if} /> 下架
+                                </label>
                             </div>
                         </div>
 
                         <div class="form-group">
                             <div class="col-sm-4 col-sm-offset-2">
-                                <input type="hidden" name="coupon_id" value="{$info.coupon_id}" />
+                                <input type="hidden" name="groupon_id" value="{$info.groupon_id}" />
                                 <button class="btn btn-primary" type="submit">提交</button>
                                 <button class="btn btn-white" onclick="javascript:history.back(-1);return false;">取消</button>
                             </div>
                         </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -165,31 +141,47 @@
 <script src="__STATIC__/layui/src/localResizeIMG2.js" type="text/javascript"></script>
 <script type="text/javascript">
 
+Calendar.setup({
+    inputField     :    "start_time",
+    ifFormat       :    "%Y-%m-%d %H:%M:%S",
+    showsTime      :    true,
+    timeFormat     :    "12"
+});
+
+Calendar.setup({
+    inputField     :    "end_time",
+    ifFormat       :    "%Y-%m-%d %H:%M:%S",
+    showsTime      :    true,
+    timeFormat     :    "12"
+});
+
 function goods(obj){
     var goods_name = $(obj).val();
-
+    
     if(goods_name == ''){
-        var option = '<option value="0">默认全部商品可用</option>';
+        var option = '<option value="">选择商品名称</option>';
         $("select[name='goods_id']").html(option);
+        $('input[name=groupon_name]').val('');
         return;
     }
 
     var option = '';
     $.post("{:url('Ajax/get_goods')}",{'goods_name':goods_name},function(data){
         $(data.data).each(function(k,v){
+            if(k==0){
+                console.log(k)
+                $('input[name=groupon_name]').val(v.goods_name);
+            }
             option += '<option value="'+v.goods_id+'">'+v.goods_name+'</option>';
         })
         $("select[name='goods_id']").html(option);
     },'json');
-    
-
 }
 
+$('select[name=goods_id]').on('change',function(){
+    $('input[name=groupon_name]').val($(this).find("option:selected").html());
+})
 
-function addType(){
-    var html = $('#itemss').html();
-    $('#items').append(html);
-}
 
     (function () {
         var viewImg = $("#imglist");

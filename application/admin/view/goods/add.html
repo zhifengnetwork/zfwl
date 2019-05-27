@@ -102,6 +102,7 @@
                                              <th class="th_1"><input type="text" readonly="readonly" style="border: 0px;" name="goods_th[1][]" value="{:lang(\'规格\')}"></th>
                                              <!-- <th><input type="text" readonly="readonly" style="border: 0px;" name="img_th[img][]" value="{:lang(\'图片\')}"></th> -->
                                              <th><input type="text" readonly="readonly" style="border: 0px;" name="pri_th[pri][]" value="{:lang(\'本店售价(元)\')}"></th>
+                                             <th><input type="text" readonly="readonly" style="border: 0px;" name="pri_th[group_pri][]" value="{:lang(\'拼团价格\')}"></th>
                                              <th><input type="text" readonly="readonly" style="border: 0px;" name="goods_th[num][]" value="{:lang(\'库存\')}"></th>
                                              <th style="width: 25px;">操作</th>
                                          </tr>
@@ -113,6 +114,7 @@
                                                      <input type="file" name="img_td[img][]" />
                                                 </td> -->
                                                  <td><input type="text" class="pri_id" value="" name="pri_td[pri][]"></td>
+                                                 <td><input type="text" class="pri_id" value="" name="pri_td[group_pri][]"></td>
                                                  <td><input class="input-text" type="text" name="goods_td[num][]"></td>
                                                  <td onclick="delTr(this)"><i class="Hui-iconfont del_td"></i></td>
                                              </tr>
@@ -153,8 +155,8 @@
                             <div class="col-sm-9">
                                 <div style="line-height:34px;">
                                     <span style="float:left;margin: 0 7px;">限时卖时间 </span>
-                                    <span style="float:left;margin: 0 7px;"><input type="text" name="limited_start" disabled value="" class="form-control timer"></span>
-                                    <span style="float:left;margin: 0 7px;"><input type="text" name="limited_end" disabled value="" class="form-control timer"></span>
+                                    <span style="float:left;margin: 0 7px;"><input type="text" id="limited_start" name="limited_start" disabled value="" class="form-control"></span>
+                                    <span style="float:left;margin: 0 7px;"><input type="text" id="limited_end" name="limited_end" disabled value="" class="form-control"></span>
                                 </div>
                             </div>
                         </div>
@@ -162,7 +164,7 @@
                         <div class="form-group">
                             <label class="col-sm-2 control-label">上架时间</label>
                             <div class="col-sm-9">
-                                <input type="text" name="add_time" value="{$Request.time|date='Y-m-d H:i:s',###}" class="form-control timer">
+                                <input type="text" id="add_time" name="add_time" value="{$Request.time|date='Y-m-d H:i:s',###}" class="form-control">
                             </div>
                         </div>
 
@@ -465,6 +467,27 @@
 <script src="__STATIC__/layui/src/localResizeIMG2.js" type="text/javascript"></script>
 
 <script type="text/javascript">
+Calendar.setup({
+    inputField     :    "add_time",
+    ifFormat       :    "%Y-%m-%d %H:%M:%S",
+    showsTime      :    true,
+    timeFormat     :    "12"
+});
+
+Calendar.setup({
+    inputField     :    "limited_start",
+    ifFormat       :    "%Y-%m-%d %H:%M:%S",
+    showsTime      :    true,
+    timeFormat     :    "12"
+});
+
+Calendar.setup({
+    inputField     :    "limited_end",
+    ifFormat       :    "%Y-%m-%d %H:%M:%S",
+    showsTime      :    true,
+    timeFormat     :    "12"
+});
+
 var rowCount = $("#goods_table tbody").find("tr").length - 1; //行数
 var colCount = $("#goods_table thead").find("tr").find("th").length - 4; //列数
 var col_id = 0;
