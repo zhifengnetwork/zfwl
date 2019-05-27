@@ -1410,7 +1410,7 @@ class Goods extends Common
     public function puls_goods_add () {
         return $this->fetch('goods/puls_goods_add');
     }
-
+//dddd
     /**
      *AJAX搜索商品
      */

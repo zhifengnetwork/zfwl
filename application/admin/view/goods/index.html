@@ -145,7 +145,7 @@
             is_show = 1;
             ts = '是否上架?';
         }
-
+//ddddd
         if(window.confirm(ts)){
             $.post("{:url('Goods/is_show')}",{'goods_id':goods_id,'is_show':is_show},function(data){
                 if(data.code){
