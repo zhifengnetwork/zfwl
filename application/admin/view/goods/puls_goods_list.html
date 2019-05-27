@@ -58,10 +58,10 @@
                                 {$vo['limited_end']>0?date('Y-m-d',$vo['limited_end']):''}</td>
                             <td>{$vo['is_show'] == 1?'上架':'下架'}</td>
                             <td>{$vo['is_del'] == 1?'已删除':'正常'}</td>
-                            <td>{$vo['status'] == 1?'启用':'未启用'}</td>
+                            <td>{$vo['status'] == 1?'启用':'关闭'}</td>
                             <td>
-                                <a href="{:url('Goods/puls_goods_update',['id'=>$vo.id,'status'=>$vo['status'] == 1?0:1],false)}">{$vo['status'] == 1?'关闭':'启用'}</a>
-                                <a onclick="del(this,{$vo.id})" href="javascript:;">删除</a>
+                                <a onclick="update(this,{$vo.id},{$vo['status'] == 1?0:1})" href="javascript:;" href="{:url('Goods/puls_goods_update',['id'=>$vo.id,'status'=>$vo['status'] == 1?0:1],false)}">{$vo['status'] == 1?'关闭':'启用'}</a>
+                                <a onclick="del(this,{$vo.id},-1)" href="javascript:;">删除</a>
                             </td>
                         </tr>
                         {/volist}
@@ -85,15 +85,30 @@
 {/block}
 {block name='script'}
 <script>
-    function del(obj,id){
-        if(window.confirm('确认删除该配送方式吗？')){
-            $.post("{:url('Goods/goods_delivery_del')}",{'id':id},function(data){
+    function del(obj,id,status){
+        if(window.confirm('确认删除该商品吗？')){
+            $.post("{:url('Goods/puls_goods_update')}",{'id':id,'status':status},function(data){
+                console.log(data)
                 alert(data.msg);
-                if(data.code){
+                if(data.code==1){
                     $(obj).parents('tr').remove();
                 }
             },'json');
         }
     }
+
+    function update(obj,id,status){
+        console.log(status,id);
+        if(window.confirm('确认修改该商品状态吗？')){
+            $.post("{:url('Goods/puls_goods_update')}",{'id':id,'status':status},function(data){
+                console.log(data)
+                alert(data.msg);
+                if(data.code==1){
+                    window.location.reload();
+                }
+            },'json');
+        }
+    }
+
 </script>
 {/block}

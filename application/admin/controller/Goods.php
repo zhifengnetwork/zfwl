@@ -1414,15 +1414,18 @@ class Goods extends Common
     public function puls_goods_add () {
         $goods_id = request()->param('goods_id',0,'intval');
         $status = request()->param('status',0,'intval');
-//        if (empty($goods_id)){
-//            $this->error('请选择商品',url('puls_goods_add'));
-//        }
-//        $insert = model('PulsGoods')->insert(['goods_id'=>$goods_id,'status'=>$status]);
-//        if ($insert){
-//            $this->success('添加成功！',url('goods/puls_goods_list'));
-//        }else{
-//            $this->error('添加失败！');
-//        }
+        if (request()->isPost()){
+            if (empty($goods_id)){
+                $this->error('请选择商品',url('puls_goods_add'));
+            }
+            $insert = model('PulsGoods')->insert(['goods_id'=>$goods_id,'status'=>$status]);
+            if ($insert){
+                $this->success('添加成功！',url('goods/puls_goods_list'));
+            }else{
+                $this->error('添加失败！');
+            }
+        }
+
         return $this->fetch('goods/puls_goods_add');
     }
 //dddd
@@ -1433,6 +1436,8 @@ class Goods extends Common
         $name = request()->param('name','');
         $where = [];
         if (!empty($name)){
+            $id_arr = model('PulsGoods')->where(['status'=>['>',-1]])->column('goods_id');
+            $where['goods_id'] = ['notin',$id_arr];
             $where['goods_name'] = ["like","%$name%"];
             $list = model('Goods')->where($where)->field('goods_id,goods_name')->select();
             return json(['code'=>1,'msg'=>'','data'=>$list]);
@@ -1450,25 +1455,14 @@ class Goods extends Common
         $id = request()->param('id',0,'intval');
         $status = request()->param('status',0,'intval');
         if (empty($id)){
-            if (IS_POST){
-                return json(['code'=>0,'msg'=>'id不存在！','data'=>[]]);
-            }else{
-                $this->error('id不存在！');
-            }
+            return json(['code'=>0,'msg'=>'id不存在！','data'=>[]]);
         }
         $update = model('PulsGoods')->update(['id'=>$id,'status'=>$status]);
         if ($update){
-            if (IS_POST){
-                return json(['code'=>1,'msg'=>'','data'=>[]]);
-            }else{
-                $this->success('操作成功！','puls_goods_list');
-            }
+            return json(['code'=>1,'msg'=>'操作成功！','data'=>[]]);
         }else{
-            if (IS_POST){
-                return json(['code'=>0,'msg'=>'操作失败！','data'=>[]]);
-            }else{
-                $this->error('id不存在！');
-            }
+            return json(['code'=>0,'msg'=>'操作失败！','data'=>[]]);
+
         }
     }
 
