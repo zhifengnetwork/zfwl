@@ -96,10 +96,9 @@
                                 <td>{$vo.add_time|date="Y-m-d",###}</td>
                                 <td>
                                     <a class="btn btn-default delete" href="{:url('Goods/comment_list',['goods_id'=>$vo.goods_id],false)}" >评论 </i></a>
-
-                                    <a href="{:url('Goods/edit',['goods_id'=>$vo.goods_id],false)}">编辑</a>
-                                    <a is_show="{$vo.is_show}" onclick="is_show(this,{$vo.goods_id})" href="javascript:;">{if condition="$vo.is_show"}下架{else /}上架{/if}</a>
-                                    <a onclick="del(this,{$vo.goods_id})" href="javascript:;">删除</a>
+                                    <a class="btn btn-default delete" href="{:url('Goods/edit',['goods_id'=>$vo.goods_id],false)}" >编辑 </i></a>
+                                    <a class="btn btn-default delete" is_show="{$vo.is_show}" onclick="is_show(this,{$vo.goods_id})" href="javascript:;" >{if condition="$vo.is_show"}下架{else /}上架{/if} </i></a>
+                                    <a class="btn btn-default delete" onclick="del(this,{$vo.goods_id})" href="javascript:;" >删除 </i></a>
                                 </td>
                             </tr>
                             {/volist}
@@ -145,17 +144,17 @@
             is_show = 1;
             ts = '是否上架?';
         }
-//ddddd
+
         if(window.confirm(ts)){
             $.post("{:url('Goods/is_show')}",{'goods_id':goods_id,'is_show':is_show},function(data){
                 if(data.code){
                     $(obj).attr('is_show',is_show);
                     if( is_show ){
-                        $(obj).parents('tr').find('td').eq(2).html('已上架');
+                        $(obj).parents('tr').find('td').eq(4).html('已上架');
                         $(obj).html('下架');
                         alert('上架成功！');
                     }else{
-                        $(obj).parents('tr').find('td').eq(2).html('未上架');
+                        $(obj).parents('tr').find('td').eq(4).html('未上架');
                         $(obj).html('上架');
                         alert('下架成功！');
                     }
