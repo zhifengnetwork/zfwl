@@ -1033,4 +1033,54 @@ return [
         ],
     ],
 
+    //配置管理
+    'clock' => [
+        'id'    => 220000,
+        'title' => '打卡管理',
+        'sort'  => 8,
+        'url'   => 'clock/index',
+        'hide'  => 1,
+        'icon'  => 'glyphicon glyphicon-dashboard',
+        'child' => [
+            [
+                'id'    => 220100,
+                'title' => '每日打卡',
+                'sort'  => 1,
+                'url'   => 'clock/index',
+                'hide'  => 1,
+                'icon'  => 'fa-th-large',
+                'child' => [
+                    [
+                        'id'    => 220101,
+                        'title' => '打卡设置',
+                        'sort'  => 1,
+                        'url'   => 'clock/setting',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    =>220201,
+                        'title' => '参与用户',
+                        'sort'  => 1,
+                        'url'   => 'clock/join_user',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 220301,
+                        'title' => '打卡列表',
+                        'sort'  => 1,
+                        'url'   => 'clock/day_list',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 220401,
+                        'title' => '打卡交易明细',
+                        'sort'  => 1,
+                        'url'   => 'clock/balance_list',
+                        'hide'  => 1,
+                    ],
+
+                ],
+            ],
+        ],
+    ],
 ];

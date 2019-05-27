@@ -31,6 +31,7 @@ if (preg_match("/(.*)\.(.*)\.c3w\.cc/i", HTTP_HOST, $matches)) {
         '127.0.0.1:12588' => 'admin',
         '127.0.0.1:12580' => 'admin',
          'test.com' => 'admin',
+        'demo.zfwl.top' => 'admin',
     ];
     if (!empty($terrace[HTTP_HOST])) {
         $module = $terrace[HTTP_HOST];
