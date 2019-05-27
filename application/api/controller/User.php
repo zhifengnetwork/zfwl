@@ -503,5 +503,38 @@ class User extends ApiBase
 
     }
 
+   
+   /**
+     * +---------------------------------
+     * 设置支付宝账户
+     * +---------------------------------
+    */
+    public function set_alipay(){
+        $user_id = $this->get_user_id();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -2, 'msg'=>'用户不存在','data'=>'']);
+        } 
+        $alipay_name   = input('alipay_name','');
+        $alipay_number = input('alipay_number','');
+        if(empty($alipay_name) || strlen($alipay_name) > 20){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'支付宝真实姓名有误！','data'=>'']);
+        }
+
+        if(empty($alipay_number) || strlen($alipay_number) > 20){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'支付宝账号！','data'=>'']);
+        }
+
+        $res = Db::table('member')->where(['id' => $user_id])->update(['alipay' => $alipay_number,'alipay_name' => $alipay_name]);
+
+        if($res !== false){
+            $this->ajaxReturn(['status' => 1 , 'msg'=>'修改成功','data'=>'']);
+        }
+
+        $this->ajaxReturn(['status' => 1 , 'msg'=>'修改失败','data'=>'']);
+         
+    }
+    
+
+
 
 }
