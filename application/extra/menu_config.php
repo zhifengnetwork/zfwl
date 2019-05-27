@@ -231,6 +231,14 @@ return [
 
                         ],
                     ],
+                    [
+                        'id'    => 30108,
+                        'title' => '添加PULS会员商品',
+                        'sort'  => 0,
+                        'url'   => 'goods/puls_goods_add',
+                        'hide'  => 0,
+                    ],
+
                 ],
             ],
             [

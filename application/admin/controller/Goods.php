@@ -1384,14 +1384,27 @@ class Goods extends Common
      * 升级PULS会员商品
      */
     public function puls_goods_list () {
+        $name = request()->param('name');
+        $where = [];
+        if (!empty($name)){
+            $where['b.goods_name'] = ['like',"%$name%"];
+        }
+        $where['a.status'] = ['>',-1];
         $field = 'a.*,b.goods_name,b.price,b.limited_start,b.limited_end,b.stock,b.is_show,b.is_del';
         $list = model('PulsGoods')->alias('a')
             ->join('goods b','a.goods_id = b.goods_id','left')
-            ->where(['a.status'=>['>',-1]])
+            ->where()
             ->order('a.id desc')->field($field)->paginate(15,'',['query'=>request()->param()]);
         $this->assign('list',$list);
-        $this->fetch('goods/puls_goods_list');
+        return $this->fetch('goods/puls_goods_list');
 
+    }
+
+    /**
+     * 添加升级PULS会员商品
+     */
+    public function puls_goods_add () {
+        return $this->fetch('goods/puls_goods_add');
     }
 
 }
