@@ -5,3 +5,4 @@ runtime
 .htaccess
 upload
 /application/database.php
+/public/index.php
