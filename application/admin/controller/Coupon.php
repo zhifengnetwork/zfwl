@@ -110,14 +110,6 @@ class Coupon extends Common
         ]);
     }
 
-
-    public function goods(){
-        $goods_name = input('goods_name');
-
-        $res = Db::table('goods')->where('goods_name','like',"%{$goods_name}%")->field('goods_id,goods_name')->select();
-        jason($res);
-    }
-
     public function del(){
         $id = input('coupon_id');
         if(!$id){

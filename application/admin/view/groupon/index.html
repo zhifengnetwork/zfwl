@@ -8,7 +8,7 @@
                 <div class="ibox-title">
                     <h5>{$meta_title}</h5>
                     <div class="pull-right" style="margin-top:-8px;">
-                            <a class="btn btn-info" href="{:url('goods/add')}"><i class="fa fa-plus"></i> 添加商品</a>
+                            <a class="btn btn-info" href="{:url('groupon/add')}"><i class="fa fa-plus"></i> 添加团购商品</a>
                     </div>
                 </div>
                 <div class="ibox-content">
@@ -18,32 +18,14 @@
 
                         <div class="col-sm-2 m-b-xs">
                             <select name="is_show" class="input-sm form-control input-s-sm inline">
-                                <option value="">选择商品状态</option>
+                                <option value="">选择上架状态</option>
                                 <option {if condition="$is_show eq '1' "} selected {/if} value="1">已上架</option>
                                 <option {if condition="$is_show heq 0 "} selected {/if} value="0">未上架</option>
                             </select>
                         </div>
                         
                         <div class="col-sm-2">
-                            <div class="input-group"><input type="text" name="goods_name" value="{$goods_name}" placeholder="搜索商品名称" class="input-sm form-control"> </div>
-                        </div>
-
-                        <div class="col-sm-2 m-b-xs">
-                            <select name="cat_id1" class="input-sm form-control input-s-sm inline">
-                                <option value="">选择一级分类</option>
-                                {volist name="cat_id11" id="vo"}
-                                    <option {if condition="$vo.cat_id eq $cat_id1"} selected {/if} value="{$vo.cat_id}">{$vo.cat_name}</option>
-                                {/volist}
-                            </select>
-                        </div>
-
-                        <div class="col-sm-2 m-b-xs">
-                            <select name="cat_id2" class="input-sm form-control input-s-sm inline">
-                                <option value="">选择二级分类</option>
-                                {volist name="cat_id22" id="vo"}
-                                    <option {if condition="$vo.cat_id eq $cat_id2"} selected {/if} value="{$vo.cat_id}">{$vo.cat_name}</option>
-                                {/volist}
-                            </select>
+                            <div class="input-group"><input type="text" name="groupon_name" value="{$groupon_name}" placeholder="搜索团购商品名称" class="input-sm form-control"> </div>
                         </div>
 
                         <div class="col-sm-3">
@@ -56,14 +38,6 @@
                     </form>
                     </div>
 
-                    <div class="row" style="margin-left:0px;" >
-                        <a class="btn btn-default delete" href="{:url('Goods/add')}" >添加商品 </i></a>
-                        <a class="btn btn-default delete" onclick="is_show_all(1)" href="javascript:;" >批量上架 </i></a>
-                        <a class="btn btn-default delete" onclick="is_show_all(0)" href="javascript:;" >批量上架 </i></a>
-                        <a class="btn btn-default delete" onclick="del_all(0)" href="javascript:;" >批量删除 <i class="fa fa-trash-o"></i></a>
-
-                    </div>
-
                     <div class="table-responsive">
                         <form action="{:URL('Admin/delAll')}" method="post">
                         <table class="table table-striped">
@@ -71,35 +45,45 @@
                             <tr>
 
                                 <th><input class="ch_all" type="checkbox">ID</th>
-                                <th>一级分类 </th>
-                                <th>二级分类 </th>
-                                <th>商品 </th>
-                                <th>商品状态 </th>
-                                <th>商品价格（元）</th>
-                                <th>库存</th>
-                                <th>销量</th>
-                                <th>上架时间</th>
+                                <th>团购商品名称 </th>
+                                <th>排序 </th>
+                                <th>目标数量 </th>
+                                <th>已售数量 </th>
+                                <th>开始时间</th>
+                                <th>结束时间</th>
+                                <th>团购状态</th>
+                                <th>上架 \ 下架</th>
                                 <th>操作</th>
                             </tr>
                             </thead>
                             <tbody>
                             {volist name="list" id="vo"}
                             <tr>
-                                <td><input type="checkbox" class="i-checks ch_item" name="goods_id[]"   value="{$vo.goods_id}">{$vo.goods_id}</td>
-                                <td>{$vo.c1_name}</td>
-                                <td>{$vo.c2_name}</td>
-                                <td>{$vo.goods_name}</td>
-                                <td>{if condition="$vo.is_show"}已上架{else /}未上架{/if}</td>
-                                <td>{$vo.price}</td>
-                                <td>{$vo.stock}</td>
-                                <td>{$vo.number_sales}</td>
-                                <td>{$vo.add_time|date="Y-m-d",###}</td>
+                                <td><input type="checkbox" class="i-checks ch_item" name="groupon_id[]"   value="{$vo.groupon_id}">{$vo.groupon_id}</td>
+                                <td>{$vo.groupon_name}</td>
+                                <td>{$vo.sort}</td>
+                                <td>{$vo.target_number}</td>
+                                <td>{$vo.sold_number}</td>
+                                <td>{$vo.start_time|date="Y-m-d H:i:s",###}</td>
+                                <td>{$vo.end_time|date="Y-m-d H:i:s",###}</td>
                                 <td>
-                                    <a class="btn btn-default delete" href="{:url('Goods/comment_list',['goods_id'=>$vo.goods_id],false)}" >评论 </i></a>
-
-                                    <a href="{:url('Goods/edit',['goods_id'=>$vo.goods_id],false)}">编辑</a>
-                                    <a is_show="{$vo.is_show}" onclick="is_show(this,{$vo.goods_id})" href="javascript:;">{if condition="$vo.is_show"}下架{else /}上架{/if}</a>
-                                    <a onclick="del(this,{$vo.goods_id})" href="javascript:;">删除</a>
+                                    {switch $vo.status}
+                                        {case 0}终止团购{/case}
+                                        {case 1}团购成功{/case}
+                                        {case 2}团购中{/case}
+                                        {case 3}团购未满{/case}
+                                    {/switch}
+                                </td>
+                                <td>
+                                    {switch $vo.is_show}
+                                        {case 0}未上架{/case}
+                                        {case 1}已上架{/case}
+                                    {/switch}
+                                </td>
+                                <td>
+                                    <a href="{:url('Groupon/edit',['groupon_id'=>$vo.groupon_id],false)}">编辑</a>
+                                    <a is_show="{$vo.is_show}" onclick="is_show(this,{$vo.groupon_id})" href="javascript:;">{if condition="$vo.is_show"}下架{else /}上架{/if}</a>
+                                    <a onclick="del(this,{$vo.groupon_id})" href="javascript:;">删除</a>
                                 </td>
                             </tr>
                             {/volist}
@@ -115,7 +99,7 @@
                         .pagination li a{float:left;width:42px;height:28px; text-align:center;line-height:30px;border-left:none;color:#3399d5;}
                     </style>
                     <ul class="pagination">
-                        {$list->render()}
+                        {$page}
                     </ul>
                 </div>
             </div>
@@ -124,9 +108,9 @@
 {/block}
 {block name='script'}
 <script>
-    function del(obj,goods_id){
+    function del(obj,groupon_id){
         if(window.confirm('确认删除该商品吗？')){
-            $.post("{:url('Goods/del')}",{'goods_id':goods_id},function(data){
+            $.post("{:url('Groupon/del')}",{'groupon_id':groupon_id},function(data){
                 alert(data.msg);
                 if(data.code){
                     $(obj).parents('tr').remove();
@@ -135,7 +119,7 @@
         }
     }
 
-    function is_show(obj,goods_id){
+    function is_show(obj,groupon_id){
         var is_show = $(obj).attr('is_show');
 
         if( is_show == 1 ){
@@ -147,15 +131,15 @@
         }
 
         if(window.confirm(ts)){
-            $.post("{:url('Goods/is_show')}",{'goods_id':goods_id,'is_show':is_show},function(data){
+            $.post("{:url('Groupon/is_show')}",{'groupon_id':groupon_id,'is_show':is_show},function(data){
                 if(data.code){
                     $(obj).attr('is_show',is_show);
                     if( is_show ){
-                        $(obj).parents('tr').find('td').eq(2).html('已上架');
+                        $(obj).parents('tr').find('td').eq(8).html('已上架');
                         $(obj).html('下架');
                         alert('上架成功！');
                     }else{
-                        $(obj).parents('tr').find('td').eq(2).html('未上架');
+                        $(obj).parents('tr').find('td').eq(8).html('未上架');
                         $(obj).html('上架');
                         alert('下架成功！');
                     }
@@ -166,12 +150,12 @@
 
     function is_show_all(is_show){
 
-        var goods_id = '';
+        var groupon_id = '';
         var flag = 0
         $('.ch_item').each(function(k,v){
             if( $(v).is(':checked') ){
                 flag = 1;
-                goods_id += $(v).val() + ',';
+                groupon_id += $(v).val() + ',';
             }
         });
         if( !flag ){
@@ -181,9 +165,9 @@
                 alert('请勾选需要批量下架的ID！');
             }
         }
-        goods_id = goods_id.substring(0, goods_id.length - 1);  
+        groupon_id = groupon_id.substring(0, groupon_id.length - 1);  
         
-        $.post("{:url('Goods/is_show_all')}",{'goods_id':goods_id,'is_show':is_show},function(data){
+        $.post("{:url('Groupon/is_show_all')}",{'groupon_id':groupon_id,'is_show':is_show},function(data){
             if(data.code){
                 if( is_show ){
                     alert('批量上架成功！');
@@ -196,23 +180,23 @@
 
     }
 
-    function del_all(obj,goods_id){
-        var goods_id = '';
+    function del_all(obj,groupon_id){
+        var groupon_id = '';
         var flag = 0
         $('.ch_item').each(function(k,v){
             if( $(v).is(':checked') ){
                 flag = 1;
-                goods_id += $(v).val() + ',';
+                groupon_id += $(v).val() + ',';
             }
         });
         if( !flag ){
             alert('请勾选需要批量删除的ID！');
             return;
         }
-        goods_id = goods_id.substring(0, goods_id.length - 1);
+        groupon_id = groupon_id.substring(0, groupon_id.length - 1);
 
         if(window.confirm('确认批量删除商品吗？')){
-            $.post("{:url('Goods/del_all')}",{'goods_id':goods_id},function(data){
+            $.post("{:url('Groupon/del_all')}",{'groupon_id':groupon_id},function(data){
                 if(data.code){
                     alert('批量删除成功！');
                     location.reload();

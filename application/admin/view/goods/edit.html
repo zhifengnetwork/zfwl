@@ -179,16 +179,9 @@
                             <div class="col-sm-9">
                                 <div style="line-height:34px;">
                                     <span style="float:left;margin: 0 7px;">限时卖时间 </span>
-                                    <span style="float:left;margin: 0 7px;"><input type="text" {if condition="is_array($info.goods_attr) and !in_array(6,$info.goods_attr)"} disabled {/if} name="limited_start" value="{$info.limited_start|date='Y-m-d',###}" class="form-control timer"></span>
-                                    <span style="float:left;margin: 0 7px;"><input type="text" {if condition="is_array($info.goods_attr) and !in_array(6,$info.goods_attr)"} disabled {/if} name="limited_end" value="{$info.limited_end|date='Y-m-d',###}" class="form-control timer"></span>
+                                    <span style="float:left;margin: 0 7px;"><input type="text" {if condition="is_array($info.goods_attr) and !in_array(6,$info.goods_attr)"} disabled {/if} id="limited_start" name="limited_start" value="{$info.limited_start|date='Y-m-d',###}" class="form-control"></span>
+                                    <span style="float:left;margin: 0 7px;"><input type="text" {if condition="is_array($info.goods_attr) and !in_array(6,$info.goods_attr)"} disabled {/if} id="limited_end" name="limited_end" value="{$info.limited_end|date='Y-m-d',###}" class="form-control"></span>
                                 </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="col-sm-2 control-label">上架时间</label>
-                            <div class="col-sm-9">
-                                <input type="text" name="add_time" value="{$info.add_time|date='Y-m-d',###}" class="form-control timer">
                             </div>
                         </div>
 
@@ -511,6 +504,20 @@
       .mask_img img{position: relative;top: 30%;left: 50%;}
   </style>
 <script type="text/javascript">
+
+Calendar.setup({
+    inputField     :    "limited_start",
+    ifFormat       :    "%Y-%m-%d %H:%M:%S",
+    showsTime      :    true,
+    timeFormat     :    "12"
+});
+
+Calendar.setup({
+    inputField     :    "limited_end",
+    ifFormat       :    "%Y-%m-%d %H:%M:%S",
+    showsTime      :    true,
+    timeFormat     :    "12"
+});
 
     var rowCount = $("#goods_table tbody").find("tr").length - 1; //行数
     var colCount = $("#goods_table thead").find("tr").find("th").length - 5; //列数
