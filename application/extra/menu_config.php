@@ -1033,7 +1033,7 @@ return [
         'sort'  => 8,
         'url'   => 'clock/index',
         'hide'  => 1,
-        'icon'  => 'glyphicon glyphicon-link',
+        'icon'  => 'glyphicon glyphicon-dashboard',
         'child' => [
             [
                 'id'    => 220100,
