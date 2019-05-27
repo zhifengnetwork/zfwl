@@ -1393,9 +1393,13 @@ class Goods extends Common
         $field = 'a.*,b.goods_name,b.price,b.limited_start,b.limited_end,b.stock,b.is_show,b.is_del';
         $list = model('PulsGoods')->alias('a')
             ->join('goods b','a.goods_id = b.goods_id','left')
-            ->where()
-            ->order('a.id desc')->field($field)->paginate(15,'',['query'=>request()->param()]);
+            ->where($where)
+            ->order('a.id desc')
+            ->field($field)
+            ->paginate(15,'',['query'=>request()->param()]);
         $this->assign('list',$list);
+        $this->assign('name',$name);
+        $this->assign('meta_title','升级PULS会员商品列表');
         return $this->fetch('goods/puls_goods_list');
 
     }
