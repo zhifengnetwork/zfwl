@@ -33,6 +33,7 @@ if (preg_match("/(.*)\.(.*)\.c3w\.cc/i", HTTP_HOST, $matches)) {
         '127.0.0.1:12580' => 'api',
         // '127.0.0.1:12580' => 'api',
         '127.0.0.1:12580' => 'admin',
+        'demo.zfwl.top' => 'admin',
          'test.com' => 'admin',
         'zfwl.com' => 'admin',
     ];
