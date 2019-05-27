@@ -128,11 +128,13 @@ class Goods extends Common
 
             // 本店售价
             $pri = $data['pri_td']['pri'];
+            $group_pri = $data['pri_td']['group_pri'];
             $pri_count = count($pri);
             for ($m = 0; $m < $pri_count; $m++) {
-                $pri_arr = $pri[$m];
-                $data_spec[$m]['pri'] = ['key' => 'pri', 'value' => $pri_arr];
+                $data_spec[$m]['pri'] = ['key' => 'pri', 'value' => $pri[$m]];
+                $data_spec[$m]['group_pri'] = ['key' => 'group_pri', 'value' => $group_pri[$m]];
             }
+
             // 初始化规格数据格式
             $count = count($data['goods_td'][1]);
             for ($i = 0; $i < $count; $i++) {
@@ -289,10 +291,11 @@ class Goods extends Common
 
             // 本店售价
             $pri = $data['pri_td']['pri'];
+            $group_pri = $data['pri_td']['group_pri'];
             $pri_count = count($pri);
             for ($m = 0; $m < $pri_count; $m++) {
-                $pri_arr = $pri[$m];
-                $data_spec[$m]['pri'] = ['key' => 'pri', 'value' => $pri_arr];
+                $data_spec[$m]['pri'] = ['key' => 'pri', 'value' => $pri[$m]];
+                $data_spec[$m]['group_pri'] = ['key' => 'group_pri', 'value' => $group_pri[$m]];
             }
             // 初始化规格数据格式
             $count = count($data['goods_td'][1]);
@@ -339,8 +342,6 @@ class Goods extends Common
                     }
                 }
             }
-    
-            $data['add_time'] = strtotime( $data['add_time'] );
             
             $data['goods_spec'] = '[' . $default_spec_str . ']';
             
@@ -448,11 +449,14 @@ class Goods extends Common
                 $spec_info[$key]['com_price'] = $val['price'];
             }
             
+            $spec_info[$key]['groupon_price'] = $val['groupon_price'];
+
             $spec_info[$key]['inventory'] = $val['inventory'];
             $spec_info[$key]['frozen_stock'] = $val['frozen_stock'];
         }
         
         $spec_th[] = '价格';
+        $spec_th[] = '拼团价格';
         $spec_th[] = '库存';
         $spec_th[] = '冻结库存';
         $info['th'] = $spec_th;
@@ -1421,7 +1425,7 @@ class Goods extends Common
         }
         return $this->fetch('goods/puls_goods_add');
     }
-
+//dddd
     /**
      *AJAX搜索商品
      */

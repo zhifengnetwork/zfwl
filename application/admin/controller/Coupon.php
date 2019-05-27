@@ -65,9 +65,11 @@ class Coupon extends Common
             $data['start_time'] = strtotime($data['start_time']);
             $data['end_time'] = strtotime($data['end_time']);
             
-            $res = Db::table('coupon')->insert($data);
+            $res = Db::table('coupon')->insertGetId($data);
 
             if($res){
+                //添加操作日志
+                slog($res);
                 $this->success('添加成功！',url('coupon/coupon_list'));
             }
         }
@@ -96,6 +98,8 @@ class Coupon extends Common
             $res = Db::table('coupon')->update($data);
 
             if($res){
+                //添加操作日志
+                slog($coupon_id);
                 $this->success('修改成功！',url('coupon/coupon_list'));
             }
         }
@@ -110,14 +114,6 @@ class Coupon extends Common
         ]);
     }
 
-
-    public function goods(){
-        $goods_name = input('goods_name');
-
-        $res = Db::table('goods')->where('goods_name','like',"%{$goods_name}%")->field('goods_id,goods_name')->select();
-        jason($res);
-    }
-
     public function del(){
         $id = input('coupon_id');
         if(!$id){
@@ -129,8 +125,10 @@ class Coupon extends Common
         }
 
         if( Db::table('coupon')->where('coupon_id',$id)->delete() ){
+            //添加操作日志
+            slog($id);
             jason([],'删除成功！');
         }
-
+        jason([],'删除失败！',0);
     }
 }

@@ -107,11 +107,12 @@
                                              <th>规格ID</th>
                                              <th class="th_1"><input type="text" readonly="readonly" style="border: 0px;" name="goods_th[1][]" value="规格"></th>
                                              {volist name='rsts.th' id='data_th'}
-                                             {if condition="($data_th neq '价格') and ($data_th neq '库存') and ($data_th neq '冻结库存') and ($data_th neq '规格') and ($data_th neq '长度') and ($data_th neq '宽度') and ($data_th neq '高度') and ($data_th neq '体积') and ($data_th neq '重量') and ($data_th neq '温藏')"}
+                                             {if condition="($data_th neq '价格') and ($data_th neq '拼团价格') and ($data_th neq '库存') and ($data_th neq '冻结库存') and ($data_th neq '规格') and ($data_th neq '长度') and ($data_th neq '宽度') and ($data_th neq '高度') and ($data_th neq '体积') and ($data_th neq '重量') and ($data_th neq '温藏')"}
                                                  <th class="th_{$key + 1}"><input type="text" readonly="readonly" style="border: 0px;width: 85%;" name="goods_th[{$key+1}][]" value="{$data_th}"><i class="Hui-iconfont Hui-iconfont-close th_close" style="color: #778899;display:none;"></i></th>
                                              {/if}	
                                              {/volist}
                                              <th><input type="text" readonly="readonly" style="border: 0px;" name="pri_th[pri][]" value="本店售价(元)"></th>
+                                             <th><input type="text" readonly="readonly" style="border: 0px;" name="pri_th[pri][]" value="拼团价格"></th>
                                              <th><input type="text" readonly="readonly" style="border: 0px;" name="goods_th[num][]" value="库存"></th>
                                              <th>冻结库存</th>
                                              <th style="width: 25px;">操作</th>
@@ -121,7 +122,7 @@
                                              {volist name='rsts.td' id='data_td'}
                                              <tr {if condition="$key === 0"}class="tr_1"{/if}>
                                                  {volist name='data_td' id='vo'}
-                                                     {if condition="($key !== 'com_price') and ($key !== 'inventory') and ($key !== 'frozen_stock') and ($key !== 'l') and ($key !== 'w') and ($key !== 'h') and ($key !== 'v') and ($key !== 'wg') and ($key !== 'refrigerate') and ($key !== 'sku_id')"}
+                                                     {if condition="($key !== 'com_price') and ($key !== 'groupon_price') and ($key !== 'inventory') and ($key !== 'frozen_stock') and ($key !== 'l') and ($key !== 'w') and ($key !== 'h') and ($key !== 'v') and ($key !== 'wg') and ($key !== 'refrigerate') and ($key !== 'sku_id')"}
                                                      <td class="td_{$key+1}"><input class="input-text" type="text" name="goods_td[{$key+1}][]" value="{$vo}"></td>
                                                      {/if}
                                                      {if condition="($key === 'inventory')"}
@@ -133,6 +134,11 @@
                                                      {if condition="($key === 'com_price')"}
                                                      <td>
                                                          <input type="text" class="pri_id" value="{$vo}" name="pri_td[pri][]">
+                                                     </td>
+                                                     {/if}
+                                                     {if condition="($key === 'groupon_price')"}
+                                                     <td>
+                                                         <input type="text" class="pri_id" value="{$vo}" name="pri_td[group_pri][]">
                                                      </td>
                                                      {/if}
                                                      {if condition="($key === 'sku_id')"}
@@ -179,16 +185,9 @@
                             <div class="col-sm-9">
                                 <div style="line-height:34px;">
                                     <span style="float:left;margin: 0 7px;">限时卖时间 </span>
-                                    <span style="float:left;margin: 0 7px;"><input type="text" {if condition="is_array($info.goods_attr) and !in_array(6,$info.goods_attr)"} disabled {/if} name="limited_start" value="{$info.limited_start|date='Y-m-d',###}" class="form-control timer"></span>
-                                    <span style="float:left;margin: 0 7px;"><input type="text" {if condition="is_array($info.goods_attr) and !in_array(6,$info.goods_attr)"} disabled {/if} name="limited_end" value="{$info.limited_end|date='Y-m-d',###}" class="form-control timer"></span>
+                                    <span style="float:left;margin: 0 7px;"><input type="text" {if condition="is_array($info.goods_attr) and !in_array(6,$info.goods_attr)"} disabled {/if} id="limited_start" name="limited_start" value="{$info.limited_start|date='Y-m-d',###}" class="form-control"></span>
+                                    <span style="float:left;margin: 0 7px;"><input type="text" {if condition="is_array($info.goods_attr) and !in_array(6,$info.goods_attr)"} disabled {/if} id="limited_end" name="limited_end" value="{$info.limited_end|date='Y-m-d',###}" class="form-control"></span>
                                 </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="col-sm-2 control-label">上架时间</label>
-                            <div class="col-sm-9">
-                                <input type="text" name="add_time" value="{$info.add_time|date='Y-m-d',###}" class="form-control timer">
                             </div>
                         </div>
 
@@ -512,8 +511,22 @@
   </style>
 <script type="text/javascript">
 
+Calendar.setup({
+    inputField     :    "limited_start",
+    ifFormat       :    "%Y-%m-%d %H:%M:%S",
+    showsTime      :    true,
+    timeFormat     :    "12"
+});
+
+Calendar.setup({
+    inputField     :    "limited_end",
+    ifFormat       :    "%Y-%m-%d %H:%M:%S",
+    showsTime      :    true,
+    timeFormat     :    "12"
+});
+
     var rowCount = $("#goods_table tbody").find("tr").length - 1; //行数
-    var colCount = $("#goods_table thead").find("tr").find("th").length - 5; //列数
+    var colCount = $("#goods_table thead").find("tr").find("th").length - 6; //列数
     
     // 添加行
     function addRow(){
