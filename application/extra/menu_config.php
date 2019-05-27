@@ -220,17 +220,17 @@ return [
                         'hide'  => 0,
                     ],
 
-                    [
-                        'id'    => 30107,
-                        'title' => 'PULS会员商品管理',
-                        'sort'  => 5,
-                        'url'   => 'goods/puls_goods_list',
-                        'hide'  => 1,
-                        'icon'  => 'fa-th-large',
-                        'child' => [
-
-                        ],
-                    ],
+//                    [
+//                        'id'    => 30107,
+//                        'title' => 'PULS会员商品管理',
+//                        'sort'  => 5,
+//                        'url'   => 'goods/puls_goods_list',
+//                        'hide'  => 1,
+//                        'icon'  => 'fa-th-large',
+//                        'child' => [
+//
+//                        ],
+//                    ],
                     [
                         'id'    => 30108,
                         'title' => '添加PULS会员商品',
@@ -1099,27 +1099,27 @@ return [
                         'id'    => 220101,
                         'title' => '打卡设置',
                         'sort'  => 1,
-                        'url'   => 'clock/setting',
+                        'url'   => 'clock/index',
                         'hide'  => 1,
                     ],
                     [
                         'id'    =>220201,
                         'title' => '参与用户',
-                        'sort'  => 1,
+                        'sort'  => 2,
                         'url'   => 'clock/join_user',
                         'hide'  => 1,
                     ],
                     [
                         'id'    => 220301,
                         'title' => '打卡列表',
-                        'sort'  => 1,
+                        'sort'  => 3,
                         'url'   => 'clock/day_list',
                         'hide'  => 1,
                     ],
                     [
                         'id'    => 220401,
                         'title' => '打卡交易明细',
-                        'sort'  => 1,
+                        'sort'  => 4,
                         'url'   => 'clock/balance_list',
                         'hide'  => 1,
                     ],

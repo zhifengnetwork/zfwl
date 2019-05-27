@@ -474,6 +474,17 @@
                                 </label>
                             </div>
                         </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">是否升级PULS会员</label>
+                            <div class="col-sm-9">
+                                <label style="margin-top:4px; margin-right:20px;">
+                                    <input type="radio" value="1" name="is_puls" {if condition="$info.is_puls"} checked {/if} /> 是
+                                </label>
+                                <label>
+                                    <input type="radio" value="0" name="is_puls" {if condition="!$info.is_puls"} checked {/if} /> 否
+                                </label>
+                            </div>
+                        </div>
                         
 
                         <div class="form-group">
