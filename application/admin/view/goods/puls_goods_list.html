@@ -54,13 +54,14 @@
                             <td>{$vo.goods_name}</td>
                             <td>{$vo.price}</td>
                             <td>{$vo.stock}</td>
-                            <td>{!empty($vo['limited_start'])?date('Y-m-d H:i:s',$vo['limited_start']):''} --- {!empty($vo['limited_end'])?date('Y-m-d H:i:s',$vo['limited_end']):''}</td>
+                            <td>{$vo['limited_start']>0?date('Y-m-d',$vo['limited_start']):''} ---
+                                {$vo['limited_end']>0?date('Y-m-d',$vo['limited_end']):''}</td>
                             <td>{$vo['is_show'] == 1?'上架':'下架'}</td>
                             <td>{$vo['is_del'] == 1?'已删除':'正常'}</td>
                             <td>{$vo['status'] == 1?'启用':'未启用'}</td>
                             <td>
-                                <!--<a href="{:url('Goods/goods_delivery_edit',['delivery_id'=>$vo.delivery_id],false)}">编辑</a>-->
-                                <!--<a onclick="del(this,{$vo.delivery_id})" href="javascript:;">删除</a>-->
+                                <a href="{:url('Goods/puls_goods_update',['id'=>$vo.id,'status'=>$vo['status'] == 1?0:1],false)}">{$vo['status'] == 1?'关闭':'启用'}</a>
+                                <a onclick="del(this,{$vo.id})" href="javascript:;">删除</a>
                             </td>
                         </tr>
                         {/volist}
@@ -84,9 +85,9 @@
 {/block}
 {block name='script'}
 <script>
-    function del(obj,delivery_id){
+    function del(obj,id){
         if(window.confirm('确认删除该配送方式吗？')){
-            $.post("{:url('Goods/goods_delivery_del')}",{'delivery_id':delivery_id},function(data){
+            $.post("{:url('Goods/goods_delivery_del')}",{'id':id},function(data){
                 alert(data.msg);
                 if(data.code){
                     $(obj).parents('tr').remove();

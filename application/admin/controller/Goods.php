@@ -1408,6 +1408,17 @@ class Goods extends Common
      * 添加升级PULS会员商品
      */
     public function puls_goods_add () {
+        $goods_id = request()->param('goods_id',0,'intval');
+        $status = request()->param('status',0,'intval');
+        if (empty($goods_id)){
+            $this->error('请选择商品',url('puls_goods_add'));
+        }
+        $insert = model('PulsGoods')->insert(['goods_id'=>$goods_id,'status'=>$status]);
+        if ($insert){
+            $this->success('添加成功！',url('goods/puls_goods_list'));
+        }else{
+            $this->error('添加失败！');
+        }
         return $this->fetch('goods/puls_goods_add');
     }
 
@@ -1420,13 +1431,41 @@ class Goods extends Common
         if (!empty($name)){
             $where['goods_name'] = ["like","%$name%"];
             $list = model('Goods')->where($where)->field('goods_id,goods_name')->select();
-//            echo model('Goods')->getLastSql();die;
             return json(['code'=>1,'msg'=>'','data'=>$list]);
         }else{
             return json(['code'=>0,'msg'=>'没有商品名称','data'=>[]]);
         }
 
 
+    }
+
+    /**
+     * 修改升级PULS会员商品状态
+     */
+    public function puls_goods_update () {
+        $id = request()->param('id',0,'intval');
+        $status = request()->param('status',0,'intval');
+        if (empty($id)){
+            if (IS_POST){
+                return json(['code'=>0,'msg'=>'id不存在！','data'=>[]]);
+            }else{
+                $this->error('id不存在！');
+            }
+        }
+        $update = model('PulsGoods')->update(['id'=>$id,'status'=>$status]);
+        if ($update){
+            if (IS_POST){
+                return json(['code'=>1,'msg'=>'','data'=>[]]);
+            }else{
+                $this->success('操作成功！','puls_goods_list');
+            }
+        }else{
+            if (IS_POST){
+                return json(['code'=>0,'msg'=>'操作失败！','data'=>[]]);
+            }else{
+                $this->error('id不存在！');
+            }
+        }
     }
 
 }

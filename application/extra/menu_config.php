@@ -245,6 +245,13 @@ return [
                         'url'   => 'goods/search_goods',
                         'hide'  => 0,
                     ],
+                    [
+                        'id'    => 30110,
+                        'title' => '修改升级PULS会员商品状态',
+                        'sort'  => 0,
+                        'url'   => 'goods/puls_goods_update',
+                        'hide'  => 0,
+                    ],
 
                 ],
             ],
