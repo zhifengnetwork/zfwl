@@ -1387,83 +1387,83 @@ class Goods extends Common
     /**
      * 升级PULS会员商品
      */
-    public function puls_goods_list () {
-        $name = request()->param('name');
-        $where = [];
-        if (!empty($name)){
-            $where['b.goods_name'] = ['like',"%$name%"];
-        }
-        $where['a.status'] = ['>',-1];
-        $field = 'a.*,b.goods_name,b.price,b.limited_start,b.limited_end,b.stock,b.is_show,b.is_del';
-        $list = model('PulsGoods')->alias('a')
-            ->join('goods b','a.goods_id = b.goods_id','left')
-            ->where($where)
-            ->order('a.id desc')
-            ->field($field)
-            ->paginate(15,'',['query'=>request()->param()]);
-        $this->assign('list',$list);
-        $this->assign('name',$name);
-        $this->assign('meta_title','升级PULS会员商品列表');
-        return $this->fetch('goods/puls_goods_list');
-
-    }
-
-    /**
-     * 添加升级PULS会员商品
-     */
-    public function puls_goods_add () {
-        $goods_id = request()->param('goods_id',0,'intval');
-        $status = request()->param('status',0,'intval');
-        if (request()->isPost()){
-            if (empty($goods_id)){
-                $this->error('请选择商品',url('puls_goods_add'));
-            }
-            $insert = model('PulsGoods')->insert(['goods_id'=>$goods_id,'status'=>$status]);
-            if ($insert){
-                $this->success('添加成功！',url('goods/puls_goods_list'));
-            }else{
-                $this->error('添加失败！');
-            }
-        }
-
-        return $this->fetch('goods/puls_goods_add');
-    }
-//dddd
-    /**
-     *AJAX搜索商品
-     */
-    public function search_goods () {
-        $name = request()->param('name','');
-        $where = [];
-        if (!empty($name)){
-            $id_arr = model('PulsGoods')->where(['status'=>['>',-1]])->column('goods_id');
-            $where['goods_id'] = ['notin',$id_arr];
-            $where['goods_name'] = ["like","%$name%"];
-            $list = model('Goods')->where($where)->field('goods_id,goods_name')->select();
-            return json(['code'=>1,'msg'=>'','data'=>$list]);
-        }else{
-            return json(['code'=>0,'msg'=>'没有商品名称','data'=>[]]);
-        }
-
-
-    }
-
-    /**
-     * 修改升级PULS会员商品状态
-     */
-    public function puls_goods_update () {
-        $id = request()->param('id',0,'intval');
-        $status = request()->param('status',0,'intval');
-        if (empty($id)){
-            return json(['code'=>0,'msg'=>'id不存在！','data'=>[]]);
-        }
-        $update = model('PulsGoods')->update(['id'=>$id,'status'=>$status]);
-        if ($update){
-            return json(['code'=>1,'msg'=>'操作成功！','data'=>[]]);
-        }else{
-            return json(['code'=>0,'msg'=>'操作失败！','data'=>[]]);
-
-        }
-    }
+//    public function puls_goods_list () {
+//        $name = request()->param('name');
+//        $where = [];
+//        if (!empty($name)){
+//            $where['b.goods_name'] = ['like',"%$name%"];
+//        }
+//        $where['a.status'] = ['>',-1];
+//        $field = 'a.*,b.goods_name,b.price,b.limited_start,b.limited_end,b.stock,b.is_show,b.is_del';
+//        $list = model('PulsGoods')->alias('a')
+//            ->join('goods b','a.goods_id = b.goods_id','left')
+//            ->where($where)
+//            ->order('a.id desc')
+//            ->field($field)
+//            ->paginate(15,'',['query'=>request()->param()]);
+//        $this->assign('list',$list);
+//        $this->assign('name',$name);
+//        $this->assign('meta_title','升级PULS会员商品列表');
+//        return $this->fetch('goods/puls_goods_list');
+//
+//    }
+//
+//    /**
+//     * 添加升级PULS会员商品
+//     */
+//    public function puls_goods_add () {
+//        $goods_id = request()->param('goods_id',0,'intval');
+//        $status = request()->param('status',0,'intval');
+//        if (request()->isPost()){
+//            if (empty($goods_id)){
+//                $this->error('请选择商品',url('puls_goods_add'));
+//            }
+//            $insert = model('PulsGoods')->insert(['goods_id'=>$goods_id,'status'=>$status]);
+//            if ($insert){
+//                $this->success('添加成功！',url('goods/puls_goods_list'));
+//            }else{
+//                $this->error('添加失败！');
+//            }
+//        }
+//
+//        return $this->fetch('goods/puls_goods_add');
+//    }
+////dddd
+//    /**
+//     *AJAX搜索商品
+//     */
+//    public function search_goods () {
+//        $name = request()->param('name','');
+//        $where = [];
+//        if (!empty($name)){
+//            $id_arr = model('PulsGoods')->where(['status'=>['>',-1]])->column('goods_id');
+//            $where['goods_id'] = ['notin',$id_arr];
+//            $where['goods_name'] = ["like","%$name%"];
+//            $list = model('Goods')->where($where)->field('goods_id,goods_name')->select();
+//            return json(['code'=>1,'msg'=>'','data'=>$list]);
+//        }else{
+//            return json(['code'=>0,'msg'=>'没有商品名称','data'=>[]]);
+//        }
+//
+//
+//    }
+//
+//    /**
+//     * 修改升级PULS会员商品状态
+//     */
+//    public function puls_goods_update () {
+//        $id = request()->param('id',0,'intval');
+//        $status = request()->param('status',0,'intval');
+//        if (empty($id)){
+//            return json(['code'=>0,'msg'=>'id不存在！','data'=>[]]);
+//        }
+//        $update = model('PulsGoods')->update(['id'=>$id,'status'=>$status]);
+//        if ($update){
+//            return json(['code'=>1,'msg'=>'操作成功！','data'=>[]]);
+//        }else{
+//            return json(['code'=>0,'msg'=>'操作失败！','data'=>[]]);
+//
+//        }
+//    }
 
 }
