@@ -238,6 +238,13 @@ return [
                         'url'   => 'goods/puls_goods_add',
                         'hide'  => 0,
                     ],
+                    [
+                        'id'    => 30109,
+                        'title' => 'AJAX搜索商品',
+                        'sort'  => 0,
+                        'url'   => 'goods/search_goods',
+                        'hide'  => 0,
+                    ],
 
                 ],
             ],

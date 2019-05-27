@@ -1395,7 +1395,6 @@ class Goods extends Common
             ->join('goods b','a.goods_id = b.goods_id','left')
             ->where($where)
             ->order('a.id desc')
-            
             ->field($field)
             ->paginate(15,'',['query'=>request()->param()]);
         $this->assign('list',$list);
@@ -1410,6 +1409,24 @@ class Goods extends Common
      */
     public function puls_goods_add () {
         return $this->fetch('goods/puls_goods_add');
+    }
+
+    /**
+     *AJAX搜索商品
+     */
+    public function search_goods () {
+        $name = request()->param('name','');
+        $where = [];
+        if (!empty($name)){
+            $where['goods_name'] = ["like","%$name%"];
+            $list = model('Goods')->where($where)->field('goods_id,goods_name')->select();
+//            echo model('Goods')->getLastSql();die;
+            return json(['code'=>1,'msg'=>'','data'=>$list]);
+        }else{
+            return json(['code'=>0,'msg'=>'没有商品名称','data'=>[]]);
+        }
+
+
     }
 
 }
