@@ -61,7 +61,37 @@ class Member extends Model
         $dephp_7 = self::getMember($dephp_0);
         return $dephp_7['groupid'];
     }
- 
 
+    /**
+     *  判断是否是puls会员
+     */
+    public function is_puls ($id = 0) {
+        $sql = "select is_puls from member where id=$id";
+        $is_puls = Db::query($sql);
+        if ($is_puls['is_puls'] == 1){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    /**
+     *  成为puls会员
+     */
+    public function create_puls ($id = 0) {
+        $sql = "select id,is_puls from member where id=$id";
+        $get_find = Db::query($sql);
+        if (empty($get_find)){
+            return false;
+        }else{
+            $update_sql = "update member set is_puls=1 where id=$id";
+            $update = Db::query($update_sql);
+            if ($update){
+                return true;
+            }else{
+                return false;
+            }
+        }
+    }
 
 }
