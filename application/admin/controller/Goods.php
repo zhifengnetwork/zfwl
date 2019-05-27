@@ -1414,15 +1414,15 @@ class Goods extends Common
     public function puls_goods_add () {
         $goods_id = request()->param('goods_id',0,'intval');
         $status = request()->param('status',0,'intval');
-        if (empty($goods_id)){
-            $this->error('请选择商品',url('puls_goods_add'));
-        }
-        $insert = model('PulsGoods')->insert(['goods_id'=>$goods_id,'status'=>$status]);
-        if ($insert){
-            $this->success('添加成功！',url('goods/puls_goods_list'));
-        }else{
-            $this->error('添加失败！');
-        }
+//        if (empty($goods_id)){
+//            $this->error('请选择商品',url('puls_goods_add'));
+//        }
+//        $insert = model('PulsGoods')->insert(['goods_id'=>$goods_id,'status'=>$status]);
+//        if ($insert){
+//            $this->success('添加成功！',url('goods/puls_goods_list'));
+//        }else{
+//            $this->error('添加失败！');
+//        }
         return $this->fetch('goods/puls_goods_add');
     }
 //dddd
