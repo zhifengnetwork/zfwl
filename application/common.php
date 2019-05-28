@@ -23,6 +23,26 @@ function substr_cut($user_name){
     return $strlen == 2 ? $firstStr . str_repeat('*', mb_strlen($user_name, 'utf-8') - 1) : $firstStr . str_repeat("*", $strlen - 2) . $lastStr;
 }
 
+function get_randMoney($money_total = 20 , $personal_num = 10){
+    $min_money    = $money_total/$personal_num - $money_total/$personal_num*0.1;
+    $money_right  = $money_total;
+    $randMoney=[];
+    for($i=1;$i<=$personal_num;$i++){
+        if($i== $personal_num){
+            $money=$money_right;
+        }else{
+            $max=$money_right*100 - ($personal_num - $i ) * $min_money *100;
+            $money= rand($min_money*100,$max) /100;
+            $money=sprintf("%.2f",$money);
+            }
+            $randMoney[]=$money;
+            $money_right=$money_right - $money;
+            $money_right=sprintf("%.2f",$money_right);
+    }
+    shuffle($randMoney);
+    return  $randMoney;
+}
+
 //树结构
 function getTree1($items,$pid ="pid") {
     $map  = [];
