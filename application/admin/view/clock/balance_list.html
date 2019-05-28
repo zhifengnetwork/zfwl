@@ -22,6 +22,43 @@
     <div class="ibox-content">
         <div class="row">
             <div class="ibox-content">
+                <div class="row" style="height: 50px;">
+                    <form method="get" action="">
+                        <div class="col-sm-2">
+                            <div class="input-group"><input type="text" name="realname" value="{if $realname}{$realname}{/if}" placeholder="搜索用户" class="input-sm form-control"> </div>
+                        </div>
+                        <div class="col-sm-1" style=" width: 90px;padding: 5px 14px;">
+                            <div class="input-group">
+                                交易日期
+                            </div>
+                        </div>
+                        <div class="col-sm-2">
+                            <div class="input-daterange input-group" data-provide="datepicker">
+                                <input class="form-control input-sm" name="create_time" type="text" value="2019-05-28">
+                            </div>
+                        </div>
+                        <div class="col-sm-1" style=" width: 90px;padding: 5px 14px;">
+                            <div class="input-group">
+                               类型
+                            </div>
+                        </div>
+                        <div class="col-sm-2">
+                            <div class="input-daterange input-group" data-provide="datepicker">
+                                <select name="type" class="form-control" style="width:180px;">
+                                    <option value="0"  {if condition="$type eq 0"} selected {/if}>消费</option>
+                                    <option value="1" {if condition="$type eq 1"} selected {/if}>获利</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="input-group">
+                                <span class="input-group-btn">
+                                    <button type="submit" class="btn btn-sm btn-primary"> 搜索</button>
+                                </span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
                 <div class="table-responsive">
                     <table class="table  table-bordered table-hover text-center">
                         <thead>

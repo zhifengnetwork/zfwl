@@ -1083,7 +1083,7 @@ return [
         'id'    => 220000,
         'title' => '打卡管理',
         'sort'  => 8,
-        'url'   => 'clock/index',
+        'url'   => 'clock/join_user',
         'hide'  => 1,
         'icon'  => 'glyphicon glyphicon-dashboard',
         'child' => [
@@ -1098,14 +1098,14 @@ return [
                     [
                         'id'    => 220101,
                         'title' => '打卡设置',
-                        'sort'  => 1,
+                        'sort'  => 2,
                         'url'   => 'clock/index',
                         'hide'  => 1,
                     ],
                     [
                         'id'    =>220201,
                         'title' => '参与用户',
-                        'sort'  => 2,
+                        'sort'  => 1,
                         'url'   => 'clock/join_user',
                         'hide'  => 1,
                     ],
