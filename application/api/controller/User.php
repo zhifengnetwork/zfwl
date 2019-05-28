@@ -24,7 +24,7 @@ class User extends ApiBase
 		if ( $member ) {
             $this->ajaxReturn(['status' => -2 , 'msg'=>'此手机号已注册，请直接登录！']);
         }
-
+        
         if($uid){
             $uid = Db::table('member')->where('mobile',$mobile)->value('id');
             if(!$uid){
