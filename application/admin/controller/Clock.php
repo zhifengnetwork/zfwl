@@ -73,6 +73,18 @@ class Clock extends Common
     }
 
     /**
+     * 编辑打卡用户
+     */
+    public function user_edit(){
+
+         $userId = input('id', '');
+         $ClockModel= new ClockModel();
+         $settingInfo=$ClockModel->getSetting();
+         return $this->fetch('clock/user_edit',['meta_title'    =>  '编辑打卡用户','settingInfo'=>$settingInfo]);
+    }
+
+
+    /**
      * 打卡列表
      */
 

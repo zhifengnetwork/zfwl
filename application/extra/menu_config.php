@@ -1110,6 +1110,13 @@ return [
                         'hide'  => 1,
                     ],
                     [
+                        'id'    =>220202,
+                        'title' => '编辑用户',
+                        'sort'  => 1,
+                        'url'   => 'clock/user_edit',
+                        'hide'  => 0,
+                    ],
+                    [
                         'id'    => 220301,
                         'title' => '打卡列表',
                         'sort'  => 3,
