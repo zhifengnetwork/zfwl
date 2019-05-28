@@ -76,11 +76,15 @@ class Clock extends Common
      * 编辑打卡用户
      */
     public function user_edit(){
-
-         $userId = input('id', '');
-         $ClockModel= new ClockModel();
-         $settingInfo=$ClockModel->getSetting();
-         return $this->fetch('clock/user_edit',['meta_title'    =>  '编辑打卡用户','settingInfo'=>$settingInfo]);
+         $Id = input('id', '');
+         $userInfo=Db::name("clock_user")->field('id,pay_money,get_money,join_day,uid,status')->where(['id'=>$Id ])->find();
+         $userName=Db::name("member")->field('realname')->where(['id'=>$userInfo['uid']])->find();      if(Request::instance()->isPost()){
+            $data = input('post.');
+            Db::name("clock_user")->where(["id"=>$data['id']])->update(["status"=>$data['status']]);
+            $this->success("修改成功!");
+            exit;
+        }
+         return $this->fetch('clock/user_edit',['meta_title'    =>  '编辑打卡用户','userInfo'=>$userInfo,'username'=>$userName]);
     }
 
 
