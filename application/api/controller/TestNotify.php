@@ -103,8 +103,17 @@ class TestNotify implements PayNotifyInterface
             }
 
             $res = Db::table('member')->update(['id'=>$order['user_id'],'gouwujifen'=>$jifen]);
+
+            //判断用户是否是puls会员
+            $is_puls = model('Member')->is_puls($order['user_id']);
+            if (empty($is_puls)){
+                //不是puls会员
+                $update_ispuls = model('Member')->create_puls($order['user_id'],$order['order_id'],1);
+            }else{
+                $update_ispuls = 1;
+            }
             
-            if($order['order_id']){
+            if($order['order_id'] && $update_ispuls){
                 Db::commit();
                 return true;
             }else{
