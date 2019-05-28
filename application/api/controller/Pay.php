@@ -152,8 +152,17 @@ class Pay extends ApiBase
             
             $res = Db::table('member')->update(['id'=>$user_id,'gouwujifen'=>$jifen]);
 
+            //判断用户是否是puls会员
+            $is_puls = model('Member')->is_puls($user_id);
+            if (empty($is_puls)){
+                //不是puls会员
+                $update_ispuls = model('Member')->create_puls($user_id,$order_id,1);
+            }else{
+                $update_ispuls = 1;
+            }
 
-            if($reult){
+
+            if($reult && $update_ispuls){
                 // 提交事务
                 Db::commit();
                 $this->ajaxReturn(['status' => 1 , 'msg'=>'余额支付成功!','data'=>['order_id' =>$order_info['order_id'],'order_amount' =>$order_info['order_amount'],'goods_name' => getPayBody($order_info['order_id']),'order_sn' => $order_info['order_sn'] ]]);

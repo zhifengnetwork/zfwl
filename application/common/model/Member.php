@@ -77,20 +77,27 @@ class Member extends Model
 
     /**
      *  成为puls会员
+     * $type    渠道 1：订单渠道，2：直接支付渠道
      */
-    public function create_puls ($id = 0) {
-        $sql = "select id,is_puls from member where id=$id";
-        $get_find = Db::query($sql);
-        if (empty($get_find)){
-            return false;
-        }else{
-            $update_sql = "update member set is_puls=1 where id=$id";
-            $update = Db::query($update_sql);
-            if ($update){
+    public function create_puls ($id = 0,$order_id = 0,$type = 2) {
+        if ($id && $type ==1 && $order_id){
+            $get_order_goods_goodsid = Db::table('order_goods')->where('order_id',$order_id)->column('goods_id');
+            $get_goods_ispuls_sum = Db::table('goods')->where(['id',['in',$get_order_goods_goodsid]])->sum('is_puls');
+            if ($get_goods_ispuls_sum == 0){
+                //订单没有商品开启升级puls会员选项
                 return true;
-            }else{
-                return false;
             }
+        }elseif ($id && $type == 2){
+
+        }else{
+            return false;
+        }
+        $update_sql = "update member set is_puls=1 where id=$id";
+        $update = Db::query($update_sql);
+        if ($update){
+            return true;
+        }else{
+            return false;
         }
     }
 
