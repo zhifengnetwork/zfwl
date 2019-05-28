@@ -47,21 +47,13 @@ class Clock extends Common
     }
 
     /**
-     *
-     */
-     public function updateSetting(){
-
-
-         print_r($_POST);
-     }
-
-    /**
      * 参与打卡用户列表
      */
 
     public function join_user(){
 
-
+       $userList=Db::name("clock_user") ->join("member a",'a.id=clock_user.uid','LEFT')->field('clock_user.id,clock_user.pay_money,clock_user.get_money,clock_user.status,clock_user.join_day,clock_user.join_time,a.realname')->order("clock_user.id DESC")->select();
+       return $this->fetch('clock/join_user',[ 'meta_title'    =>  '打卡用户列表','list'=>$userList]);
     }
 
     /**
@@ -70,6 +62,8 @@ class Clock extends Common
 
     public  function day_list(){
 
+        $dayList=Db::name("clock_day") ->join("member a",'a.id=clock_day.uid','LEFT')->field('clock_day.id,clock_day.punch_time,clock_day.money,clock_day.status,a.realname')->order("clock_day.punch_time DESC")->select();
+        return $this->fetch('clock/day_list',[ 'meta_title'    =>  '打卡列表','list'=>$dayList]);
 
     }
 
@@ -79,7 +73,8 @@ class Clock extends Common
 
     public function balance_list(){
 
-
+        $logList=Db::name("clock_balance_log") ->join("member a",'a.id=clock_balance_log.uid','LEFT')->field('clock_balance_log.id,clock_balance_log.create_time,clock_balance_log.log,clock_balance_log.type,a.realname')->order("clock_balance_log.create_time DESC")->select();
+        return $this->fetch('clock/balance_list',[ 'meta_title'    =>  '打卡交易明细列表','list'=>$logList]);
 
     }
 
