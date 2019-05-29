@@ -177,6 +177,7 @@ class Goods extends ApiBase
         $goodsRes = Db::table('goods')->alias('g')
                     ->join('goods_attr ga','FIND_IN_SET(ga.attr_id,g.goods_attr)','LEFT')
                     ->field('g.*,GROUP_CONCAT(ga.attr_name) attr_name')
+                    ->where('g.is_show',1)
                     ->find($goods_id);
         if (empty($goodsRes)) {
             $this->ajaxReturn(['status' => -2 , 'msg'=>'商品不存在！']);
@@ -256,7 +257,7 @@ class Goods extends ApiBase
                 $goodsRes['group_user'] = $group_list;
             }
         }
-        pred($goodsRes);
+        
         $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$goodsRes]);
 
     }
