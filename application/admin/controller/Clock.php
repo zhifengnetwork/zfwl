@@ -132,7 +132,6 @@ class Clock extends Common
         $kw = input('realname', '');
         $create_time = input('create_time', '');
         $type = input('type', '');
-        echo $type;
         $where = [];
         if(!empty($kw)){
             $where['a.realname']=$kw;
