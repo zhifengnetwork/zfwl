@@ -34,7 +34,7 @@
                         </div>
                         <div class="col-sm-2">
                             <div class="input-daterange input-group" data-provide="datepicker">
-                                <input class="form-control input-sm" name="punch_time" type="text" value="2019-05-28">
+                                <input class="form-control input-sm" name="punch_time" type="text"  autocomplete="off" >
                             </div>
                         </div>
                         <div class="col-sm-1" style=" width: 90px;padding: 5px 14px;">
@@ -78,8 +78,8 @@
                             <td>{$vo.id}</td>
                             <td>{$vo.realname}</td>
                             <td>{$vo.money}</td>
-                            <td>{if condition="$vo.status eq 1"}<span class="yes">已瓜分</span>{else/}<span class="no">未瓜分{/if}</span></td>
-                            <td>{$vo.punch_time|date="y-m-d H:i:s",###}</td>
+                            <td>{if condition="$vo.status eq 1"}<span class="yes">已瓜分</span>{elseif condition="$vo.status eq 0" }<span class="no" style="background: #908e8e;">待瓜分</span>{else/}<span class="no">未瓜分{/if}</span></td>
+                            <td>{$vo.punch_time|date="y-m-d ",###}</td>
 
                         </tr>
                         {/volist}

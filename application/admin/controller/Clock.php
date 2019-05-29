@@ -4,6 +4,7 @@ namespace app\admin\controller;
 use app\common\model\Clock as ClockModel;
 use think\Request;
 use think\Db;
+use think\cache;
 /**
  * 基本配置管理控制器
  */
@@ -37,6 +38,9 @@ class Clock extends Common
                     $data['img']= $names."/".$saveName;
             }
             if ( Db::table('clock')->where(['id'=>1])->update($data) ) {
+                $settingInfo=$ClockModel->getSetting();
+                //将打卡信息存入缓存中
+                cache::set("clockInfo",$settingInfo);
                 $this->success("打卡配置更新成功!");
             }else{
                 $this->success("打卡配置更新失败!");
@@ -106,9 +110,7 @@ class Clock extends Common
         }
         //查询某一天打卡用户
         if(!empty($punch_time)){
-            $begin_time=$punch_time." 00:00:00";
-            $end_time=$punch_time." 23:59:59";
-            $where['clock_day.punch_time'] = [['EGT', strtotime($begin_time)], ['LT', strtotime($end_time)]];
+            $where['clock_day.punch_time'] =strtotime($punch_time);
         }
         $carryParameter = [
             'kw'               => $kw,
@@ -139,16 +141,14 @@ class Clock extends Common
         }
         //查询某一天的交易情况
         if(!empty($create_time)){
-            $begin_time=$create_time." 00:00:00";
-            $end_time=$create_time." 23:59:59";
-            $where['clock_balance_log.create_time'] = [['EGT', strtotime($begin_time)], ['LT', strtotime($end_time)]];
+            $where['clock_balance_log.create_time'] =strtotime($create_time);
         }
         $carryParameter = [
             'kw'               => $kw,
             'create_time'        => $create_time,
             'type'        => $type,
         ];
-        $logList=Db::name("clock_balance_log") ->join("member a",'a.id=clock_balance_log.uid','LEFT')->where($where)->field('clock_balance_log.id,clock_balance_log.create_time,clock_balance_log.log,clock_balance_log.type,a.realname')->order("clock_balance_log.create_time DESC")->paginate(1, false,['query' => $carryParameter]);
+        $logList=Db::name("clock_balance_log") ->join("member a",'a.id=clock_balance_log.uid','LEFT')->where($where)->field('clock_balance_log.id,clock_balance_log.create_time,clock_balance_log.log,clock_balance_log.type,a.realname')->order("clock_balance_log.create_time DESC")->paginate(20, false,['query' => $carryParameter]);
         return $this->fetch('clock/balance_list',[ 'meta_title'    =>  '打卡交易明细列表','list'=>$logList,'realname'=>$kw,'type'=>$type]);
     }
 
