@@ -145,10 +145,10 @@ class Clock extends ApiBase
 
     //打卡明细
     public function get_user_clock_detail(){
+        $user_id = $this->get_user_id();
         $pageNum=input('page_num') ? input('page_num'):1;
         $pageSize=10;
         $offset=($pageNum-1);
-        $user_id    = 9;
         if(!$user_id){
             $this->ajaxReturn(['status' => -2 , 'msg'=>'用户不存在','data'=>'']);
         }
