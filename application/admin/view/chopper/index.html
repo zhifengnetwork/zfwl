@@ -50,6 +50,7 @@
                                 <th>第一刀</th>
                                 <th>第二刀</th>
                                 <th>第三刀</th>
+                                <th>区间刀</th>  
                                 <th>最低金额 </th>
                                 <th>剩余砍价次数</th>
                                 <th>剩余砍价金额</th>
@@ -69,6 +70,7 @@
                                 <td>{$vo.first_amount}</td>
                                 <td>{$vo.second_amount}</td>
                                 <td>{$vo.third_amount}</td>
+                                <td>{:get_qujian($vo.chopper_id)}</td>
                                 <td>{$vo.surplus_amount}</td>
                                 <td>{$vo.end_num}</td>
                                 <td>{$vo.end_price}</td>

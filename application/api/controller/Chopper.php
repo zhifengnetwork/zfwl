@@ -6,31 +6,38 @@ use think\Db;
 class Chopper extends ApiBase
 {
     /**
-    * 砍一刀商品列表
+    * 砍一刀商品列表 //判断该用户是否砍过
     */
-    public function goods_list(){
-        
+    public function goods_list(){    
+        $user_id = $this->get_user_id();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'用户不存在','data'=>'']);
+        }
+         //砍价专区图片
+        $picture = Db::table('category')->where('cat_name','like',"%砍价%")->value('img');
         $page = input('page');
-        $where['gg.is_show'] = 1;
+        $where['gg.is_show']   = 1;
         $where['gg.is_delete'] = 0;
-        $where['gg.status'] = 2;
-        $where['g.is_del'] = 0;
-        $where['g.is_show'] = 1;
-        $where['gi.main'] = 1;
-
-        $list = Db::table('goods_chopper')->alias('gg')
+        $where['gg.status']    = 2;
+        $where['g.is_del']     = 0;
+        $where['g.is_show']    = 1;
+        $where['gi.main']      = 1;
+        //砍价商品
+        $list = GoodsChopper::alias('gg')
                 ->join('goods g','g.goods_id=gg.goods_id','LEFT')
-                ->join('goods_img gi','gi.goods_id=g.goods_id','LEFT')
+                ->join('goods_img gi','gi.goods_id = g.goods_id','LEFT')
                 ->where($where)
-                ->field('gg.chopper_id,g.goods_id,gg.already_amount,gg.surplus_amount,gg.start_time,gg.end_time,gg.sort,g.goods_name,g.desc,gi.picture img')
+                ->field('gg.chopper_id,g.goods_id,gg.surplus_amount,gg.start_time,gg.end_time,gg.sort,g.goods_name,g.desc,gi.picture img')
                 ->paginate(6,false,['page'=>$page]);
         if($list){
-            foreach($list as $key=>&$value){
-                //拿出砍价商品规格价格最低的来显示
-                $value['price'] = Db::table('goods_sku')->where('goods_id',$value['goods_id'])->where('inventory','>',0)->min('groupon_price');
+            foreach($list as &$value){
+                //拿出砍价商品规格价格最低的来显示 当前用户是否砍价
+                $chopper = Db::name('chopper_random')->where(['user_id' => $user_id,'chopper_id' => $value['chopper_id']])->find();
+                $value['is_chopper'] = $chopper?1:0;
+                $value['price']      = Db::table('goods_sku')->where('goods_id',$value['goods_id'])->where('inventory','>',0)->min('groupon_price');
             }
+            unset($value);
         }
-        
         $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$list]);
     }
 
@@ -42,19 +49,38 @@ class Chopper extends ApiBase
         if(!$user_id){
             $this->ajaxReturn(['status' => -2 , 'msg'=>'用户不存在','data'=>'']);
         }
+        $chopper_id            = input('chopper_id/d',4);
+        if(!$chopper_id){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'参数错误！','data'=>'']);
+        }
         $where['gg.is_show']   = 1;
         $where['gg.is_delete'] = 0;
         $where['gg.status']    = 2;
         $where['g.is_del']     = 0;
         $where['g.is_show']    = 1;
         $where['gi.main']      = 1;
-        $list = Db::table('goods_chopper')->alias('gg')
+        $where['m.chopper_id'] = $chopper_id;
+        $where['m.user_id']    = $user_id;
+        $info = Db::table('chopper_random')->alias('m')
+                ->join('goods_chopper gg','m.chopper_id = gg.chopper_id','LEFT')
                 ->join('goods g','g.goods_id = gg.goods_id','LEFT')
                 ->join('goods_img gi','gi.goods_id=g.goods_id','LEFT')
                 ->where($where)
-                ->field('gg.chopper_id,g.goods_id,gg.already_amount,gg.surplus_amount,gg.start_time,gg.end_time,gg.sort,g.goods_name,g.desc,gi.picture img')
+                ->field('gg.chopper_id,g.goods_id,m.goods_amount,gg.chopper_price,m.already_amount,gg.surplus_amount,gg.start_time,gg.end_time,gg.sort,g.goods_name,g.desc,gi.picture img')
                 ->find();
-             
+        if(!$info){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'参数错误！','data'=>'']);
+        }        
+        //百分比
+        $info['div'] = round($info['already_amount']/$info['goods_amount'],2) * 100;
+        //砍价用户
+        $list = Db::name('user_chopper')->where(['user_id|invite_id' => $user_id,'chopper_id' => $chopper_id])->select();
+        // 返回数据
+        $data = [
+            'info' => $info,
+            'list' => $list,
+        ];
+        $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$data]);
     }
 
 
@@ -63,73 +89,113 @@ class Chopper extends ApiBase
      */
 
     public function chopper(){
-        
         $user_id = $this->get_user_id();
+        $invite_id  = input('invite_id',0);//被邀请人ID
         if(!$user_id){
             $this->ajaxReturn(['status' => -2 , 'msg'=>'用户不存在','data'=>'']);
         }
-        $chopper_id = input('chopper_id/d',0);
-        if($chopper_id){
+        $chopper_id = input('chopper_id/d',4);
+        if(!$chopper_id){
             $this->ajaxReturn(['status' => -2 , 'msg'=>'参数错误！','data'=>'']);
         }
-        $chopper = GoodsChopper::get($chopper_id);
-        $info    = Db::name('user_chopper')->where(['status' => 1])->order('id desc')->find();
-        $dt_end_price = unserialize($chopper['dt_end_price']);
-        $section = unserialize($chopper['section']);
-        $what    = $info?$info['what'] + 1: 1;
-        if($info){
-             if($info['what'] == 1){
-                $amount = $chopper['second_amount']; 
-             }elseif($info['what'] == 2){
-                $amount =  $chopper['third_amount'];
-             }elseif($section['start'] >= $what && $section['end'] <= $what){
-                $amount =  $section['amount'];
-             }else{
-                if($chopper['dt_end_num'] == 0){
-                    $amount = 0.01;
-                }else{
-                    $amount = $dt_end_price[$chopper['dt_end_num']];
-                }      
-             }
-        }else{
-            $amount = $chopper['first_amount'];
-        }
         
+        $userchopper = Db::name('user_chopper')->where(['user_id' => $user_id,'chopper_id' => $chopper_id])->select();
+        
+        if(count($userchopper) >= 1){
+             $this->ajaxReturn(['status' => -2 , 'msg'=>'每个商品当前只能砍一次,请邀请好友哟','data'=>'']);
+        }
+
+        $chopper = GoodsChopper::get($chopper_id);
+
+        $random  = Db::name('chopper_random')->where(['user_id' => $user_id,'chopper_id' => $chopper_id])->find();
+        if(!$random){
+            $amount      = $chopper['first_amount'];//第一刀
+            $random_ins = [
+                'user_id'       => $user_id,
+                'chopper_id'    => $chopper_id,
+                'amount'        => serialize(get_randMoney($chopper['end_price'],$chopper['end_num'])),
+                'end_num'       => $chopper['end_num'],
+                'chopper_state' => 0,
+                'already_amount'=> $amount,
+                'already_num'   => 1,
+                'goods_amount'  => $chopper['goods_price'],
+                'create_time'   => time(),
+            ];
+            
+            $res1 = Db::name('chopper_random')->insert($random_ins); 
+            if($res1 == false){
+                $this->ajaxReturn(['status' => -2 , 'msg'=>'砍价失败，请重试！','data'=>'']);
+            }
+        }else{
+            $section = unserialize($chopper['section']);
+            if($random['already_num'] == 1){
+               $amount   = $chopper['second_amount']; //第二刀
+            }elseif($random['already_num'] == 2){
+               $amount   =  $chopper['third_amount']; //第三刀
+            }elseif($section['start'] >= $random['already_num'] && $section['end'] <= $random['already_num']){
+               $amount   =  $section['amount'];//区间刀
+            }else{
+               if($random['end_num'] == 0){
+                   $amount = 0.01;//刀满
+               }else{
+                   $is_random    = 1;
+                   $dt_end_price = unserialize($random['amount']);//随机刀
+                   $amount       = $dt_end_price[$random['end_num']-1];
+               }      
+            }
+        } 
+        //用户砍价记录
         $insert = [
             'chopper_id'   => $chopper['chopper_id'],
             'user_id'      => $user_id,
             'goods_id'     => $chopper['goods_id'],
+            'invite_id'    => $invite_id,
             'status'       => 1,
-            'what'         => $what,
+            'already_num'  => $random?$random['already_num']:1,
             'create_time'  => time(),
             'amount'       => $amount
         ];
         // 启动事务
         Db::startTrans();
+        //用户记录
         $perid = Db::name('user_chopper')->strict(false)->insertGetId($insert);
-
         if($perid !== false){
           $update = [
               'participants'   =>  Db::raw('participants+1'),
               'chopper_num'    =>  Db::raw('chopper_num+1'),
-              'already_amount' =>  Db::raw('already_amount-'.$amount.''),
-              'dt_end_num'     =>  Db::raw('dt_end_num-1'),
           ]; 
+          //砍价主表统计
           $res = GoodsChopper::where(['chopper_id' => $chopper['chopper_id']])->update($update);
-          if($res !== false){
-                // 提交事务
-                Db::commit();
-                $this->ajaxReturn(['status' => 1 , 'msg'=>'成功砍掉'.$amount.'元！','data'=>'']);
+          if($res == false){
+             Db::rollback();
+             $this->ajaxReturn(['status' => -2 , 'msg'=>'砍价失败，请重试！','data'=>'']);
           }
-            Db::rollback();
-            $this->ajaxReturn(['status' => -2 , 'msg'=>'砍价失败，请重试！','data'=>'']);
+          //砍价用户从表数据统计
+          if($random){
+                $update_random = [ 
+                    'chopper_state' => $random['end_num']?0:1,
+                    'already_amount'=> Db::raw('already_amount+'.$amount.''),
+                    'already_num'   => Db::raw('already_num+1'),
+                    'end_time'      => $random['end_num']?0:time(),
+                ];
+               
+                //判断是否随机刀
+                if(isset($is_random)){
+                    $update_random['end_num'] = Db::raw('end_num-1');
+                }
+                $random_res1 = Db::name('chopper_random')->where(['chopper_id' => $chopper['chopper_id'],'user_id' => $user_id])->update($update_random);
+                if($random_res1 == false){
+                    Db::rollback();
+                    $this->ajaxReturn(['status' => -2 , 'msg'=>'砍价失败，请重试！','data'=>'']);
+                }
+          }
+            // 提交事务
+            Db::commit();
+            $this->ajaxReturn(['status' => 1 , 'msg'=>'成功砍掉'.$amount.'元！','data'=>'']);
         }else{
             Db::rollback();
             $this->ajaxReturn(['status' => -2 , 'msg'=>'砍价失败，请重试！','data'=>'']);
         }
-        
-
-
 
     }
 

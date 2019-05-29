@@ -24,10 +24,9 @@ class Chopper extends Common
         }
 
         $list = Db::name('goods_chopper')->order('sort desc,chopper_id desc')->Where($where)->paginate(10,false);
-
         $page = $list->render();
         $list = $list->all();
-        
+
         return $this->fetch("",[
             'chopper_name' => $chopper_name,
             'is_show'      => $is_show,
@@ -73,24 +72,21 @@ class Chopper extends Common
 
             $end_price = $good['price'] - $first_amount - $second_amount - $third_amount - $section['amount'];
 
-            $dt_end_price = serialize(get_randMoney($end_price,$end_num)); 
             $section      = serialize($section);
             $data = [
-                'section'      => $section,
+                'section'        => $section,
                 'surplus_amount' => $surplus_amount,
-                'chopper_name' => $chopper_name,
-                'first_amount' => $first_amount,
-                'second_amount'=> $second_amount,
-                'third_amount' => $third_amount,
-                'end_num'      => $end_num,
-                'end_price'    => $end_price,
-                'start_time'   => strtotime($start_time),
-                'end_time'     => strtotime($end_time),
-                'goods_id'     => $goods_id,
+                'chopper_name'   => $chopper_name,
+                'first_amount'   => $first_amount,
+                'second_amount'  => $second_amount,
+                'third_amount'   => $third_amount,
+                'end_num'        => $end_num,
+                'end_price'      => $end_price,
+                'start_time'     => strtotime($start_time),
+                'end_time'       => strtotime($end_time),
+                'goods_id'       => $goods_id,
                 'goods_cost_price' => $goods_cost_price,
                 'goods_price'      => $goods_price,
-                'dt_end_num'       => $end_num,
-                'dt_end_price'     => $dt_end_price
             ]; 
             //添加信息
             $chopper_id =  Db::name('goods_chopper')->insertGetId($data);
