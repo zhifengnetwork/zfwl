@@ -76,12 +76,12 @@ class TestNotify implements PayNotifyInterface
             $jifen = 0;
             foreach($goods_res as $key=>$value){
 
-                $sku = Db::table('goods_sku')->where('sku_id',$value['sku_id'])->field('inventory,frozen_stock')->find();
-                $sku_num = $sku['inventory'] - $sku['frozen_stock'];
-                if( $value['goods_num'] > $sku_num ){
-                    Db::rollback();
-                    $this->ajaxReturn(['status' => -2 , 'msg'=>"商品：{$value['goods_name']}，规格：{$value['spec_key_name']}，数量：剩余{$sku_num}件可购买！",'data'=>'']);
-                }
+                // $sku = Db::table('goods_sku')->where('sku_id',$value['sku_id'])->field('inventory,frozen_stock')->find();
+                // $sku_num = $sku['inventory'] - $sku['frozen_stock'];
+                // if( $value['goods_num'] > $sku_num ){
+                //     Db::rollback();
+                //     $this->ajaxReturn(['status' => -2 , 'msg'=>"商品：{$value['goods_name']}，规格：{$value['spec_key_name']}，数量：剩余{$sku_num}件可购买！",'data'=>'']);
+                // }
 
                 $goods = Db::table('goods')->where('goods_id',$value['goods_id'])->field('less_stock_type,gift_points')->find();
                 //付款减库存

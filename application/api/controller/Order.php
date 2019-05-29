@@ -76,6 +76,11 @@ class Order extends ApiBase
                     $this->ajaxReturn(['status' => -2 , 'msg'=>'该期拼团已结束，请前往最新一期拼团！','data'=>$value['goods_id']]);
                     unset($data['goods_res'][$key]);
                 }
+                if($groupon['end_time'] < time()){
+                    Db::table('cart')->where('id',$value['id'])->delete();
+                    $this->ajaxReturn(['status' => -2 , 'msg'=>'该期拼团已结束，请前往最新一期拼团！','data'=>$value['goods_id']]);
+                    unset($data['goods_res'][$key]);
+                }
                 $count = count($cart_res);
                 if($count > 1){
                     $this->ajaxReturn(['status' => -2 , 'msg'=>'不能和其他拼团一起下单！','data'=>'']);
@@ -198,7 +203,7 @@ class Order extends ApiBase
         $cart_ids = ''; //提交成功后删掉购物车
         $goods_ids = '';//商品IDS
         $goods_coupon = [];
-        
+        $groupon_id = 0;
         foreach($cart_res as $key=>$value){
 
             if($value['groupon_id']){
@@ -208,11 +213,16 @@ class Order extends ApiBase
                     $this->ajaxReturn(['status' => -2 , 'msg'=>'该期拼团已结束，请前往最新一期拼团！','data'=>$value['goods_id']]);
                     unset($data['goods_res'][$key]);
                 }
-
+                if($groupon['end_time'] < time()){
+                    Db::table('cart')->where('id',$value['id'])->delete();
+                    $this->ajaxReturn(['status' => -2 , 'msg'=>'该期拼团已结束，请前往最新一期拼团！','data'=>$value['goods_id']]);
+                    unset($data['goods_res'][$key]);
+                }
                 $count = count($cart_res);
                 if($count > 1){
                     $this->ajaxReturn(['status' => -2 , 'msg'=>'不能和其他拼团一起下单！','data'=>'']);
                 }
+                $groupon_id = $value['groupon_id'];
             }
             
             $goods_ids .= $value['goods_id'] . ',';
@@ -308,6 +318,7 @@ class Order extends ApiBase
 
         $orderInfoData['order_sn'] = date('YmdHis',time()) . mt_rand(10000000,99999999);
         $orderInfoData['user_id'] = $user_id;
+        $orderInfoData['groupon_id'] = $groupon_id;
         $orderInfoData['order_status'] = 1;         //订单状态 0:待确认,1:已确认,2:已收货,3:已取消,4:已完成,5:已作废,6:申请退款,7:已退款,8:拒绝退款
         $orderInfoData['pay_status'] = 0;       //支付状态 0:未支付,1:已支付,2:部分支付
         $orderInfoData['shipping_status'] = 0;       //商品配送情况;0:未发货,1:已发货,2:部分发货,3:已收货

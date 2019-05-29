@@ -256,7 +256,7 @@ class Goods extends ApiBase
                 $goodsRes['group_user'] = $group_list;
             }
         }
-
+        pred($goodsRes);
         $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$goodsRes]);
 
     }

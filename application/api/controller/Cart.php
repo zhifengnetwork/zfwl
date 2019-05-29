@@ -121,6 +121,9 @@ class Cart extends ApiBase
                     if( ($groupon['target_number'] - $groupon['sold_number']) <= 0 ){
                         $this->ajaxReturn(['status' => -2 , 'msg'=>'该期拼团已结束，请前往最新一期拼团！','data'=>$sku_res['goods_id']]);
                     }
+                    if( $groupon['end_time'] < time() ){
+                        $this->ajaxReturn(['status' => -2 , 'msg'=>'该期拼团已结束，请前往最新一期拼团！','data'=>$sku_res['goods_id']]);
+                    }
                     $group_order = Db::table('order')->where('groupon_id',$groupon_id)->where('user_id',$user_id)->value('order_id');
                     if($group_order){
                         $this->ajaxReturn(['status' => -2 , 'msg'=>'该期拼团您已参与，请勿重复参与！','data'=>'']);
