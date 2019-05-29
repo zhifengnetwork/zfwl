@@ -25,7 +25,7 @@ class Order extends ApiBase
         $cart_where['id'] = array('in',$idStr);
         $cart_where['user_id'] = $user_id;
         $cartM = model('Cart');
-        $cart_res = $cartM->cartList($cart_where);
+        $cart_res = $cartM->cartList1($cart_where);
         if(!$cart_res){
             $this->ajaxReturn(['status' => -2 , 'msg'=>'购物车商品不存在！','data'=>'']);
         }
@@ -65,41 +65,63 @@ class Order extends ApiBase
         $shipping_price = 0;
         $goods_ids = '';
         $goods_coupon = [];
-        foreach($cart_res as $key=>$value){
-            
-            //处理运费
-            $goods_res = Db::table('goods')->field('shipping_setting,shipping_price,delivery_id,less_stock_type')->where('goods_id',$value['goods_id'])->find();
-            if($goods_res['shipping_setting'] == 1){
-                $shipping_price = sprintf("%.2f",$shipping_price + $goods_res['shipping_price']);   //计算该订单的物流费用
-            }else if($goods_res['shipping_setting'] == 2){
-                if( !$goods_res['delivery_id'] ){
-                    $deliveryWhere['is_default'] = 1;
-                }else{
-                    $deliveryWhere['delivery_id'] = $goods_res['delivery_id'];
+        $cart_goods_arr = [];
+        $data['groupon'] = [];
+        foreach($data['goods_res'] as $key=>$value){
+
+            if($value['groupon_id']){
+                $groupon = Db::table('goods_groupon')->where('groupon_id',$value['groupon_id'])->where('goods_id',$value['goods_id'])->where('is_show',1)->where('is_delete',0)->where('status',2)->find();
+                if(!$groupon){
+                    Db::table('cart')->where('id',$value['id'])->delete();
+                    $this->ajaxReturn(['status' => -2 , 'msg'=>'该期拼团已结束，请前往最新一期拼团！','data'=>$value['goods_id']]);
+                    unset($data['goods_res'][$key]);
                 }
-                $delivery = Db::table('goods_delivery')->where($deliveryWhere)->find();
-                if( $delivery ){
-                    if($delivery['type'] == 2){
-                        $shipping_price = sprintf("%.2f",$shipping_price + $delivery['firstprice']);   //计算该订单的物流费用
-                        $number = $value['goods_num'] - $delivery['firstweight'];
-                        if($number > 0){
-                            $number = ceil( $number / $delivery['secondweight'] );  //向上取整
-                            $xu = sprintf("%.2f",$delivery['secondprice'] * $number );   //续价
-                            $shipping_price = sprintf("%.2f",$shipping_price + $xu);   //计算该订单的物流费用
+                $count = count($cart_res);
+                if($count > 1){
+                    $this->ajaxReturn(['status' => -2 , 'msg'=>'不能和其他拼团一起下单！','data'=>'']);
+                }
+                $data['groupon'] = $groupon;
+            }
+
+            if( !in_array($value['goods_id'],$cart_goods_arr) ){
+                $cart_goods_arr[] = $value['goods_id'];
+            
+                //处理运费
+                $goods_res = Db::table('goods')->field('shipping_setting,shipping_price,delivery_id,less_stock_type')->where('goods_id',$value['goods_id'])->find();
+                if($goods_res['shipping_setting'] == 1){
+                    $shipping_price = sprintf("%.2f",$shipping_price + $goods_res['shipping_price']);   //计算该订单的物流费用
+                }else if($goods_res['shipping_setting'] == 2){
+                    if( !$goods_res['delivery_id'] ){
+                        $deliveryWhere['is_default'] = 1;
+                    }else{
+                        $deliveryWhere['delivery_id'] = $goods_res['delivery_id'];
+                    }
+                    $delivery = Db::table('goods_delivery')->where($deliveryWhere)->find();
+                    if( $delivery ){
+                        if($delivery['type'] == 2){
+                            $shipping_price = sprintf("%.2f",$shipping_price + $delivery['firstprice']);   //计算该订单的物流费用
+                            $number = $value['goods_num'] - $delivery['firstweight'];
+                            if($number > 0){
+                                $number = ceil( $number / $delivery['secondweight'] );  //向上取整
+                                $xu = sprintf("%.2f",$delivery['secondprice'] * $number );   //续价
+                                $shipping_price = sprintf("%.2f",$shipping_price + $xu);   //计算该订单的物流费用
+                            }
                         }
                     }
                 }
+
+                $order_amount = sprintf("%.2f",$order_amount + $value['subtotal_price']);   //计算该订单的总价
+
+                $goods_coupon[$value['goods_id']]['subtotal_price'] =  $value['subtotal_price'];
+
+                $goods_ids .= $value['goods_id'] . ',';
             }
-
-            $order_amount = sprintf("%.2f",$order_amount + $value['subtotal_price']);   //计算该订单的总价
-
-            $goods_coupon[$value['goods_id']]['subtotal_price'] =  $value['subtotal_price'];
-
-            $goods_ids .= $value['goods_id'] . ',';
         }
         $goods_ids = $goods_ids . 0;
-        
-        $data['shipping_price'] = $shipping_price;
+
+        $data['goods_res'] = array_values($data['goods_res']);
+
+        $data['shipping_price'] = $shipping_price;  //该订单的物流费用
 
         $coupon = Db::table('coupon_get')->alias('cg')
                     ->join('coupon c','c.coupon_id=cg.coupon_id','LEFT')
@@ -127,18 +149,13 @@ class Order extends ApiBase
         }
 
         $data['coupon'] = $coupon_arr;
-
+        
         $this->ajaxReturn(['status' => 1 , 'msg'=>'成功','data'=>$data]);
     }
 
 
     /**
      * 提交订单
-     * user_id
-     * cart_id
-     * addr_id
-     * pay_type
-     * invoice_id
      */
     public function submitOrder()
     {   
@@ -181,7 +198,23 @@ class Order extends ApiBase
         $cart_ids = ''; //提交成功后删掉购物车
         $goods_ids = '';//商品IDS
         $goods_coupon = [];
+        
         foreach($cart_res as $key=>$value){
+
+            if($value['groupon_id']){
+                $groupon = Db::table('goods_groupon')->where('groupon_id',$value['groupon_id'])->where('goods_id',$value['goods_id'])->where('is_show',1)->where('is_delete',0)->where('status',2)->find();
+                if(!$groupon){
+                    Db::table('cart')->where('id',$value['id'])->delete();
+                    $this->ajaxReturn(['status' => -2 , 'msg'=>'该期拼团已结束，请前往最新一期拼团！','data'=>$value['goods_id']]);
+                    unset($data['goods_res'][$key]);
+                }
+
+                $count = count($cart_res);
+                if($count > 1){
+                    $this->ajaxReturn(['status' => -2 , 'msg'=>'不能和其他拼团一起下单！','data'=>'']);
+                }
+            }
+            
             $goods_ids .= $value['goods_id'] . ',';
             $goods_coupon[$value['goods_id']]['subtotal_price'] =  $value['subtotal_price'];
 

@@ -70,7 +70,7 @@ class TestNotify implements PayNotifyInterface
 
             Db::name('order')->where(['order_sn' => $data['order_no']])->update($update);
 
-            $order = Db::table('order')->where(['order_sn' => $data['order_no']])->field('order_id,user_id')->find();
+            $order = Db::table('order')->where(['order_sn' => $data['order_no']])->field('order_id,groupon_id,user_id')->find();
 
             $goods_res = Db::table('order_goods')->field('goods_id,goods_name,goods_num,spec_key_name,goods_price,sku_id')->where('order_id',$order['order_id'])->select();
             $jifen = 0;
@@ -101,6 +101,8 @@ class TestNotify implements PayNotifyInterface
                     $jifen = sprintf("%.2f",$jifen + ($value['goods_num'] * $goods['gift_points']));
                 }
             }
+            //团购
+            Db::table('goods_groupon')->where('groupon_id',$order['groupon_id'])->setInc('sold_number',1);
 
             $res = Db::table('member')->update(['id'=>$order['user_id'],'gouwujifen'=>$jifen]);
 

@@ -39,6 +39,7 @@ class Cart extends ApiBase
         }
 
         $cart_where['user_id'] = $user_id;
+        $cart_where['groupon_id'] = 0;
         $num = Db::table('cart')->where($cart_where)->sum('goods_num');
 
         $this->ajaxReturn(['status' => 1 , 'msg'=>'成功','data'=>$num]);
@@ -55,11 +56,16 @@ class Cart extends ApiBase
             $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
         }
 
-        $sku_id = Request::instance()->param("sku_id", '', 'intval');
+        $sku_id = Request::instance()->param("sku_id", 0, 'intval');
+        $groupon_id = Request::instance()->param("groupon_id", 0, 'intval');
         $cart_number = Request::instance()->param("cart_number", 1, 'intval');
         $act = input('act');
-        
-        $sku_res = Db::name('goods_sku')->where('sku_id', $sku_id)->field('price,inventory,frozen_stock,goods_id')->find();
+
+        if( !$sku_id || !$cart_number ){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'该商品不存在！','data'=>'']);
+        }
+
+        $sku_res = Db::name('goods_sku')->where('sku_id', $sku_id)->field('price,groupon_price,inventory,frozen_stock,goods_id')->find();
 
         if (empty($sku_res)) {
             $this->ajaxReturn(['status' => -2 , 'msg'=>'该商品不存在！','data'=>'']);
@@ -106,6 +112,37 @@ class Cart extends ApiBase
             $this->ajaxReturn(['status' => -2 , 'msg'=>'超过最多购买量！','data'=>'']);
         }
 
+        if($groupon_id){
+            $groupon = Db::table('goods_groupon')->where('groupon_id',$groupon_id)->where('goods_id',$sku_res['goods_id'])->where('is_show',1)->where('is_delete',0)->find();
+            if($groupon){
+                if( $groupon['status'] != 2 && $groupon['status'] != 0 ){
+                    $this->ajaxReturn(['status' => -2 , 'msg'=>'该期拼团已结束，请前往最新一期拼团！','data'=>$sku_res['goods_id']]);
+                }else if( $groupon['status'] == 2 ){
+                    if( ($groupon['target_number'] - $groupon['sold_number']) <= 0 ){
+                        $this->ajaxReturn(['status' => -2 , 'msg'=>'该期拼团已结束，请前往最新一期拼团！','data'=>$sku_res['goods_id']]);
+                    }
+                    $group_order = Db::table('order')->where('groupon_id',$groupon_id)->where('user_id',$user_id)->value('order_id');
+                    if($group_order){
+                        $this->ajaxReturn(['status' => -2 , 'msg'=>'该期拼团您已参与，请勿重复参与！','data'=>'']);
+                    }
+                    $group_cart = Db::table('cart')->where('groupon_id',$groupon_id)->where('user_id',$user_id)->value('sku_id');
+                }else{
+                    $this->ajaxReturn(['status' => -2 , 'msg'=>'该商品没有拼团！','data'=>'']);
+                }
+            }else{
+                $this->ajaxReturn(['status' => -2 , 'msg'=>'该商品没有拼团！','data'=>'']);
+            }
+        }
+
+        if($groupon_id){
+            if($group_cart){
+                if($sku_id != $group_cart){
+                    $this->ajaxReturn(['status' => -2 , 'msg'=>'该期拼团商品已存在购物！','data'=>'']);
+                }
+            }
+        }
+        
+        $cart_where['groupon_id'] = $groupon_id;
         $cart_where['sku_id'] = $sku_id;
         $cart_res = Db::table('cart')->where($cart_where)->field('id,goods_num')->find();
 
@@ -125,7 +162,11 @@ class Cart extends ApiBase
                 $update_data = array();
                 $update_data['id'] = $cart_res['id'];
                 $update_data['goods_num'] = $new_number;
-                $update_data['subtotal_price'] = $new_number * $sku_res['price'];
+                if($groupon_id){
+                    $update_data['subtotal_price'] = $new_number * $sku_res['groupon_price'];
+                }else{
+                    $update_data['subtotal_price'] = $new_number * $sku_res['price'];
+                }
                 $result = Db::table('cart')->update($update_data);
                 $cart_id = $cart_res['id'];
             } else {
@@ -134,20 +175,27 @@ class Cart extends ApiBase
         } else {
             $cartData = array();
             $goods_res = Db::name('goods')->where('goods_id',$sku_res['goods_id'])->field('goods_name,price,original_price')->find();
+            $cartData['groupon_id'] = $groupon_id;
             $cartData['goods_id'] = $sku_res['goods_id'];
             $cartData['goods_name'] = $goods_res['goods_name'];
             $cartData['sku_id'] = $sku_id;
             $cartData['user_id'] = $user_id;
             $cartData['market_price'] = $goods_res['original_price'];
-            $cartData['goods_price'] = $sku_res['price'];
-            $cartData['member_goods_price'] = $sku_res['price'];
+            if($groupon_id){
+                $cartData['goods_price'] = $sku_res['groupon_price'];
+                $cartData['member_goods_price'] = $sku_res['groupon_price'];
+                $cartData['subtotal_price'] = $cart_number * $sku_res['groupon_price'];
+            }else{
+                $cartData['goods_price'] = $sku_res['price'];
+                $cartData['member_goods_price'] = $sku_res['price'];
+                $cartData['subtotal_price'] = $cart_number * $sku_res['price'];
+            }
             $cartData['goods_num'] = $cart_number;
-            $cartData['subtotal_price'] = $cart_number * $sku_res['price'];
             $cartData['add_time'] = time();
-            
             $sku_attr = action('Goods/get_sku_str', $sku_id);
             $cartData['spec_key_name'] = $sku_attr;
             $cart_id = Db::table('cart')->insertGetId($cartData);
+            $cart_id = intval($cart_id);
         }
 
         if($cart_id) {
@@ -184,75 +232,4 @@ class Cart extends ApiBase
         }
     }
 
-
-    /**
-     * 将商品加入购物车.
-     *
-     * @param token 登录凭证
-     */
-    // public function addcart()
-    // {
-    //     $user_id = $this->get_user_id();
-    //     if(!$user_id){
-    //         $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
-    //     }
-
-
-
-
-    //     $data = '购物车数据';
-    //     $this->ajaxReturn(['status' => 0 , 'msg'=>'加入购物车成功','data'=>$data]);
-    // }
-
-    
-    /*
-     * 请求获取购物车列表
-     */
-    // public function cartlist()
-    // {
-
-    //     // $user_id = $this->get_user_id();
-    //     // if(!$user_id){
-    //     //     $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
-    //     // }
-    //     $user_id   = 52974;
-    //     $cartLogic = new CartLogic();
-    //     $cartLogic->setUserId($user_id);
-    //     $data      = $cartLogic->getCartList();//用户购物车
-    //     $seller    = Db::name('seller')->select();
-    //     /*foreach ($data as $k=>$v) {
-    //         if($v['goods']['seller_id']==$seller[0]['seller_id']){
-    //             $v['seller_name']=$seller[0]['seller_name'];
-    //         }else{
-    //             $v['seller_name']="";
-    //         }
-    //     }*/
-    //     foreach($data as $k=>$v){
-    //         unset($v['user_id']);
-    //         unset($v["session_id"]);
-    //         unset($v["goods_id"]);
-    //         unset($v["goods_name"]);
-    //         unset($v["market_price"]);
-    //         unset($v["member_goods_price"]);
-    //         unset($v["item_id"]);
-    //         unset($v["spec_key"]);
-    //         unset($v["bar_code"]);
-    //         unset($v["add_time"]);
-    //         unset($v["prom_type"]);
-    //         unset($v["prom_id"]);
-    //         unset($v["sku"]);
-    //         unset($v["combination_group_id"]);
-    //     }
-    //     $res[0] = array(
-    //         'seller_id'=> 0,
-    //         'seller_name'=>'ZF智丰自营',
-    //         'data'=>$data,
-    //     );
-    //     $this->ajaxReturn(['status' => 0 , 'msg'=>'购物车列表成功','data'=>$res]);
-    // }
-
-
-
-    
-    
 }
