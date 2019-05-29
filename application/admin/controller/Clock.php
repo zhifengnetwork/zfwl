@@ -132,11 +132,12 @@ class Clock extends Common
         $kw = input('realname', '');
         $create_time = input('create_time', '');
         $type = input('type', '');
+        echo $type;
         $where = [];
         if(!empty($kw)){
             $where['a.realname']=$kw;
         }
-        if(!empty($type)){
+        if($type=="0"){
             $where['clock_balance_log.type']=$type;
         }
         //查询某一天的交易情况
