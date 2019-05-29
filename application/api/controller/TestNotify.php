@@ -70,18 +70,18 @@ class TestNotify implements PayNotifyInterface
 
             Db::name('order')->where(['order_sn' => $data['order_no']])->update($update);
 
-            $order = Db::table('order')->where(['order_sn' => $data['order_no']])->field('order_id,user_id')->find();
+            $order = Db::table('order')->where(['order_sn' => $data['order_no']])->field('order_id,groupon_id,user_id')->find();
 
             $goods_res = Db::table('order_goods')->field('goods_id,goods_name,goods_num,spec_key_name,goods_price,sku_id')->where('order_id',$order['order_id'])->select();
             $jifen = 0;
             foreach($goods_res as $key=>$value){
 
-                $sku = Db::table('goods_sku')->where('sku_id',$value['sku_id'])->field('inventory,frozen_stock')->find();
-                $sku_num = $sku['inventory'] - $sku['frozen_stock'];
-                if( $value['goods_num'] > $sku_num ){
-                    Db::rollback();
-                    $this->ajaxReturn(['status' => -2 , 'msg'=>"商品：{$value['goods_name']}，规格：{$value['spec_key_name']}，数量：剩余{$sku_num}件可购买！",'data'=>'']);
-                }
+                // $sku = Db::table('goods_sku')->where('sku_id',$value['sku_id'])->field('inventory,frozen_stock')->find();
+                // $sku_num = $sku['inventory'] - $sku['frozen_stock'];
+                // if( $value['goods_num'] > $sku_num ){
+                //     Db::rollback();
+                //     $this->ajaxReturn(['status' => -2 , 'msg'=>"商品：{$value['goods_name']}，规格：{$value['spec_key_name']}，数量：剩余{$sku_num}件可购买！",'data'=>'']);
+                // }
 
                 $goods = Db::table('goods')->where('goods_id',$value['goods_id'])->field('less_stock_type,gift_points')->find();
                 //付款减库存
@@ -101,6 +101,8 @@ class TestNotify implements PayNotifyInterface
                     $jifen = sprintf("%.2f",$jifen + ($value['goods_num'] * $goods['gift_points']));
                 }
             }
+            //团购
+            Db::table('goods_groupon')->where('groupon_id',$order['groupon_id'])->setInc('sold_number',1);
 
             $res = Db::table('member')->update(['id'=>$order['user_id'],'gouwujifen'=>$jifen]);
 

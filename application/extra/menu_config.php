@@ -625,7 +625,7 @@ return [
                 'child' => [
                     [
                         'id'    => 50101,
-                        'title' => '首页轮播图',
+                        'title' => '页面广告轮播',
                         'sort'  => 1,
                         'url'   => 'advertisement/index',
                         'hide'  => 1,
@@ -635,6 +635,20 @@ return [
                         'title' => '轮播图编辑',
                         'sort'  => 1,
                         'url'   => 'advertisement/edit',
+                        'hide'  => 0,
+                    ],
+                    [
+                        'id'    => 50301,
+                        'title' => '页面编辑',
+                        'sort'  => 1,
+                        'url'   => 'advertisement/page_edit',
+                        'hide'  => 0,
+                    ],
+                    [
+                        'id'    => 50401,
+                        'title' => '广告轮播列表',
+                        'sort'  => 1,
+                        'url'   => 'advertisement/list',
                         'hide'  => 0,
                     ],
                 ],

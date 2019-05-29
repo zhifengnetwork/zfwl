@@ -15,13 +15,18 @@ class ApiBase extends Controller
 {
     protected $uid;
     protected $user_name;
+    protected $is_bing_mobile;
 
     public function _initialize () {
         header("Access-Control-Allow-Origin:*");
         header("Access-Control-Allow-Headers:*");
         header("Access-Control-Allow-Methods:GET, POST, OPTIONS, DELETE");
         header('Content-Type:application/json; charset=utf-8');
+
         config((new Config)->getConfig());
+//        if (empty($this->is_bing_mobile($openid))){
+//            $this->ajaxReturn(['code'=>9999,'msg'=>'请绑定手机号！']);
+//        }
         if (session('admin_user_auth')) {
             $this->uid = session('admin_user_auth.uid');
             $this->user_name = session('admin_user_auth.user_name');
@@ -38,7 +43,7 @@ class ApiBase extends Controller
                 return;
             }
             $user_id = $this->decode_token(input('token'));
-            if(empty($user_id)) exit(json_encode(['code'=>0,'msg'=>'您未登录，请登录！']));
+            if(empty($user_id)) exit(json_encode(['code'=>10000,'msg'=>'您未登录，请登录！']));
 
         }
     }
@@ -148,6 +153,22 @@ class ApiBase extends Controller
        return $res['user_id'];
        
     }
+
+    /**
+     *  判断是否绑定手机号码
+     */
+    protected function is_bing_mobile ($openid) {
+
+        $mobile = Db::table('member')->where('openid',$openid)->value('mobile');
+        if (empty($mobile)){
+            return false;
+        }else{
+            return true;
+        }
+
+    }
+
+
     /**
      * 空
      */
