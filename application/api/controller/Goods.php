@@ -18,51 +18,51 @@ class Goods extends ApiBase
     /**
     * 商品分类接口
     */
-    // public function categoryList(){
-    //     $list = Db::name('category')->where('is_show',1)->field('cat_id,cat_name,pid,img')->order('sort DESC,cat_id DESC')->select();
-    //     $list  = getTree1($list);
+    /*public function categoryList(){
+        $list = Db::name('category')->where('is_show',1)->field('cat_id,cat_name,pid,img')->order('sort DESC,cat_id DESC')->select();
+        $list  = getTree1($list);
         
-    //     if($list){
-    //         foreach($list as $key=>&$value){
-    //             //热销
-    //             $list[$key]['hot'] = Db::table('goods')->alias('g')
-    //                                     ->join('goods_img gi','gi.goods_id=g.goods_id','LEFT')
-    //                                     ->where('cat_id1',$value['cat_id'])
-    //                                     ->where('g.is_show',1)
-    //                                     ->where('gi.main',1)
-    //                                     ->where('FIND_IN_SET(3,g.goods_attr)')
-    //                                     ->field('g.goods_id,goods_name,gi.picture img,price,original_price,g.goods_attr')
-    //                                     ->select();
-    //             if(isset($value['children'])){
-    //                 foreach($value['children'] as $ke=>&$val){
+        if($list){
+            foreach($list as $key=>&$value){
+                //热销
+                $list[$key]['hot'] = Db::table('goods')->alias('g')
+                                        ->join('goods_img gi','gi.goods_id=g.goods_id','LEFT')
+                                        ->where('cat_id1',$value['cat_id'])
+                                        ->where('g.is_show',1)
+                                        ->where('gi.main',1)
+                                        ->where('FIND_IN_SET(3,g.goods_attr)')
+                                        ->field('g.goods_id,goods_name,gi.picture img,price,original_price,g.goods_attr')
+                                        ->select();
+                if(isset($value['children'])){
+                    foreach($value['children'] as $ke=>&$val){
 
-    //                     $val['goods'] = Db::table('goods')->alias('g')
-    //                             ->join('goods_img gi','gi.goods_id=g.goods_id','LEFT')
-    //                             ->where('cat_id2',$val['cat_id'])
-    //                             ->where('g.is_show',1)
-    //                             ->where('gi.main',1)
-    //                             ->field('g.goods_id,goods_name,gi.picture img,price,original_price,g.goods_attr')
-    //                             ->select();
-    //                     if($val['goods']){
-    //                         foreach($val['goods'] as $g=>$v){
-    //                             if(strpos($v['goods_attr'], '3') !== false){
-    //                                 $list[$key]['hot'][] = $v;
-    //                             }
-    //                         }
-    //                     }
-    //                 }
-    //             }
-    //             if( $list[$key]['hot'] ){
-    //                 $list[$key]['hot'] = array_unique($list[$key]['hot'],SORT_REGULAR);
-    //                 foreach($list[$key]['hot'] as $hot=>$hot_val){
-    //                     $list[$key]['hot'][$hot]['attr_name'] = Db::table('goods_attr')->where('attr_id','in',$hot_val['goods_attr'])->field('attr_name')->select();
-    //                 }
-    //             }
-    //         }
-    //     }
+                        $val['goods'] = Db::table('goods')->alias('g')
+                                ->join('goods_img gi','gi.goods_id=g.goods_id','LEFT')
+                                ->where('cat_id2',$val['cat_id'])
+                                ->where('g.is_show',1)
+                                ->where('gi.main',1)
+                                ->field('g.goods_id,goods_name,gi.picture img,price,original_price,g.goods_attr')
+                                ->select();
+                        if($val['goods']){
+                            foreach($val['goods'] as $g=>$v){
+                                if(strpos($v['goods_attr'], '3') !== false){
+                                    $list[$key]['hot'][] = $v;
+                                }
+                            }
+                        }
+                    }
+                }
+                if( $list[$key]['hot'] ){
+                    $list[$key]['hot'] = array_unique($list[$key]['hot'],SORT_REGULAR);
+                    foreach($list[$key]['hot'] as $hot=>$hot_val){
+                        $list[$key]['hot'][$hot]['attr_name'] = Db::table('goods_attr')->where('attr_id','in',$hot_val['goods_attr'])->field('attr_name')->select();
+                    }
+                }
+            }
+        }
         
-    //     $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$list]);
-    // }
+        $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$list]);
+    }*/
 
 
 
@@ -177,6 +177,7 @@ class Goods extends ApiBase
         $goodsRes = Db::table('goods')->alias('g')
                     ->join('goods_attr ga','FIND_IN_SET(ga.attr_id,g.goods_attr)','LEFT')
                     ->field('g.*,GROUP_CONCAT(ga.attr_name) attr_name')
+                    ->where('g.is_show',1)
                     ->find($goods_id);
         if (empty($goodsRes)) {
             $this->ajaxReturn(['status' => -2 , 'msg'=>'商品不存在！']);
@@ -190,7 +191,8 @@ class Goods extends ApiBase
 
         $goodsRes['spec'] = $this->getGoodsSpec($goods_id);
         $goodsRes['stock'] = $goodsRes['spec']['count_num'];
-        unset($goodsRes['spec']['count_num']);
+        $goodsRes['groupon_price'] = $goodsRes['spec']['min_groupon_price'];
+        unset($goodsRes['spec']['count_num'],$goodsRes['spec']['min_groupon_price']);
 
         $goodsRes['img'] = Db::table('goods_img')->where('goods_id',$goods_id)->field('picture')->order('main DESC')->select();
         
@@ -200,6 +202,8 @@ class Goods extends ApiBase
         }else{
             $goodsRes['collection'] = 0;
         }
+
+        $goodsRes['comment_count'] = Db::table('goods_comment')->where('goods_id',$goods_id)->count();
 
         $where = [];
         $where['start_time'] = ['<', time()];
@@ -217,6 +221,42 @@ class Goods extends ApiBase
                 }
             }
         }
+
+        $goodsRes['group'] = [];
+        $goodsRes['group_user'] = [];
+        $group = Db::table('goods_groupon')->where('goods_id',$goods_id)->where('is_show',1)->where('is_delete',0)->where('status',2)->order('period DESC')->find();
+        if($group){
+            $goodsRes['group'] = $group;
+            $goodsRes['group']['surplus'] = $group['target_number'] - $group['sold_number'];      //剩余量
+
+            //过期或者拼团人数已满，重新生成新团购信息
+            if( !$goodsRes['group']['surplus'] || $group['end_time'] < time() ){
+                //更改团购过期状态
+                $update_res = Db::name('goods_groupon')->where('groupon_id',$group['groupon_id'])->update(['is_show'=>0,'status'=>3]);
+                if($update_res){
+                    //生成新一期团购
+                    $new_roupon = action('Groupon/new_groupon',[$group]);
+                    if ($new_roupon) $goodsRes['group'] = $new_roupon;
+                }
+            }else{
+                $goodsRes['group']['surplus_percentage'] = $goodsRes['group']['surplus'] / $group['target_number'];      //剩余百分比
+
+                $group_list = Db::table('order')->alias('o')
+                                ->join('member m','m.id=o.user_id','LEFT')
+                                ->where('o.groupon_id',$group['groupon_id'])
+                                ->where('o.pay_status',1)
+                                ->order('o.order_id DESC')
+                                ->field('id user_id,nickname,realname,avatar')
+                                ->select();
+                if($group_list){
+                    for($i=0;$i<$group['sold_number'];$i++){
+                        $group_list[$i]['cha'] = $group['target_number'] - $group['sold_number'] + $i;
+                    }
+                }
+                
+                $goodsRes['group_user'] = $group_list;
+            }
+        }
         
         $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$goodsRes]);
 
@@ -228,12 +268,17 @@ class Goods extends ApiBase
     public function comment_list(){
 
         $goods_id = input('goods_id');
+        $page = input('page');
+
+        $pageParam['query']['goods_id'] = $goods_id;
 
         $comment = Db::table('goods_comment')->alias('gc')
                 ->join('member m','m.id=gc.user_id','LEFT')
                 ->field('m.mobile,gc.*')
                 ->where('gc.goods_id',$goods_id)
-                ->select();
+                ->paginate(10,false,$pageParam);
+
+        $comment = $comment->all();
 
         if (empty($comment)) {
             $this->ajaxReturn(['status' => 1 , 'msg'=>'暂无评论！','data'=>[]]);
@@ -282,8 +327,9 @@ class Goods extends ApiBase
         //sku信息
         $skuRes = Db::name('goods_sku')->where('goods_id',$goods_id)->select();
         $count_num = 0;
+        $min = [];
         foreach ($skuRes as $sku_k=>$sku_v){
-            
+            $min[] = $sku_v['groupon_price'];
             $skuRes[$sku_k]['inventory'] = $skuRes[$sku_k]['inventory'] - $skuRes[$sku_k]['frozen_stock'];
             $count_num += $skuRes[$sku_k]['inventory'];
             $skuRes[$sku_k]['sku_attr'] = preg_replace("/(\w):/",  '"$1":' ,  $sku_v['sku_attr']);
@@ -302,6 +348,7 @@ class Goods extends ApiBase
         $specData['spec_attr'] = $specRes;
         $specData['goods_sku'] = $skuRes;
         $specData['count_num'] = $count_num;
+        $specData['min_groupon_price'] = min($min);
         return $specData;
     }
 
