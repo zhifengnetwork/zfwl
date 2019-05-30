@@ -245,6 +245,19 @@
                                     <span style="float:left;width:10%;"><input type="text" name="cost_price" value="{$info.cost_price}" class="form-control"></span>
                                     <span style="float:left;margin: 0 7px;">元</span>
                                 </div>
+
+                                <div style="line-height:34px;">
+                                <span style="float:left;margin: 0 7px;">省代佣金 </span>
+                                <span style="float:left;width:10%;"><input type="text" name="province_price" value="{$info.cost_price}" class="form-control"></span>
+                                <span style="float:left;margin: 0 7px;">元</span>
+                                </div>
+
+                                <div style="line-height:34px;">
+                                <span style="float:left;margin: 0 7px;">PULS佣金 </span>
+                                <span style="float:left;width:10%;"><input type="text" name="PULS_price" value="{$info.cost_price}" class="form-control"></span>
+                                <span style="float:left;margin: 0 7px;">元</span>
+                                </div>
+
                             </div>
                         </div>
 
@@ -260,14 +273,7 @@
                                     </select>
                                 </div>
 
-                                <div style="line-height:34px;float:left;">
-                                    <select class="form-control" name="cat_id2">
-                                        <option value="" >请选择二级分类</option>
-                                        {volist name="cat_id2" id="vo"}
-                                        <option {if condition="$info.cat_id2 eq $vo.cat_id"} selected {/if} value="{$vo.cat_id}">{$vo.cat_name}</option>
-                                        {/volist}
-                                    </select>
-                                </div>
+
 
                             </div>
                         </div>
@@ -337,17 +343,7 @@
                             </div>
                         </div>
 
-                        <div class="form-group">
-                            <label class="col-sm-2 control-label">是否参与分销</label>
-                            <div class="col-sm-9">
-                                <label style="margin-top:4px; margin-right:20px;">
-                                    <input type="radio" value="1" name="is_distribution" {if condition="$info.is_distribution"} checked {/if} /> 是
-                                </label>
-                                <label>
-                                    <input type="radio" value="0" name="is_distribution" {if condition="!$info.is_distribution"} checked {/if} /> 否
-                                </label>
-                            </div>
-                        </div>
+
     
                         <div class="form-group">
                             <label class="col-sm-2 control-label">用户最多购买量</label>
@@ -362,20 +358,7 @@
                             </div>
                         </div>
 
-                        <div class="form-group">
-                            <label class="col-sm-2 control-label">赠送积分</label>
-                            <div class="col-sm-9">
-                                <span style="width:80%;float:left;">
-                                    <input type="text" name="gift_points" value="{$info.gift_points}" class="form-control">
-                                </span>
-                                <span style="line-height:34px;">
-                                    分
-                                </span>
-                                <div>会员购物赠送的积分，如果不填写或者填0，则默认为不赠送积分，如果带%则为按成价格的比例计算积分</div>
-                                <div>如：购买2件，设置10积分，不管成交价格是多少，则购买后获得20积分</div>
-                                <div>如：购买2件，设置10%积分，成交价格2 * 200= 400，则购买后获得40积分</div>
-                            </div>
-                        </div>
+
 
                         <div class="form-group">
                             <label class="col-sm-2 control-label">已售数量</label>
@@ -403,65 +386,14 @@
                             </div>
                         </div>
 
-                        <div class="form-group">
-                            <label class="col-sm-2 control-label">分销商</label>
-                            <div class="col-sm-9">
-                                <span style="width:80%;">
-                                    <select class="form-control" name="distributor_level">
-                                        <option value="">请选择分销商等级</option>
-                                    </select>
-                                </span>
-                                <div>购买此商品成为指定的分销商等级</div>
-                            </div>
-                        </div>
 
-                        <div class="form-group">
-                            <label class="col-sm-2 control-label">分红代理</label>
-                            <div class="col-sm-9">
-                                <span style="width:80%;">
-                                    <select class="form-control" name="dividend_agent_level">
-                                        <option value="">请选择分销商等级</option>
-                                    </select>
-                                </span>
-                                <div>购买此商品成为指定的分红代理等级</div>
-                            </div>
-                        </div>
 
-                        <div class="form-group">
-                            <label class="col-sm-2 control-label">是否全返</label>
-                            <div class="col-sm-9">
-                                <label style="margin-top:4px; margin-right:20px;">
-                                    <input type="radio" value="1" name="is_full_return" {if condition="$info.is_full_return"} checked {/if} /> 是
-                                </label>
-                                <label>
-                                    <input type="radio" value="0" name="is_full_return" {if condition="!$info.is_full_return"} checked {/if} /> 否
-                                </label>
-                            </div>
-                        </div>
 
-                        <div class="form-group">
-                            <label class="col-sm-2 control-label">是否排列全返</label>
-                            <div class="col-sm-9">
-                                <label style="margin-top:4px; margin-right:20px;">
-                                    <input type="radio" value="1" name="is_arrange_all" {if condition="$info.is_arrange_all"} checked {/if} /> 是
-                                </label>
-                                <label>
-                                    <input type="radio" value="0" name="is_arrange_all" {if condition="!$info.is_arrange_all"} checked {/if} /> 否
-                                </label>
-                            </div>
-                        </div>
 
-                        <div class="form-group">
-                            <label class="col-sm-2 control-label">购物全返</label>
-                            <div class="col-sm-9">
-                                <label style="margin-top:4px; margin-right:20px;">
-                                    <input type="radio" value="1" name="shopping_all_return" {if condition="$info.shopping_all_return"} checked {/if} /> 是
-                                </label>
-                                <label>
-                                    <input type="radio" value="0" name="shopping_all_return" {if condition="!$info.shopping_all_return"} checked {/if} /> 否
-                                </label>
-                            </div>
-                        </div>
+
+
+
+
 
                         <div class="form-group">
                             <label class="col-sm-2 control-label">是否上架</label>
