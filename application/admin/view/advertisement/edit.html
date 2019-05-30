@@ -7,6 +7,7 @@
     <div class="ibox-content">
         <form method="post" class="form-horizontal" action="">
             <input type="hidden" name="id" value="{$id}">
+            <input type="hidden" name="page_id" value="{$page_id}">
             <div class="form-group">
                 <label class="col-sm-2 control-label">标题</label>
                 <div class="col-sm-9">
@@ -18,6 +19,20 @@
                 <div class="col-sm-9">
                     <input type="text" name="sort" value="{$info.sort|default=''}" class="form-control">
                     <p style="color:red">* 0 - 10 , 客户端显示从小到大。</p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">链接</label>
+                <div class="col-sm-9">
+                    <input type="text" name="url" value="{$info.url|default=''}" class="form-control">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-2 control-label">类型</label>
+                <div class="col-sm-9">
+                    <input name="type" type="radio" value="0" {if !isset($info['type']) || $info['type'] == 0}checked="checked"{/if}/><label>轮播</label>
+                    <input name="type" type="radio"  value='1' {if isset($info['type']) && $info['type'] == 1}checked="checked"{/if}/><label>广告</label>
                 </div>
             </div>
 

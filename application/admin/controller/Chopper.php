@@ -24,10 +24,9 @@ class Chopper extends Common
         }
 
         $list = Db::name('goods_chopper')->order('sort desc,chopper_id desc')->Where($where)->paginate(10,false);
-
         $page = $list->render();
         $list = $list->all();
-        
+
         return $this->fetch("",[
             'chopper_name' => $chopper_name,
             'is_show'      => $is_show,
@@ -48,8 +47,8 @@ class Chopper extends Common
             $third_amount   = input('third_amount/f',0);//第三刀
             $section        = input('section/a');//区间刀
             $end_num        = input('end_num/d');//区间刀
-            $start_time     = input('start_time');//区间刀
-            $end_time       = input('end_time');//区间刀
+            $start_time     = input('start_time');//开始时间
+            $end_time       = input('end_time');//结束时间
             $goods_id       = input('goods_id/d');
             $goods_cost_price = input('cost_price/f');
             $goods_price      = input('price/f');
@@ -67,30 +66,47 @@ class Chopper extends Common
                 $this->error('请选择商品!');    
             }
             $good = Goods::get($goods_id);
+            //判断砍价最低价不能小于成本价
             if($surplus_amount < $good['cost_price']){
                 $this->error('最低价不能小于成本价!');
             }
 
-            $end_price = $good['price'] - $first_amount - $second_amount - $third_amount - $section['amount'];
+            //区间刀总金额
 
-            $dt_end_price = serialize(get_randMoney($end_price,$end_num)); 
+            $qe_amount = ($section['end'] - $section['start'] + 1) * $section['amount'];
+
+            //判断砍价总金额不能超过可砍金额
+            $total_amount     = $first_amount + $second_amount + $third_amount + $qe_amount;
+         
+            $end_price        = $good['price'] - $surplus_amount - $total_amount;//随机砍的金额
+            //用户需要砍的总金额
+            $tamount = $total_amount + $end_price;
+           
+            //可砍金额
+            $kekan_amount  = $good['price'] - $surplus_amount;
+
+
+            if($tamount  > $kekan_amount){
+                $this->error('设置的砍价金额超过商品可砍金额!');
+            }
+
+
             $section      = serialize($section);
             $data = [
-                'section'      => $section,
+                'section'        => $section,
+                'chopper_price'  => $tamount,
                 'surplus_amount' => $surplus_amount,
-                'chopper_name' => $chopper_name,
-                'first_amount' => $first_amount,
-                'second_amount'=> $second_amount,
-                'third_amount' => $third_amount,
-                'end_num'      => $end_num,
-                'end_price'    => $end_price,
-                'start_time'   => strtotime($start_time),
-                'end_time'     => strtotime($end_time),
-                'goods_id'     => $goods_id,
+                'chopper_name'   => $chopper_name,
+                'first_amount'   => $first_amount,
+                'second_amount'  => $second_amount,
+                'third_amount'   => $third_amount,
+                'end_num'        => $end_num,
+                'end_price'      => $end_price,
+                'start_time'     => strtotime($start_time),
+                'end_time'       => strtotime($end_time),
+                'goods_id'       => $goods_id,
                 'goods_cost_price' => $goods_cost_price,
                 'goods_price'      => $goods_price,
-                'dt_end_num'       => $end_num,
-                'dt_end_price'     => $dt_end_price
             ]; 
             //添加信息
             $chopper_id =  Db::name('goods_chopper')->insertGetId($data);

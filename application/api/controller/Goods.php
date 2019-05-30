@@ -392,6 +392,25 @@ class Goods extends ApiBase
         return $sku_attr;
     }
 
+    /**
+     *  商品分类
+     */
+    public function goods_cate () {
+        $where['level'] = 1;
+        $where['is_show'] = 1;
+        $field = 'cat_id,cat_name,img,is_show';
+        $list = Db::table('category')->where($where)->order('sort desc')->field($field)->select();
+        return json(['cede'=>1,'msg'=>'','data'=>$list]);
+    }
+
+    /**
+     *  精选商品
+     */
+    public function selling_goods ()
+    {
+        $where['is_show'] = 1;
+        $where['is_del'] = 0;
+    }
 
     /**
      * 限时购

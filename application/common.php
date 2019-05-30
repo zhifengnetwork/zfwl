@@ -42,6 +42,14 @@ function get_randMoney($money_total = 20 , $personal_num = 10){
     shuffle($randMoney);
     return  $randMoney;
 }
+//获取区间刀
+function get_qujian($chopper_id){
+    $section = Db::name('goods_chopper')->where(['chopper_id' =>$chopper_id])->value('section');
+    $section = unserialize($section);
+    $qe_amount = ($section['end'] - $section['start'] + 1) * $section['amount'];
+    $res     = '第'.$section['start'].'刀到第'.$section['end'].'刀每刀砍价'.$section['amount'].'元一共'.$qe_amount.'元';
+    return $res;
+}
 
 //树结构
 function getTree1($items,$pid ="pid") {

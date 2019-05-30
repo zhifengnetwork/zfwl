@@ -18,7 +18,7 @@ class Goods extends Validate
     ];
 
     protected $scene = [
-        'add'     => ['goods_name','cat_id1','cat_id2'],
-        'edit'    => ['goods_name','cat_id1','cat_id2'],
+        'add'     => ['goods_name','cat_id1'],
+        'edit'    => ['goods_name','cat_id1'],
     ];
 }
