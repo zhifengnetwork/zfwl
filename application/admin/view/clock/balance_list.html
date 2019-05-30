@@ -34,7 +34,7 @@
                         </div>
                         <div class="col-sm-2">
                             <div class="input-daterange input-group" data-provide="datepicker">
-                                <input class="form-control input-sm" name="create_time" type="text"  autocomplete="off">
+                                <input class="form-control input-sm" name="create_time"  value="{if $create_time}{$create_time}{/if}"  type="text"  autocomplete="off">
                             </div>
                         </div>
                         <div class="col-sm-1" style=" width: 90px;padding: 5px 14px;">
@@ -45,7 +45,7 @@
                         <div class="col-sm-2">
                             <div class="input-daterange input-group" data-provide="datepicker">
                                 <select name="type" class="form-control" style="width:180px;">
-                                    <option value="0"  {if condition="$type eq 0"} selected {/if}>消费</option>
+                                    <option value="-1"  {if condition="$type eq -1"} selected {/if}>消费</option>
                                     <option value="1" {if condition="$type eq 1"} selected {/if}>获利</option>
                                 </select>
                             </div>

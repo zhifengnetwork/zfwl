@@ -34,7 +34,7 @@
                         </div>
                         <div class="col-sm-2">
                             <div class="input-daterange input-group" data-provide="datepicker">
-                                <input class="form-control input-sm" name="punch_time" type="text"  autocomplete="off" >
+                                <input class="form-control input-sm" name="punch_time" type="text"  autocomplete="off" value="{if $punch_time}{$punch_time}{/if}" >
                             </div>
                         </div>
                         <div class="col-sm-1" style=" width: 90px;padding: 5px 14px;">
@@ -45,6 +45,7 @@
                         <div class="col-sm-2">
                             <div class="input-daterange input-group" data-provide="datepicker">
                                 <select name="status" class="form-control" style="width:180px;">
+                                    <option value="-1"  {if condition="$status eq 0"} selected {/if}>待瓜分</option>
                                     <option value="1"  {if condition="$status eq 1"} selected {/if}>已瓜分</option>
                                     <option value="2" {if condition="$status eq 2"} selected {/if}>未瓜分</option>
 
