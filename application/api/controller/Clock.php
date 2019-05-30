@@ -8,9 +8,65 @@ use think\Db;
 
 class Clock extends ApiBase
 {
+    public function test(){
 
-    public function play_clock(){
+       echo strtotime(date("Y-m-d H:i:s",strtotime("-1 day")));
+
+    }
+
+    //生成订单
+    public function create_order(){
         $user_id = $this->get_user_id();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'用户不存在','data'=>'']);
+        }
+        $clock=new clockModel();
+        $clockUser=$clock->getClockUserInfo($user_id);
+        $clockInfo=$clock->getClockInfo();
+        if($this->is_permit_user($clockUser)){
+             $punch_time=strtotime(date("Y-m-d",strtotime("-1 day")));
+            //查看当天是否创建过订单
+             $orderInfo=Db::name("clock_balance_log")->where(['uid'=>$user_id,'punch_time'=>$punch_time])->find();
+             if(empty($orderInfo)){
+                 $data['order_sn']=date('YmdHis',time()) . mt_rand(10000000,99999999);
+                 $data['title']=$clockInfo['title'];
+                 $data['uid']=$user_id;
+                 $data['pay_status']=0;
+                 $data['pay_money']=$clockInfo['join_money'];
+                 $data['create_time']=time();
+                 $data['punch_time']=$punch_time;
+                 $order_id = Db::table("clock_balance_log")->insertGetId($data);
+                 if($order_id){
+                      $dataR['order_id']= $order_id;
+                      $dataR['order_sn']=$data['order_sn'];
+                      $dataR['uid']= $user_id;
+                      $dataR['title']=$data['title'];
+                      $dataR['content']="订单创建成功!";
+                     $this->ajaxReturn(['status' => 1 , 'msg'=>'请求成功','data'=>$dataR]);
+                 }else{
+                     $this->ajaxReturn(['status' => -2 , 'msg'=>'网络出错','data'=>'']);
+                 }
+              }else{
+                 if($orderInfo['pay_status']==2){
+                     $this->ajaxReturn(['status' => -2 , 'msg'=>'无须重复打卡','data'=>'']);
+                 }else{
+                     $dataR['order_id']= $orderInfo['order_id'];
+                     $dataR['order_sn']=$orderInfo['order_sn'];
+                     $dataR['uid']= $user_id;
+                     $dataR['title']=$orderInfo['title'];
+                     $dataR['content']="订单创建成功!";
+                     $this->ajaxReturn(['status' => 1 , 'msg'=>'请求成功','data'=>$dataR]);
+                 }
+             }
+
+        }else{
+                $this->ajaxReturn(['status' => -2 , 'msg'=>'已被禁止打卡','data'=>'']);
+        }
+     }
+
+    //执行打卡
+    public function play_clock(){
+        $user_id = 9;
         if(!$user_id){
             $this->ajaxReturn(['status' => -2 , 'msg'=>'用户不存在','data'=>'']);
         }
@@ -34,28 +90,27 @@ class Clock extends ApiBase
                     $data['start_time']=$clockInfo['start_time'];
                     $data['end_time']=$clockInfo['end_time'];
                     $data['content']="获得".$clockInfo['money']."元";
-                    $log="打卡瓜分了".$clockInfo['money']."元";
                     Db::startTrans();
                     $res=Db::name("clock_user")->where(['uid'=>$user_id])->setInc('get_money',$clockInfo['money']);
-                    $res2=Db::name("clock_balance_log")->insert(['uid'=>$user_id,'create_time'=>time(),'type'=>1,'log'=>$log]);
+                    $res2=Db::name("clock_balance_log")->where(['uid'=>$user_id,'punch_time'=>$where['punch_time'] ])->update(['get_money'=>$clockInfo['money'],'get_time'=>time()]);
                      if($res&&$res2){
                          Db::commit();
                          $this->ajaxReturn(['status' => 1 , 'msg'=>'打卡成功','data'=>$data]);
                      }else{
                          Db::rollback();
                          $data['is_success']=0;
-                         $this->ajaxReturn(['status' => -1 , 'msg'=>'打卡失败','data'=>'']);
+                         $this->ajaxReturn(['status' => -2 , 'msg'=>'打卡失败','data'=>'']);
                      }
 
                 }else{
                     $data['is_success']=0;
-                    $this->ajaxReturn(['status' => -1 , 'msg'=>'打卡失败','data'=>'']);
+                    $this->ajaxReturn(['status' => -2 , 'msg'=>'打卡失败','data'=>'']);
                 }
             }else{
                 $this->ajaxReturn(['status' => -2 , 'msg'=>'无法打卡','data'=>'']);
             }
         }else{
-            $this->ajaxReturn(['status' => -3 , 'msg'=>'当前时间无法打卡','data'=>'']);
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'当前时间无法打卡','data'=>'']);
         }
 
     }
@@ -155,7 +210,7 @@ class Clock extends ApiBase
         $clock=new clockModel();
         $clockUserInfo=$clock->getClockUserInfo($user_id);
         if(empty($clockUserInfo)){
-            $this->ajaxReturn(['status' => -3 , 'msg'=>'打卡用户不存在','data'=>'']);
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'打卡用户不存在','data'=>'']);
         }
         //总的记录数
         $count=Db::name("clock_day")->where(['uid'=>$user_id])->count();
@@ -198,7 +253,7 @@ class Clock extends ApiBase
         $clock=new clockModel();
         $clockUserInfo=$clock->getClockUserInfo($user_id);
         if(empty($clockUserInfo)){
-            $this->ajaxReturn(['status' => -3 , 'msg'=>'打卡用户不存在','data'=>'']);
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'打卡用户不存在','data'=>'']);
         }
         $newDay=$clock->getUserNewDay($user_id);
         if($newDay==date("Y-m-d",time())){
@@ -255,6 +310,19 @@ class Clock extends ApiBase
               $data['new_clock_user']=1;
           }
         $this->ajaxReturn(['status' => 1 ,'msg'=>'获取成功','data'=>$data]);
+    }
+
+    //是否允许用户打卡
+    public function is_permit_user( $clockUserInfo){
+        if(empty($clockUserInfo)){
+           return true;
+        }else{
+           if($clockUserInfo['status']==0){
+               return false;
+           }else{
+               return true;
+           }
+        }
     }
 
 
