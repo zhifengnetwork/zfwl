@@ -27,7 +27,7 @@ class Chopper extends ApiBase
                 ->join('goods g','g.goods_id=gg.goods_id','LEFT')
                 ->join('goods_img gi','gi.goods_id = g.goods_id','LEFT')
                 ->where($where)
-                ->field('gg.chopper_id,g.goods_id,gg.surplus_amount,gg.start_time,gg.end_time,gg.sort,g.goods_name,g.desc,gi.picture img,gg.participants')
+                ->field('gg.chopper_id,g.goods_id,gg.chopper_price,gg.surplus_amount,gg.start_time,gg.end_time,gg.sort,g.goods_name,g.desc,gi.picture img,gg.participants')
                 ->paginate(6,false,['page'=>$page]);
         if($list){
             foreach($list as &$value){
