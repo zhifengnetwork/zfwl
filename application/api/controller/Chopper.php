@@ -27,14 +27,16 @@ class Chopper extends ApiBase
                 ->join('goods g','g.goods_id=gg.goods_id','LEFT')
                 ->join('goods_img gi','gi.goods_id = g.goods_id','LEFT')
                 ->where($where)
-                ->field('gg.chopper_id,g.goods_id,gg.surplus_amount,gg.start_time,gg.end_time,gg.sort,g.goods_name,g.desc,gi.picture img')
+                ->field('gg.chopper_id,g.goods_id,gg.chopper_price,gg.surplus_amount,gg.start_time,gg.end_time,gg.sort,g.goods_name,g.desc,gi.picture img,gg.participants')
                 ->paginate(6,false,['page'=>$page]);
         if($list){
             foreach($list as &$value){
                 //拿出砍价商品规格价格最低的来显示 当前用户是否砍价
                 $chopper = Db::name('chopper_random')->where(['user_id' => $user_id,'chopper_id' => $value['chopper_id']])->find();
-                $value['is_chopper'] = $chopper?1:0;
-                $value['price']      = Db::table('goods_sku')->where('goods_id',$value['goods_id'])->where('inventory','>',0)->min('groupon_price');
+                $value['div']            = empty($chopper['already_amount'])?0:round($chopper['already_amount']/$value['chopper_price'],2) * 100;
+                $value['is_chopper']     = $chopper?1:0;
+                $value['already_amount'] = $chopper['already_amount'];
+                $value['price']          = Db::table('goods_sku')->where('goods_id',$value['goods_id'])->where('inventory','>',0)->min('groupon_price');
             }
             unset($value);
         }

@@ -15,6 +15,8 @@ class Index extends Common
 {
     public function index()
     {   
+        var_dump(strtotime('-7 days'));
+        die;
         $where= [];
         $where['status'] = ['>=',0];
         $list       = Db::table('diy_ewei_shop')
