@@ -463,4 +463,8 @@ class Goods extends ApiBase
 
         $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>['list'=>$arr,'limited_img'=>$limited_img]]);
     }
+
+    function ts(){
+        phpinfo();
+    }
 }
