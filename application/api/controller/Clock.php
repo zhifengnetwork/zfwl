@@ -8,14 +8,10 @@ use think\Db;
 
 class Clock extends ApiBase
 {
-    public function test(){
 
-       echo strtotime(date("Y-m-d H:i:s",strtotime("-1 day")));
 
-    }
-
-    //生成订单
-    public function create_order(){
+    //生成打卡订单
+    public function create_clock_order(){
         $user_id = $this->get_user_id();
         if(!$user_id){
             $this->ajaxReturn(['status' => -2 , 'msg'=>'用户不存在','data'=>'']);
@@ -24,7 +20,7 @@ class Clock extends ApiBase
         $clockUser=$clock->getClockUserInfo($user_id);
         $clockInfo=$clock->getClockInfo();
         if($this->is_permit_user($clockUser)){
-             $punch_time=strtotime(date("Y-m-d",strtotime("-1 day")));
+             $punch_time=strtotime(date("Y-m-d"));
             //查看当天是否创建过订单
              $orderInfo=Db::name("clock_balance_log")->where(['uid'=>$user_id,'punch_time'=>$punch_time])->find();
              if(empty($orderInfo)){
@@ -66,7 +62,7 @@ class Clock extends ApiBase
 
     //执行打卡
     public function play_clock(){
-        $user_id = 9;
+        $user_id = $this->get_user_id();
         if(!$user_id){
             $this->ajaxReturn(['status' => -2 , 'msg'=>'用户不存在','data'=>'']);
         }

@@ -45,7 +45,7 @@
                         <div class="col-sm-2">
                             <div class="input-daterange input-group" data-provide="datepicker">
                                 <select name="status" class="form-control" style="width:180px;">
-                                    <option value="-1"  {if condition="$status eq 0"} selected {/if}>待瓜分</option>
+                                    <option value="-1"  {if condition="$status eq -1"} selected {/if}>待瓜分</option>
                                     <option value="1"  {if condition="$status eq 1"} selected {/if}>已瓜分</option>
                                     <option value="2" {if condition="$status eq 2"} selected {/if}>未瓜分</option>
 

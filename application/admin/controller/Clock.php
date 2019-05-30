@@ -136,6 +136,7 @@ class Clock extends Common
 
         $kw = input('realname', '');
         $punch_time = input('punch_time', '');
+        $pay_status = input('pay_status', '');
         $where = [];
 
         if(!empty($kw)){
@@ -145,12 +146,22 @@ class Clock extends Common
         if(!empty($punch_time)){
             $where['clock_balance_log.punch_time'] =strtotime($punch_time);
         }
+
+        if(!empty($pay_status)){
+            if($pay_status==-1){
+                $where['clock_balance_log.pay_status']=0;
+            }else{
+                $where['clock_balance_log.pay_status']=$pay_status;
+            }
+
+        }
         $carryParameter = [
             'kw'               => $kw,
             'punch_time'        => $punch_time,
+            'pay_status'        => $pay_status,
         ];
         $logList=Db::name("clock_balance_log") ->join("member a",'a.id=clock_balance_log.uid','LEFT')->where($where)->field('clock_balance_log.*,a.realname')->order("clock_balance_log.create_time DESC")->paginate(20, false,['query' => $carryParameter]);
-        return $this->fetch('clock/balance_list',[ 'meta_title'    =>  '打卡交易明细列表','list'=>$logList,'realname'=>$kw,'punch_time'=>$punch_time]);
+        return $this->fetch('clock/balance_list',[ 'meta_title'    =>  '打卡交易明细列表','list'=>$logList,'realname'=>$kw,'punch_time'=>$punch_time,"pay_status"=>$pay_status]);
     }
 
 }
