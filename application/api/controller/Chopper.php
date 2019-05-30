@@ -33,7 +33,7 @@ class Chopper extends ApiBase
             foreach($list as &$value){
                 //拿出砍价商品规格价格最低的来显示 当前用户是否砍价
                 $chopper = Db::name('chopper_random')->where(['user_id' => $user_id,'chopper_id' => $value['chopper_id']])->find();
-                $value['div']            = round($chopper['already_amount']/$value['chopper_price'],2) * 100;
+                $value['div']            = empty($chopper['already_amount'])?0:round($chopper['already_amount']/$value['chopper_price'],2) * 100;
                 $value['is_chopper']     = $chopper?1:0;
                 $value['already_amount'] = $chopper['already_amount'];
                 $value['price']          = Db::table('goods_sku')->where('goods_id',$value['goods_id'])->where('inventory','>',0)->min('groupon_price');
