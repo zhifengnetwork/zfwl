@@ -9,10 +9,10 @@ class Chopper extends ApiBase
     * 砍一刀商品列表 //判断该用户是否砍过
     */
     public function goods_list(){    
-        $user_id = $this->get_user_id();
-        if(!$user_id){
-            $this->ajaxReturn(['status' => -2 , 'msg'=>'用户不存在','data'=>'']);
-        }
+         $user_id = 100;
+        // if(!$user_id){
+        //     $this->ajaxReturn(['status' => -2 , 'msg'=>'用户不存在','data'=>'']);
+        // }
         //砍价专区图片
         $picture = Db::table('category')->where('cat_name','like',"%砍价%")->value('img');
         $page = input('page');
@@ -71,11 +71,11 @@ class Chopper extends ApiBase
      * 砍一刀详情
      */
     public function chopper_edit(){
-        $user_id = $this->get_user_id();
+        $user_id = 100;
         if(!$user_id){
             $this->ajaxReturn(['status' => -2 , 'msg'=>'用户不存在','data'=>'']);
         }
-        $chopper_id            = input('chopper_id/d',4);
+        $chopper_id            = input('chopper_id/d',8);
         if(!$chopper_id){
             $this->ajaxReturn(['status' => -2 , 'msg'=>'参数错误！','data'=>'']);
         }
