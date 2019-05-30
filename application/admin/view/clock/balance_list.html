@@ -84,7 +84,7 @@
                             <td>{$vo.title}</td>
                             <td>{$vo.pay_money}</td>
                             <td>{if condition="$vo.pay_status eq 1"}<span class="yes">已支付</span>{else/}<span class="no">未支付{/if}</span></td>
-                            <td>{if condition="$vo.pay_status eq 1"}<span >余额支付</span>{elseif condition="$vo.pay_status eq 2"}<span >微信支付</span>{else/}{/if}</td>
+                            <td>{if condition="$vo.pay_type eq 1"}<span >余额支付</span>{else/}<span >微信支付</span>{/if}</td>
                             <td>{if $vo.pay_time }{$vo.pay_time|date="y-m-d H:i:s",###}{/if}</td>
                             <td>{if condition="$vo.get_money gt '0.00'" }{$vo.get_money}{/if}</td>
                             <td>{if $vo.get_time }{$vo.get_time|date="y-m-d H:i:s",###}{/if}</td>
