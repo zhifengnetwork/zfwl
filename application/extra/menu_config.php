@@ -849,6 +849,13 @@ return [
                         'url'   => 'distribution/distribution_notify',
                         'hide'  => 1,
                     ],
+                    [
+                        'id'    => 70701,
+                        'title' => 'PULS会员权益',
+                        'sort'  => 7,
+                        'url'   => 'distribution/puls_interests',
+                        'hide'  => 1,
+                    ],
                 ],
             ],
         ],
