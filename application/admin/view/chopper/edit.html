@@ -93,7 +93,7 @@
                         </div>
                         
                         <div class="form-group">
-                            <label class="col-sm-2 control-label"><span style="color:red;">*</span>商品原价</label>
+                            <label class="col-sm-2 control-label"><span style="color:red;">*</span>商品现价</label>
                             <div class="col-sm-2">
                                 <input type="text" name="price" value="" readonly="readonly"  class="form-control">
                             </div>
@@ -214,6 +214,25 @@ Calendar.setup({
     timeFormat     :    "12"
 });
 
+
+
+var chopper_name = $('input[name=chopper_name]').val();
+if(chopper_name != ''){
+    var option = '';
+    var chopper_name  = chopper_name.substr(0,5)
+    $.post("{:url('Ajax/get_goods')}",{'goods_name':chopper_name},function(data){
+        $(data.data).each(function(k,v){
+            if(k==0){
+                console.log(k)
+                $('input[name=cost_price]').val(v.cost_price);
+                $('input[name=price]').val(v.price);
+                $('input[name=chopper_name]').val(v.goods_name);
+            }
+            option += '<option value="'+v.goods_id+'">'+v.goods_name+'</option>';
+        })
+        $("select[name='goods_id']").html(option);
+    },'json');
+}
 
 function goods(obj){
     var goods_name = $(obj).val();
