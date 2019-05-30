@@ -182,11 +182,13 @@ class Goods extends Common
 
             if( isset( $data['goods_attr'] ) ){
                 if( in_array( 6 , $data['goods_attr']  ) ){
+                    $data['stock1'] = array_sum($data['goods_td']['num']);
                     $data['limited_start'] = strtotime( $data['limited_start'] );
                     $data['limited_end'] = strtotime( $data['limited_end'] );
                 }
                 $data['goods_attr'] = implode( ',' , $data['goods_attr'] );
             }
+            
             
             $data['add_time'] = strtotime( $data['add_time'] );
             $goods_id = Db::table('goods')->strict(false)->insertGetId($data);
@@ -346,9 +348,12 @@ class Goods extends Common
             $data['goods_spec'] = '[' . $default_spec_str . ']';
             
             $skuRes = setSukMore2($goods_id, $data_spec);
-
+            
             if( isset( $data['goods_attr'] ) ){
                 if( in_array( 6 , $data['goods_attr']  ) ){
+                    if( !in_array( 6 , $info['goods_attr']  ) ){
+                        $data['stock1'] = array_sum($data['goods_td']['num']);
+                    }
                     $data['limited_start'] = strtotime( $data['limited_start'] );
                     $data['limited_end'] = strtotime( $data['limited_end'] );
                 }
