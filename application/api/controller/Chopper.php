@@ -9,11 +9,11 @@ class Chopper extends ApiBase
     * 砍一刀商品列表 //判断该用户是否砍过
     */
     public function goods_list(){    
-        $user_id = $this->get_user_id();
-        if(!$user_id){
-            $this->ajaxReturn(['status' => -2 , 'msg'=>'用户不存在','data'=>'']);
-        }
-         //砍价专区图片
+         $user_id = 100;
+        // if(!$user_id){
+        //     $this->ajaxReturn(['status' => -2 , 'msg'=>'用户不存在','data'=>'']);
+        // }
+        //砍价专区图片
         $picture = Db::table('category')->where('cat_name','like',"%砍价%")->value('img');
         $page = input('page');
         $where['gg.is_show']   = 1;
@@ -40,16 +40,42 @@ class Chopper extends ApiBase
         }
         $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$list]);
     }
+    /**
+     * 用户记录
+     */
+    public function chopper_user(){
+        $user_id = 100;
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'用户不存在','data'=>'']);
+        }
+        $chopper_state = input('chopper_state/d',0);//0:进行中,1:已完成，2已失效
+        $page          = input('page/d',0);
+
+        $where['c.user_id']       = $user_id;
+        $where['c.chopper_state'] = $chopper_state;
+        //砍价商品
+        $list = Db::name('chopper_random')->alias('c')
+                ->join('goods_chopper gg','c.chopper_id=gg.chopper_id','LEFT')
+                ->join('goods g','g.goods_id=gg.goods_id','LEFT')
+                ->join('goods_img gi','gi.goods_id = g.goods_id','LEFT')
+                ->where($where)
+                ->field('gg.chopper_id,g.goods_id,gg.surplus_amount,gg.start_time,gg.end_time,gg.sort,g.goods_name,g.desc,gi.picture as img,c.chopper_state,c.already_amount,gg.status')
+                ->paginate(6,false,['page'=>$page]);
+                   
+        // 返回数据
+        $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$list]);
+
+    }
 
     /**
      * 砍一刀详情
      */
     public function chopper_edit(){
-        $user_id = $this->get_user_id();
+        $user_id = 100;
         if(!$user_id){
             $this->ajaxReturn(['status' => -2 , 'msg'=>'用户不存在','data'=>'']);
         }
-        $chopper_id            = input('chopper_id/d',4);
+        $chopper_id            = input('chopper_id/d',8);
         if(!$chopper_id){
             $this->ajaxReturn(['status' => -2 , 'msg'=>'参数错误！','data'=>'']);
         }
@@ -89,21 +115,21 @@ class Chopper extends ApiBase
      */
 
     public function chopper(){
-        $user_id = $this->get_user_id();
+        $user_id = 100;
         $invite_id  = input('invite_id',0);//被邀请人ID
-        if(!$user_id){
-            $this->ajaxReturn(['status' => -2 , 'msg'=>'用户不存在','data'=>'']);
-        }
-        $chopper_id = input('chopper_id/d',4);
+        // if(!$user_id){
+        //     $this->ajaxReturn(['status' => -2 , 'msg'=>'用户不存在','data'=>'']);
+        // }
+        $chopper_id = input('chopper_id/d',8);
         if(!$chopper_id){
             $this->ajaxReturn(['status' => -2 , 'msg'=>'参数错误！','data'=>'']);
         }
         
         $userchopper = Db::name('user_chopper')->where(['user_id' => $user_id,'chopper_id' => $chopper_id])->select();
         
-        if(count($userchopper) >= 1){
-             $this->ajaxReturn(['status' => -2 , 'msg'=>'每个商品当前只能砍一次,请邀请好友哟','data'=>'']);
-        }
+        // if(count($userchopper) >= 1){
+        //      $this->ajaxReturn(['status' => -2 , 'msg'=>'每个商品当前只能砍一次,请邀请好友哟','data'=>'']);
+        // }
 
         $chopper = GoodsChopper::get($chopper_id);
 
@@ -127,12 +153,13 @@ class Chopper extends ApiBase
                 $this->ajaxReturn(['status' => -2 , 'msg'=>'砍价失败，请重试！','data'=>'']);
             }
         }else{
-            $section = unserialize($chopper['section']);
-            if($random['already_num'] == 1){
+            $section     = unserialize($chopper['section']);
+            $already_num =  $random['already_num']+1;
+            if($already_num  == 2){
                $amount   = $chopper['second_amount']; //第二刀
-            }elseif($random['already_num'] == 2){
+            }elseif($already_num == 3){
                $amount   =  $chopper['third_amount']; //第三刀
-            }elseif($section['start'] >= $random['already_num'] && $section['end'] <= $random['already_num']){
+            }elseif($already_num >= $section['start'] && $already_num <= $section['end']){
                $amount   =  $section['amount'];//区间刀
             }else{
                if($random['end_num'] == 0){
@@ -151,7 +178,7 @@ class Chopper extends ApiBase
             'goods_id'     => $chopper['goods_id'],
             'invite_id'    => $invite_id,
             'status'       => 1,
-            'already_num'  => $random?$random['already_num']:1,
+            'already_num'  => $random?$already_num:1,
             'create_time'  => time(),
             'amount'       => $amount
         ];
@@ -178,7 +205,6 @@ class Chopper extends ApiBase
                     'already_num'   => Db::raw('already_num+1'),
                     'end_time'      => $random['end_num']?0:time(),
                 ];
-               
                 //判断是否随机刀
                 if(isset($is_random)){
                     $update_random['end_num'] = Db::raw('end_num-1');

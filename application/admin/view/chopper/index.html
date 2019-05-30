@@ -51,9 +51,10 @@
                                 <th>第二刀</th>
                                 <th>第三刀</th>
                                 <th>区间刀</th>  
-                                <th>最低金额 </th>
-                                <th>剩余砍价次数</th>
-                                <th>剩余砍价金额</th>
+                                <th>砍价底价</th>
+                                <th>随机砍价次数</th>
+                                <th>随机砍价金额</th>
+                                <th>可砍金额</th>
                                 <th>开始时间</th>
                                 <th>结束时间</th>
                                 <th>砍价状态</th>
@@ -74,6 +75,7 @@
                                 <td>{$vo.surplus_amount}</td>
                                 <td>{$vo.end_num}</td>
                                 <td>{$vo.end_price}</td>
+                                <td>{$vo.chopper_price}</td>
                                 <td>{$vo.start_time|date="Y-m-d H:i:s",###}</td>
                                 <td>{$vo.end_time|date="Y-m-d H:i:s",###}</td>
                                 <td>
