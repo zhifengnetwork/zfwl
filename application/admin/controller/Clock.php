@@ -135,31 +135,22 @@ class Clock extends Common
     public function balance_list(){
 
         $kw = input('realname', '');
-        $create_time = input('create_time', '');
-        $type = input('type', '');
+        $punch_time = input('punch_time', '');
         $where = [];
 
         if(!empty($kw)){
             $where['a.realname']=$kw;
         }
-        if(!empty($type)){
-            if ($type==-1){
-                $where['clock_balance_log.type']=0;
-            }else{
-                $where['clock_balance_log.type']=$type;
-            }
-        }
         //查询某一天的交易情况
-        if(!empty($create_time)){
-            $where['clock_balance_log.create_time'] =strtotime($create_time);
+        if(!empty($punch_time)){
+            $where['clock_balance_log.punch_time'] =strtotime($punch_time);
         }
         $carryParameter = [
             'kw'               => $kw,
-            'create_time'        => $create_time,
-            'type'        => $type,
+            'punch_time'        => $punch_time,
         ];
-        $logList=Db::name("clock_balance_log") ->join("member a",'a.id=clock_balance_log.uid','LEFT')->where($where)->field('clock_balance_log.id,clock_balance_log.create_time,clock_balance_log.log,clock_balance_log.type,a.realname')->order("clock_balance_log.create_time DESC")->paginate(20, false,['query' => $carryParameter]);
-        return $this->fetch('clock/balance_list',[ 'meta_title'    =>  '打卡交易明细列表','list'=>$logList,'realname'=>$kw,'type'=>$type,'create_time'=>$create_time]);
+        $logList=Db::name("clock_balance_log") ->join("member a",'a.id=clock_balance_log.uid','LEFT')->where($where)->field('clock_balance_log.*,a.realname')->order("clock_balance_log.create_time DESC")->paginate(20, false,['query' => $carryParameter]);
+        return $this->fetch('clock/balance_list',[ 'meta_title'    =>  '打卡交易明细列表','list'=>$logList,'realname'=>$kw,'punch_time'=>$punch_time]);
     }
 
 }
