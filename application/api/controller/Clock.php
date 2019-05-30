@@ -44,18 +44,18 @@ class Clock extends ApiBase
                      }else{
                          Db::rollback();
                          $data['is_success']=0;
-                         $this->ajaxReturn(['status' => -1 , 'msg'=>'打卡失败','data'=>'']);
+                         $this->ajaxReturn(['status' => -2 , 'msg'=>'打卡失败','data'=>'']);
                      }
 
                 }else{
                     $data['is_success']=0;
-                    $this->ajaxReturn(['status' => -1 , 'msg'=>'打卡失败','data'=>'']);
+                    $this->ajaxReturn(['status' => -2 , 'msg'=>'打卡失败','data'=>'']);
                 }
             }else{
                 $this->ajaxReturn(['status' => -2 , 'msg'=>'无法打卡','data'=>'']);
             }
         }else{
-            $this->ajaxReturn(['status' => -3 , 'msg'=>'当前时间无法打卡','data'=>'']);
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'当前时间无法打卡','data'=>'']);
         }
 
     }
@@ -155,7 +155,7 @@ class Clock extends ApiBase
         $clock=new clockModel();
         $clockUserInfo=$clock->getClockUserInfo($user_id);
         if(empty($clockUserInfo)){
-            $this->ajaxReturn(['status' => -3 , 'msg'=>'打卡用户不存在','data'=>'']);
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'打卡用户不存在','data'=>'']);
         }
         //总的记录数
         $count=Db::name("clock_day")->where(['uid'=>$user_id])->count();
@@ -198,7 +198,7 @@ class Clock extends ApiBase
         $clock=new clockModel();
         $clockUserInfo=$clock->getClockUserInfo($user_id);
         if(empty($clockUserInfo)){
-            $this->ajaxReturn(['status' => -3 , 'msg'=>'打卡用户不存在','data'=>'']);
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'打卡用户不存在','data'=>'']);
         }
         $newDay=$clock->getUserNewDay($user_id);
         if($newDay==date("Y-m-d",time())){
