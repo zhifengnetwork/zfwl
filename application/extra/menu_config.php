@@ -1139,7 +1139,7 @@ return [
                     ],
                     [
                         'id'    => 220401,
-                        'title' => '打卡交易明细',
+                        'title' => '打卡交易',
                         'sort'  => 4,
                         'url'   => 'clock/balance_list',
                         'hide'  => 1,

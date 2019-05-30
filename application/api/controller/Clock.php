@@ -8,7 +8,14 @@ use think\Db;
 
 class Clock extends ApiBase
 {
+    //余额支付参与打卡
+    public function balance_pay(){
+        $user_id = $this->get_user_id();
 
+
+     }
+
+    //执行打卡
     public function play_clock(){
         $user_id = $this->get_user_id();
         if(!$user_id){
