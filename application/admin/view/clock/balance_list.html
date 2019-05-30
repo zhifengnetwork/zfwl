@@ -37,6 +37,19 @@
                                 <input class="form-control input-sm" name="punch_time"  value="{if $punch_time}{$punch_time}{/if}"  type="text"  autocomplete="off">
                             </div>
                         </div>
+                        <div class="col-sm-1" style=" width: 90px;padding: 5px 14px;">
+                            <div class="input-group">
+                                支付状态
+                            </div>
+                        </div>
+                        <div class="col-sm-2">
+                            <div class="input-daterange input-group" data-provide="datepicker">
+                                <select name="pay_status" class="form-control" style="width:180px;">
+                                    <option value="-1" {if condition="$pay_status eq -1"} selected {/if}>未支付</option>
+                                    <option value="1" {if condition="$pay_status eq 1"} selected {/if}>已支付</option>
+                                </select>
+                            </div>
+                        </div>
                         <div class="col-sm-3">
                             <div class="input-group">
                                 <span class="input-group-btn">
@@ -70,7 +83,7 @@
                             <td><a href="{:url('member/member_edit',array('id' => $vo['uid']));}" title="会员详情">{$vo.realname}</a></td>
                             <td>{$vo.title}</td>
                             <td>{$vo.pay_money}</td>
-                            <td>{if condition="$vo.pay_status eq 2"}<span class="yes">已支付</span>{else/}<span class="no">未支付{/if}</span></td>
+                            <td>{if condition="$vo.pay_status eq 1"}<span class="yes">已支付</span>{else/}<span class="no">未支付{/if}</span></td>
                             <td>{if condition="$vo.pay_status eq 1"}<span >余额支付</span>{elseif condition="$vo.pay_status eq 2"}<span >微信支付</span>{else/}{/if}</td>
                             <td>{if $vo.pay_time }{$vo.pay_time|date="y-m-d H:i:s",###}{/if}</td>
                             <td>{if condition="$vo.get_money gt '0.00'" }{$vo.get_money}{/if}</td>
