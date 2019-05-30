@@ -202,9 +202,9 @@ class Pay extends ApiBase
      */
     public function clock_pay(){
 
-        $order_id     = input('order_id');
-        $pay_type     = input('pay_type');//支付方式
-        $user_id      = $this->get_user_id();
+        $order_id     = 12;
+        $pay_type     = 1;//支付方式
+        $user_id      = 9;
         if(!$user_id){
             $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
         }
@@ -280,7 +280,7 @@ class Pay extends ApiBase
             if($reult){
                 // 提交事务
                 Db::commit();
-                $this->ajaxReturn(['status' => 1 , 'msg'=>'余额支付成功!','data'=>['order_id' =>$order_info['order_id'],'order_amount' =>$order_info['pay_money'],'goods_name' =>"",'order_sn' => $order_info['order_sn'] ]]);
+                $this->ajaxReturn(['status' => 1 , 'msg'=>'余额支付成功!','data'=>['order_id' =>$order_info['order_id'],'order_amount' =>$order_info['pay_money'],'goods_name' =>$order_info['title'],'order_sn' => $order_info['order_sn'] ]]);
             }else{
                 Db::rollback();
                 $this->ajaxReturn(['status' => -2 , 'msg'=>'余额支付失败','data'=>'']);
