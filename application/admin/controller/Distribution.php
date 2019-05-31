@@ -273,11 +273,6 @@ class Distribution extends Common
         ]);
     }
 
-    /**
-     *  PULS会员权益
-     */
-    public function puls_interests () {
-        echo 'hello world';die;
-    }
+
 
 }

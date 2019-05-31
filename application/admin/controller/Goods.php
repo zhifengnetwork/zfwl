@@ -272,6 +272,8 @@ class Goods extends Common
             $this->error('参数错误！');
         }
         $info = Db::table('goods')->find($goods_id);
+
+//        dump($info);die;
         if($info['goods_attr']){
             $info['goods_attr'] = explode(',',$info['goods_attr']);
         }

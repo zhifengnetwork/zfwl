@@ -849,13 +849,6 @@ return [
                         'url'   => 'distribution/distribution_notify',
                         'hide'  => 1,
                     ],
-                    [
-                        'id'    => 70701,
-                        'title' => 'PULS会员权益',
-                        'sort'  => 7,
-                        'url'   => 'distribution/puls_interests',
-                        'hide'  => 1,
-                    ],
                 ],
             ],
         ],
@@ -1085,7 +1078,7 @@ return [
                         'title' => '会员设置',
                         'sort'  => 4,
                         'url'   => 'member/set',
-                        'hide'  => 1,
+                        'hide'  => 0,
                     ],
                     [
                         'id'    => 90112,
