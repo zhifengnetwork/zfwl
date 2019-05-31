@@ -286,6 +286,11 @@ class Goods extends ApiBase
      */
     public function comment_list(){
 
+        $user_id = $this->get_user_id();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+        }
+
         $goods_id = input('goods_id');
         $page = input('page');
 
@@ -293,7 +298,7 @@ class Goods extends ApiBase
 
         $comment = Db::table('goods_comment')->alias('gc')
                 ->join('member m','m.id=gc.user_id','LEFT')
-                ->field('m.mobile,gc.*')
+                ->field('m.mobile,gc.user_id,gc.id comment_id,gc.content,gc.star_rating,gc.replies,gc.praise,gc.add_time,gc.img,gc.sku_id')
                 ->where('gc.goods_id',$goods_id)
                 ->paginate(10,false,$pageParam);
 
@@ -304,7 +309,7 @@ class Goods extends ApiBase
         }
         
         foreach($comment as $key=>$value ){
-
+            
             $comment[$key]['mobile'] = $value['mobile'] ? substr_cut($value['mobile']) : '';
 
             if($value['img']){
@@ -314,6 +319,8 @@ class Goods extends ApiBase
             }
 
             $comment[$key]['spec'] = $this->get_sku_str($value['sku_id']);
+
+            $comment[$key]['is_praise'] = Db::table('goods_comment_praise')->where('comment_id',$value['comment_id'])->where('user_id',$user_id)->count();
         }
         
         $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$comment]);
@@ -443,6 +450,11 @@ class Goods extends ApiBase
      */
     public function limited_list(){
 
+        $user_id = $this->get_user_id();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+        }
+
         //限时购专区图片
         $limited_img = Db::table('category')->where('cat_name','like',"%限时购%")->value('img');
 
@@ -492,5 +504,31 @@ class Goods extends ApiBase
 
     function ts(){
         phpinfo();
+    }
+
+    public function praise(){
+
+        $user_id = $this->get_user_id();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+        }
+
+        $comment_id = input('comment_id');
+
+        $where['comment_id'] = $comment_id;
+        $where['user_id'] = $user_id;
+
+        $res = Db::table('goods_comment_praise')->where($where)->find();
+
+        if($res){
+            Db::table('goods_comment')->where('id',$comment_id)->setDec('praise',1);
+            Db::table('goods_comment_praise')->where($where)->delete();
+            
+            $this->ajaxReturn(['status' => 1 , 'msg'=>'取消点赞成功！','data'=>'']);
+        }else{
+            Db::table('goods_comment')->where('id',$comment_id)->setInc('praise',1);
+            Db::table('goods_comment_praise')->insert($where);
+            $this->ajaxReturn(['status' => 1 , 'msg'=>'点赞成功！','data'=>'']);
+        }
     }
 }
