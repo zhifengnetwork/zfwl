@@ -188,7 +188,16 @@
                                     <span style="float:left;margin: 0 7px;"><input type="text" {if condition="is_array($info.goods_attr) and !in_array(6,$info.goods_attr)"} disabled {/if} id="limited_start" name="limited_start" value="{$info.limited_start|date='Y-m-d',###}" class="form-control"></span>
                                     <span style="float:left;margin: 0 7px;"><input type="text" {if condition="is_array($info.goods_attr) and !in_array(6,$info.goods_attr)"} disabled {/if} id="limited_end" name="limited_end" value="{$info.limited_end|date='Y-m-d',###}" class="form-control"></span>
                                 </div>
-                            </div>
+
+                                <div style="line-height:34px;">
+                                <span style="float:left;margin: 0 7px;">puls会员折扣 </span>
+                                <span style="float:left;margin: 0 7px;"><input type="text"  name="puls_discount" value="{$info.puls_discount}" class="form-control">商品现价的%</span>
+                                </div>
+                                <div style="line-height:34px;">
+                                <span style="float:left;margin: 0 7px;">分享金 </span>
+                                <span style="float:left;margin: 0 7px;"><input type="text"  name="share_discount" value="{$info.share_discount}" class="form-control">商品现价的%</span>
+                                </div>
+                                    </div>
                         </div>
 
                         <style type="text/css">

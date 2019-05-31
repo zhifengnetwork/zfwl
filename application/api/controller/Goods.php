@@ -404,12 +404,38 @@ class Goods extends ApiBase
     }
 
     /**
-     *  精选商品
+     *  商品列表
+     */
+    public function goods_list () {
+        $keyword = request()->param('keyword','');
+        $cat_id = request()->param('cat_id',0,'intval');
+        $page = request()->param('page',0,'intval');
+        $goods = new Goods();
+        $list = $goods->getGoodsList($keyword,$cat_id,$page);
+        if (!empty($list)){
+            return json(['code'=>1,'msg'=>'','data'=>$list]);
+        }else{
+            return json(['code'=>-2,'msg'=>'没有数据哦','data'=>$list]);
+        }
+    }
+
+    /**
+     *  指定属性商品
      */
     public function selling_goods ()
     {
         $where['is_show'] = 1;
         $where['is_del'] = 0;
+        $page = request()->param('page',0,'intval');
+        $attr = request()->param('attr',0,'intval');
+        $field = 'goods_id,goods_name,price,stock,number_sales,desc';
+        $list = model('Goods')->where($where)->where("find_in_set($attr,`goods_attr`)")->field($field)->paginate(4,'',['page'=>$page]);
+        if (!empty($list)){
+            foreach ($list as &$v){
+                $v['picture'] = Db::table('goods_img')->where(['goods_id'=>$v['goods_id'],'main'=>1])->value('picture');
+            }
+        }
+        return json(['code'=>1,'msg'=>'','data'=>$list]);
     }
 
     /**
