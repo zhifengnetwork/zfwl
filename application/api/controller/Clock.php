@@ -9,7 +9,6 @@ use think\Db;
 class Clock extends ApiBase
 {
 
-
     //生成打卡订单
     public function create_clock_order(){
         $user_id = $this->get_user_id();
