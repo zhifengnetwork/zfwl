@@ -202,9 +202,9 @@ class Pay extends ApiBase
      */
     public function clock_pay(){
 
-        $order_id     = 12;
-        $pay_type     = 1;//支付方式
-        $user_id      = 9;
+        $order_id     = input('order_id');
+        $pay_type     = input('pay_type');//支付方式
+        $user_id      = $this->get_user_id();
         if(!$user_id){
             $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
         }
