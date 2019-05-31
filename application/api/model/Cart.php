@@ -10,7 +10,7 @@ class Cart extends Model
     public function cartList($where = array())
     {   
 
-        $cart_list = $this->field('id,user_id,groupon_id,goods_id,goods_sn,goods_name,market_price,goods_price,member_goods_price,subtotal_price,sku_id,goods_num,spec_key_name')->where($where)->order('id DESC')->select();
+        $cart_list = $this->field('id,selected,user_id,groupon_id,goods_id,goods_sn,goods_name,market_price,goods_price,member_goods_price,subtotal_price,sku_id,goods_num,spec_key_name')->where($where)->order('id DESC')->select();
 
         $arr = [];
         if($cart_list){
@@ -57,7 +57,7 @@ class Cart extends Model
     public function cartList1($where = array())
     {   
 
-        $cart_list = $this->field('id,user_id,groupon_id,goods_id,goods_sn,goods_name,market_price,goods_price,member_goods_price,subtotal_price,sku_id,goods_num,spec_key_name')->where($where)->order('id DESC')->select();
+        $cart_list = $this->field('id,selected,user_id,groupon_id,goods_id,goods_sn,goods_name,market_price,goods_price,member_goods_price,subtotal_price,sku_id,goods_num,spec_key_name')->where($where)->order('id DESC')->select();
 
         $arr = [];
         if($cart_list){
