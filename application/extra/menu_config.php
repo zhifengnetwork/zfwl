@@ -1078,7 +1078,7 @@ return [
                         'title' => '会员设置',
                         'sort'  => 4,
                         'url'   => 'member/set',
-                        'hide'  => 1,
+                        'hide'  => 0,
                     ],
                     [
                         'id'    => 90112,

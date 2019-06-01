@@ -196,14 +196,50 @@ class Pay extends ApiBase
             exit;
         }
     }
+    /**
+     * 打卡微信支付接口
+     */
+    public function clock_wx_pay(){
+
+        $order_id     = 13;
+        $pay_type     = input('pay_type');//支付方式
+        $user_id      = 9;
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+        }
+        $order_info   = Db::name('clock_balance_log')->where(['order_id' => $order_id])->field('order_id,order_sn,title,pay_money,pay_status,uid,punch_time')->find();//订单信息
+        $member       = MemberModel::get($user_id);
+        //验证是否本人的
+        if(empty($order_info)){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'订单不存在','data'=>'']);
+        }
+        if($order_info['uid'] != $user_id){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'非本人订单','data'=>'']);
+        }
+
+        if($order_info['pay_status'] == 1){
+            $this->ajaxReturn(['status' => -4 , 'msg'=>'此订单，已完成支付!','data'=>'']);
+        }
+
+        $rechData['order_no']        = $order_info['order_sn'];
+        $rechData['body']            = '每日打卡支付';
+        $rechData['timeout_express'] = time() + 600;
+        $rechData['amount']          = $order_info['pay_money'];
+        $rechData['subject']         = '每日打卡';
+        $rechData['openid']       = $member['openid'];
+        $pay_config = Config::get('pay_config');
+        $wxConfig = Config::get('wx_config');
+        $url      = Charge::run(Config::WX_CHANNEL_WAP, $wxConfig, $rechData);
+
+    }
+
 
     /**
-     * 打卡支付接口
+     * 打卡余额支付接口
      */
-    public function clock_pay(){
+    public function clock_balance_pay(){
 
         $order_id     = input('order_id');
-        $pay_type     = input('pay_type');//支付方式
         $user_id      = $this->get_user_id();
         if(!$user_id){
             $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
@@ -228,14 +264,7 @@ class Pay extends ApiBase
         $payData['body']            = $order_info['title'];
         $payData['timeout_express'] = time() + 600;
         $payData['amount']          = $amount;
-        if($pay_type == 2){
-            $payData['subject']      = '微信支付';
-            $payData['openid']       = $order_info['openid'];
-            $payData['product_id']   = '';
-            $payData['sub_appid']    = '';
-            $payData['sub_mch_id']   = '';
-        }elseif($pay_type == 1){
-            $balance_info  = get_balance($user_id,0);
+        $balance_info  = get_balance($user_id,0);
             if($balance_info['balance'] < $order_info['pay_money']){
                 $this->ajaxReturn(['status' => 0 , 'msg'=>'余额不足','data'=>'']);
             }
@@ -271,7 +300,7 @@ class Pay extends ApiBase
             //修改订单状态
             $update = [
                 'pay_status'   => 1,
-                'pay_type'     => $pay_type,
+                'pay_type'     => 1,
                 'day_id'   => $day_id,
                 'pay_time'     => time(),
             ];
@@ -280,23 +309,11 @@ class Pay extends ApiBase
             if($reult){
                 // 提交事务
                 Db::commit();
-                $this->ajaxReturn(['status' => 1 , 'msg'=>'余额支付成功!','data'=>['order_id' =>$order_info['order_id'],'order_amount' =>$order_info['pay_money'],'goods_name' =>"",'order_sn' => $order_info['order_sn'] ]]);
+                $this->ajaxReturn(['status' => 1 , 'msg'=>'余额支付成功!','data'=>['order_id' =>$order_info['order_id'],'order_amount' =>$order_info['pay_money'],'goods_name' =>$order_info['title'],'order_sn' => $order_info['order_sn'] ]]);
             }else{
                 Db::rollback();
                 $this->ajaxReturn(['status' => -2 , 'msg'=>'余额支付失败','data'=>'']);
             }
-        }
-       if($pay_type == 2){//微信
-
-        }
-
-        try {
-            $this->ajaxReturn(['status' => 1 , 'msg'=>'请求路径','data'=>""]);
-        } catch (PayException $e) {
-            $this->ajaxReturn(['status' => 0 , 'msg'=>$e->errorMessage(),'data'=>'']);
-            exit;
-        }
-
 
     }
 

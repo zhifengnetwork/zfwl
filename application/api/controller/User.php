@@ -10,7 +10,7 @@ use think\Db;
 class User extends ApiBase
 {
      public function __construct(){
-        $this->weixin_config =  Config::get('weixin');//取微获信配置
+        $this->weixin_config =  Config::get('pay_weixin');//取微获信配置
     }
     // 网页授权登录获取 OpendId
     public function GetOpenid()
@@ -22,7 +22,9 @@ class User extends ApiBase
             //$baseUrl = urlencode('http://'.$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING']);
             $baseUrl = urlencode($this->get_url());
             $url = $this->__CreateOauthUrlForCode($baseUrl); // 获取 code地址 // 跳转到微信授权页面 需要用户确认登录的页面
-            $this->ajaxReturn(['status' => 1 , 'msg'=>'微信授权登录地址','data'=>$url]);
+            Header("Location: $url"); // 跳转到微信授权页面 需要用户确认登录的页面
+            exit();
+            // $this->ajaxReturn(['status' => 1 , 'msg'=>'微信授权登录地址','data'=>$url]);
         } else {
             //上面获取到code后这里跳转回来
             $code  = $_GET['code'];

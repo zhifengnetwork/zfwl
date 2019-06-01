@@ -405,7 +405,7 @@ class Member extends Common
 
     public function level(){
         $where      = array();
-        $list       = Db::table('member_level')
+        $list       = Db::table('puls_level')
                         ->field('*')
                         ->where($where)
                         ->order('id')
@@ -417,33 +417,29 @@ class Member extends Common
 
 
     public function level_add(){
-        $setdata = Db::table('sysset')->find();
-        $shopset = unserialize($setdata['sets']);
-        if (Request::instance()->isPost()){
-            $levelname  = input('levelname','');
-            $level      = input('level/d',0);
-            $ordermoney = input('ordermoney/d',0);
-            $ordercount = input('ordercount/d',0);
-            $discount   = input('discount/f',0);
-            if(empty($levelname)){
-                $this->error('等级名称不能为空');
+        if (request()->isPost()){
+            $name = request()->param('name','');
+            $level = request()->param('level','');
+            $children_num = request()->param('children_num','');
+            $team_num = request()->param('team_num','');
+            $reward = request()->param('reward','');
+            if (empty($name)){
+                $this->error('等级名称不能为空！');
             }
-            $add = [
-                'levelname' => $levelname,
-                'level'     => $level,
-                'ordermoney'=> $ordermoney,
-                'ordercount'=> $ordercount,
-                'discount'  => $discount
+            $data = [
+                'name'  =>  $name,
+                'level'  =>  $level,
+                'children_num'  =>  $children_num,
+                'team_num'  =>  $team_num,
+                'reward'  =>  $reward
             ];
-           $res = Db::table('member_level')->insert($add);
-
-           if($res !== false ){
-              $this->success('新增成功', url('member/level'));
-           }
-            $this->error('新增失败');
-            
+            $inser = Db::table('puls_level')->insert($data);
+            if (!empty($inser)){
+                $this->success('添加成功！', url('member/level'));
+            }else{
+                $this->error('添加失败！');
+            }
         }
-        $this->assign('shopset', $shopset['shop']);
         $this->assign('meta_title', '会员等级设置');
         return $this->fetch();              
     }
@@ -451,36 +447,34 @@ class Member extends Common
 
     public function level_edit(){
         $id      = input('id');
-        $level   = Db::table('member_level')->where(['id' => $id])->find();
+        $level   = Db::table('puls_level')->where(['id' => $id])->find();
         if (Request::instance()->isPost()){
-            $levelname  = input('levelname','');
-            $level      = input('level/d',0);
-            $ordermoney = input('ordermoney/d',0);
-            $ordercount = input('ordercount/d',0);
-            $discount   = input('discount/f',0);
-            if(empty($levelname)){
-                $this->error('等级名称不能为空');
+            $name = request()->param('name','');
+            $level = request()->param('level','');
+            $children_num = request()->param('children_num','');
+            $team_num = request()->param('team_num','');
+            $reward = request()->param('reward','');
+            if (empty($name)){
+                $this->error('等级名称不能为空！');
             }
-            $update = [
-                'levelname' => $levelname,
-                'level'     => $level,
-                'ordermoney'=> $ordermoney,
-                'ordercount'=> $ordercount,
-                'discount'  => $discount
+            $data = [
+                'name'  =>  $name,
+                'level'  =>  $level,
+                'children_num'  =>  $children_num,
+                'team_num'  =>  $team_num,
+                'reward'  =>  $reward
             ];
-           $res = Db::table('member_level')->where(['id' => $id])->update($update);
+           $res = Db::table('member_level')->where(['id' => $id])->update($data);
 
            if($res !== false ){
               $this->success('编辑成功', url('member/level'));
+           }else{
+               $this->error('编辑失败');
            }
-            $this->error('编辑失败');
         }
-        $setdata = Db::table('sysset')->find();
-        $shopset = unserialize($setdata['sets']);
-        $this->assign('shopset', $shopset['shop']);
         $this->assign('level', $level);
         $this->assign('meta_title', '会员等级设置');
-        return $this->fetch();              
+        return $this->fetch();
     }
 
 

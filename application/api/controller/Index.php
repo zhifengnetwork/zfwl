@@ -6,6 +6,7 @@ namespace app\api\controller;
 use app\common\model\Users;
 use app\common\logic\UsersLogic;
 use think\Db;
+use think\Cache;
 
 class Index extends ApiBase
 {
@@ -17,6 +18,27 @@ class Index extends ApiBase
     {
         // $redis = $this->getRedis();
 
+        // pred( $redis->lpop('aa') );
+        // Cache::set('name',11122111,3600);
+        // echo Cache::get('name');
+        // for($i=1;$i<=10;$i++){
+        //     $redis->rpush('ss',$i);
+        // }
+
+        // $n = 12;
+        // for($i=0;$i<$n;$i++){
+        //     if( $redis->lpop('ss') <= 0 ){
+        //         for($j=1;$j<=$i;$j++){
+        //             $redis->rpush('ss',$j);
+        //             continue;
+        //         }
+        //         echo "还有{$i}件可购买";die;
+        //         continue;
+        //     }
+        // }
+
+
+        // die;
         echo 1111;
         exit;
         $user_id = $this->get_user_id();

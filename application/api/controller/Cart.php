@@ -25,7 +25,7 @@ class Cart extends ApiBase
         $cart_where['user_id'] = $user_id;
         $cartM = model('Cart');
         $cart_res = $cartM->cartList1($cart_where);
-
+        
         $this->ajaxReturn(['status' => 1 , 'msg'=>'成功','data'=>$cart_res]);
     }
 
@@ -218,7 +218,7 @@ class Cart extends ApiBase
             $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
         }
 
-        $idStr = Request::instance()->param("id", '', 'htmlspecialchars');
+        $idStr = Request::instance()->param("cart_id", '', 'htmlspecialchars');
         
         $where['id'] = array('in', $idStr);
         $where['user_id'] = $user_id;
@@ -233,6 +233,36 @@ class Cart extends ApiBase
         } else {
             $this->ajaxReturn(['status' => -2 , 'msg'=>'系统异常！','data'=>'']);
         }
+    }
+
+    /**
+     * 选中状态
+     */
+    public function selected(){
+        $user_id = $this->get_user_id();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+        }
+
+        $cart_id = Request::instance()->param("cart_id", '', 'htmlspecialchars');
+
+        $selected = Db::table('cart')->where('id',$cart_id)->value('selected');
+        if(!$selected && $selected != 0){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'购物车不存在！','data'=>'']);
+        }
+
+        if($selected){
+            $res = Db::table('cart')->where('id',$cart_id)->update(['selected'=>0]);
+        }else{
+            $res = Db::table('cart')->where('id',$cart_id)->update(['selected'=>1]);
+        }
+
+        if ($res) {
+            $this->ajaxReturn(['status' => 1 , 'msg'=>'成功！','data'=>'']);
+        } else {
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'系统异常！','data'=>'']);
+        }
+
     }
 
 }

@@ -194,8 +194,10 @@ class Goods extends ApiBase
         $goodsRes['groupon_price'] = $goodsRes['spec']['min_groupon_price'];
         unset($goodsRes['spec']['count_num'],$goodsRes['spec']['min_groupon_price']);
 
+        //组图
         $goodsRes['img'] = Db::table('goods_img')->where('goods_id',$goods_id)->field('picture')->order('main DESC')->select();
         
+        //收藏
         $goodsRes['collection'] = Db::table('collection')->where('user_id',$user_id)->where('goods_id',$goods_id)->find();
         if($goodsRes['collection']){
             $goodsRes['collection'] = 1;
@@ -203,14 +205,30 @@ class Goods extends ApiBase
             $goodsRes['collection'] = 0;
         }
 
+        //评论总数
         $goodsRes['comment_count'] = Db::table('goods_comment')->where('goods_id',$goods_id)->count();
 
+        //限时购
+        $goodsRes['is_limited'] = 0;
+        $attr = explode(',',$goodsRes['goods_attr']);
+        if( in_array(6,$attr) ){
+            if($goodsRes['limited_end'] < time()){
+                $k =  array_search(6,$attr);
+                unset($attr[$k]);
+                $goods_attr = implode(',',$attr);
+                Db::table('goods')->where('goods_id',$goods_id)->update(['goods_attr'=>$goods_attr]);
+                $goodsRes['is_limited'] = 0;
+            }else{
+                $goodsRes['is_limited'] = 1;
+            }
+        }
+
+        //优惠券
         $where = [];
         $where['start_time'] = ['<', time()];
         $where['end_time'] = ['>', time()];
-
-        $goodsRes['coupon'] = Db::table('coupon')->where('goods_id',$goods_id)->whereOr('goods_id',0)->select();
-
+        $where['goods_id'] = ['in',$goods_id.',0'];
+        $goodsRes['coupon'] = Db::table('coupon')->where($where)->select();
         if($goodsRes['coupon']){
             foreach($goodsRes['coupon'] as $key=>$value){
                 $res = Db::table('coupon_get')->where('user_id',$user_id)->where('coupon_id',$value['coupon_id'])->find();
@@ -221,7 +239,8 @@ class Goods extends ApiBase
                 }
             }
         }
-
+        
+        //拼团
         $goodsRes['group'] = [];
         $goodsRes['group_user'] = [];
         $group = Db::table('goods_groupon')->where('goods_id',$goods_id)->where('is_show',1)->where('is_delete',0)->where('status',2)->order('period DESC')->find();
@@ -267,6 +286,11 @@ class Goods extends ApiBase
      */
     public function comment_list(){
 
+        $user_id = $this->get_user_id();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+        }
+
         $goods_id = input('goods_id');
         $page = input('page');
 
@@ -274,7 +298,7 @@ class Goods extends ApiBase
 
         $comment = Db::table('goods_comment')->alias('gc')
                 ->join('member m','m.id=gc.user_id','LEFT')
-                ->field('m.mobile,gc.*')
+                ->field('m.mobile,gc.user_id,gc.id comment_id,gc.content,gc.star_rating,gc.replies,gc.praise,gc.add_time,gc.img,gc.sku_id')
                 ->where('gc.goods_id',$goods_id)
                 ->paginate(10,false,$pageParam);
 
@@ -285,7 +309,7 @@ class Goods extends ApiBase
         }
         
         foreach($comment as $key=>$value ){
-
+            
             $comment[$key]['mobile'] = $value['mobile'] ? substr_cut($value['mobile']) : '';
 
             if($value['img']){
@@ -295,6 +319,8 @@ class Goods extends ApiBase
             }
 
             $comment[$key]['spec'] = $this->get_sku_str($value['sku_id']);
+
+            $comment[$key]['is_praise'] = Db::table('goods_comment_praise')->where('comment_id',$value['comment_id'])->where('user_id',$user_id)->count();
         }
         
         $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$comment]);
@@ -385,11 +411,124 @@ class Goods extends ApiBase
     }
 
     /**
-     *  精选商品
+     *  商品列表
+     */
+    public function goods_list () {
+        $keyword = request()->param('keyword','');
+        $cat_id = request()->param('cat_id',0,'intval');
+        $page = request()->param('page',0,'intval');
+        $goods = new Goods();
+        $list = $goods->getGoodsList($keyword,$cat_id,$page);
+        if (!empty($list)){
+            return json(['code'=>1,'msg'=>'','data'=>$list]);
+        }else{
+            return json(['code'=>-2,'msg'=>'没有数据哦','data'=>$list]);
+        }
+    }
+
+    /**
+     *  指定属性商品
      */
     public function selling_goods ()
     {
         $where['is_show'] = 1;
         $where['is_del'] = 0;
+        $page = request()->param('page',0,'intval');
+        $attr = request()->param('attr',0,'intval');
+        $field = 'goods_id,goods_name,price,stock,number_sales,desc';
+        $list = model('Goods')->where($where)->where("find_in_set($attr,`goods_attr`)")->field($field)->paginate(4,'',['page'=>$page]);
+        if (!empty($list)){
+            foreach ($list as &$v){
+                $v['picture'] = Db::table('goods_img')->where(['goods_id'=>$v['goods_id'],'main'=>1])->value('picture');
+            }
+        }
+        return json(['code'=>1,'msg'=>'','data'=>$list]);
+    }
+
+    /**
+     * 限时购
+     */
+    public function limited_list(){
+
+        $user_id = $this->get_user_id();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+        }
+
+        //限时购专区图片
+        $limited_img = Db::table('category')->where('cat_name','like',"%限时购%")->value('img');
+
+        $page = input('page');
+        
+        $where['is_show'] =  1;
+        $where['main'] =  1;
+        $where['is_del'] =  0;
+
+        $pageParam['query']['is_show'] = 1;
+        $pageParam['query']['is_del'] = 0;
+
+
+        $list = Db::table('goods')->alias('g')
+                ->join('goods_img gi','gi.goods_id=g.goods_id','LEFT')
+                ->where($where)
+                ->where("FIND_IN_SET(6,goods_attr)")
+                ->field('g.goods_id,goods_name,goods_attr,gi.picture img,desc,limited_start,limited_end,price,original_price,stock,stock1')
+                ->paginate(5,false,$pageParam);
+        $list = $list->all();
+        $arr = [];
+        if($list){
+            foreach($list as $key=>$value){
+                if($value['limited_end'] < time()){
+                    $attr = explode(',',$value['goods_attr']);
+                    $k =  array_search(6,$attr);
+                    unset($attr[$k]);
+                    $goods_attr = implode(',',$attr);
+                    Db::table('goods')->where('goods_id',$value['goods_id'])->update(['goods_attr'=>$goods_attr]);
+                    continue;
+                }
+                $value['purchased'] = $value['stock1'] - $value['stock'];
+                $value['surplus'] = $value['stock1'] - $value['purchased'];      //剩余量
+                if($value['surplus']){
+                    $value['surplus_percentage'] = $value['surplus'] / $value['stock1'];      //剩余百分比
+                }else{
+                    $value['surplus_percentage'] = 0;      //剩余百分比
+                }
+                unset($value['goods_attr'],$value['stock'],$value['stock1']);
+
+                $arr[] = $value;
+            }
+        }
+
+        $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>['list'=>$arr,'limited_img'=>$limited_img]]);
+    }
+
+    function ts(){
+        phpinfo();
+    }
+
+    public function praise(){
+
+        $user_id = $this->get_user_id();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+        }
+
+        $comment_id = input('comment_id');
+
+        $where['comment_id'] = $comment_id;
+        $where['user_id'] = $user_id;
+
+        $res = Db::table('goods_comment_praise')->where($where)->find();
+
+        if($res){
+            Db::table('goods_comment')->where('id',$comment_id)->setDec('praise',1);
+            Db::table('goods_comment_praise')->where($where)->delete();
+            
+            $this->ajaxReturn(['status' => 1 , 'msg'=>'取消点赞成功！','data'=>'']);
+        }else{
+            Db::table('goods_comment')->where('id',$comment_id)->setInc('praise',1);
+            Db::table('goods_comment_praise')->insert($where);
+            $this->ajaxReturn(['status' => 1 , 'msg'=>'点赞成功！','data'=>'']);
+        }
     }
 }
