@@ -19,12 +19,10 @@ class User extends ApiBase
         $code = input('code');
         //通过code获得openid
         if (!isset($code)){
-          
             //触发微信返回code码
             //$baseUrl = urlencode('http://'.$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING']);
             $baseUrl = urlencode($this->get_url());
             $url = $this->__CreateOauthUrlForCode($baseUrl); // 获取 code地址 // 跳转到微信授权页面 需要用户确认登录的页面
-            
             // Header("Location: $url"); // 跳转到微信授权页面 需要用户确认登录的页面
             // exit();
             $this->ajaxReturn(['status' => 1 , 'msg'=>'微信授权登录地址','data' => $url]);
@@ -254,7 +252,7 @@ class User extends ApiBase
         $type = input('type',1);
         if($type == $type){
            $user_info = $this->GetOpenid();//微信授权用户信息
-           $wxres = Db::name('user')->where(['openid' => $user_info])->find();
+           $wxres = Db::name('user')->where(['openid' => $user_info['openid']])->find();
            if($wxres){
                if($wxres['is_checked'] == 0){
                     $data = [
@@ -266,7 +264,7 @@ class User extends ApiBase
                    $data = Db::table("member")->where('id',$wxres['uid'])
                             ->field('id,mobile')
                             ->find();
-                   $data['token']    = $this->create_token($data['id']);   
+                   $data['token']   = $this->create_token($data['id']);   
                    $data = [
                        'is_checked' => 1,
                    ];
