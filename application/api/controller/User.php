@@ -32,8 +32,8 @@ class User extends ApiBase
             $data  = $this->getOpenidFromMp($code);//获取网页授权access_token和用户openid
             // var_dump($data);
             $data2 = $this->GetUserInfo($data['access_token'],$data['openid']);//获取微信用户信息
-            var_dump($data2);
-            die;
+            // var_dump($data2);
+            // die;
             $data['nickname']    = empty($data2['nickname']) ? '微信用户' : trim($data2['nickname']);
             $data['sex']         = $data2['sex'];    
             
@@ -247,7 +247,6 @@ class User extends ApiBase
         $this->ajaxReturn(['status' => 1 , 'msg'=>'注册成功！','data'=>$data]);
     }
 
-    array(10) { ["access_token"]=> string(110) "22_CCScMRW_XlpGQeF8ApKJJuz8fZmbIAUKCoV0ygxJ9D0LRoYhhiLHrPVzHur9wdL6C7FrAgpRQTrtwsLmoaJPUsZ6QVQRMnTKY6ySYECj02A" ["expires_in"]=> int(7200) ["refresh_token"]=> string(110) "22_GVA1HzygmXNixTbiAtATtndn4f0-szUjgiDLa2BZleA8EW0-U_lJ5KGYOpHCndCE-2Uktoflx-DgjroovRiS6IDVme4sCgQb7zNQQwvPHNE" ["openid"]=> string(28) "ofPl91f1jDbvZsJdOhxDwueJRo1k" ["scope"]=> string(15) "snsapi_userinfo" ["unionid"]=> string(28) "oKrbL1bBO02MTYzSiZaww1f0-MiI" ["nickname"]=> string(1) "D" ["sex"]=> int(1) ["head_pic"]=> string(130) "http://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTIUMc4rJdPaLNeBmrzhoqsbIibhuOAhmAlTPhU89CoEibIWgxGITvxL4SrOOEn9oxO7BprYQoSwc5icw/132" ["oauth"]=> string(6) "weixin" }
 
     /*
      *  登录接口
