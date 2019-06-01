@@ -250,8 +250,11 @@ class User extends ApiBase
      */
     public function login(){
         $type = input('type',1);
-        if($type == $type){
+        if($type == 1){
            $user_info = $this->GetOpenid();//微信授权用户信息
+
+           var_dump($user_info);
+           die;
            $wxres = Db::name('user')->where(['openid' => $user_info['openid']])->find();
            if($wxres){
                if($wxres['is_checked'] == 0){
