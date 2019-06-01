@@ -6,6 +6,7 @@ use think\Db;
 use think\Request;
 use think\Session;
 use think\View;
+use app\common\util\Redis;
 
 /*
  * 公共控制器
@@ -235,11 +236,8 @@ class Common extends Controller
     private  static $redis = null;
     /*获取redis对象*/
     protected function getRedis(){
-        if(!self::$redis instanceof \Redis){
-            self::$redis = new \Redis();
-            self::$redis->connect(Config('cache.redis.host'),Config('cache.redis.port'));
-            self::$redis->auth(Config('cache.redis.auth'));
-            // self::$redis->select(0);
+        if(!self::$redis instanceof Redis){
+            self::$redis = new Redis(Config('cache.redis'));
         }
         return self::$redis;
     }
