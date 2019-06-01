@@ -43,7 +43,7 @@ class User extends ApiBase
             	$data['unionid'] = $data2['unionid'];
             }
             // session('data',$data);
-            return $data;
+            // return $data;
         }
     }
 
@@ -64,7 +64,7 @@ class User extends ApiBase
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,FALSE);
         curl_setopt($ch, CURLOPT_HEADER, FALSE);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);         
-        $res = curl_exec($ch);//运行curl，结果以jason形式返回            
+        $res  = curl_exec($ch);//运行curl，结果以jason形式返回            
         $data = json_decode($res,true);            
         curl_close($ch);
         //获取用户是否关注了微信公众号， 再来判断是否提示用户 关注
