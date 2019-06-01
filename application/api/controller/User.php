@@ -32,11 +32,12 @@ class User extends ApiBase
             $data  = $this->getOpenidFromMp($code);//获取网页授权access_token和用户openid
             // var_dump($data);
             $data2 = $this->GetUserInfo($data['access_token'],$data['openid']);//获取微信用户信息
-            var_dump($data2);
-            die;
+            // var_dump($data2);
+            // die;
+            $data['city']        = $data2['city'];
             $data['nickname']    = empty($data2['nickname']) ? '微信用户' : trim($data2['nickname']);
-            $data['sex']         = $data2['sex'];    
-            
+            $data['sex']         = $data2['sex'];   
+            $data['province']    = $data2['province']; 
             $data['head_pic']    = $data2['headimgurl']; 
             // $data['subscribe']   = $data2['subscribe']; 
             // $data['oauth_child'] = 'mp';
@@ -256,8 +257,8 @@ class User extends ApiBase
         if($type == 1){
            $user_info = $this->GetOpenid();//微信授权用户信息
 
-           var_dump($user_info);
-           die;
+        //    var_dump($user_info);
+        //    die;
            $wxres = Db::name('user')->where(['openid' => $user_info['openid']])->find();
            if($wxres){
                if($wxres['is_checked'] == 0){
