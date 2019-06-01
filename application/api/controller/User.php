@@ -134,7 +134,7 @@ class User extends ApiBase
      */
     private function __CreateOauthUrlForCode($redirectUrl)
     {
-        $urlObj["appid"] = $this->weixin_config['appid'];
+        $urlObj["appid"] = $this->weixin_config['app_id'];
         $urlObj["redirect_uri"] = "$redirectUrl";
         $urlObj["response_type"] = "code";
        //$urlObj["scope"] = "snsapi_base";
@@ -181,8 +181,8 @@ class User extends ApiBase
      */
     private function __CreateOauthUrlForOpenid($code)
     {
-        $urlObj["appid"]      = $this->weixin_config['appid'];
-        $urlObj["secret"]     = $this->weixin_config['appsecret'];
+        $urlObj["appid"]      = $this->weixin_config['app_id'];
+        $urlObj["secret"]     = $this->weixin_config['app_secret'];
         $urlObj["code"]       = $code;
         $urlObj["grant_type"] = "authorization_code";
         $bizString = $this->ToUrlParams($urlObj);
