@@ -5,6 +5,7 @@
 namespace app\api\controller;
 use app\common\model\Users;
 use app\common\logic\UsersLogic;
+use think\Config;
 use think\Db;
 
 class User extends ApiBase
