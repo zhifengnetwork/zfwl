@@ -35,8 +35,8 @@ class User extends ApiBase
             $data['nickname']    = empty($data2['nickname']) ? '微信用户' : trim($data2['nickname']);
             $data['sex']         = $data2['sex'];
             $data['head_pic']    = $data2['headimgurl']; 
-            $data['subscribe']   = $data2['subscribe'];      
-            $data['oauth_child'] = 'mp';
+            // $data['subscribe']   = $data2['subscribe'];      
+            // $data['oauth_child'] = 'mp';
             // session('openid',$data['openid']);
             $data['oauth']       = 'weixin';
             if(isset($data2['unionid'])){
