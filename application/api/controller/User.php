@@ -293,7 +293,7 @@ class User extends ApiBase
                    'id'         => $wxid,   
                    'is_checked' => 0,
                ]; 
-               if($res){
+               if($wxid){
                     $this->ajaxReturn(['status' => 1 , 'msg'=>'授权成功！','data' => $data]);
                }
                $this->ajaxReturn(['status' => -2 , 'msg'=>'授权失败！','data' => $data]);                  
