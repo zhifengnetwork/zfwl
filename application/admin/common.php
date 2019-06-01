@@ -232,8 +232,13 @@ function getTree($array, $pid =0, $level = 0){
     return $list;
 }
 
-function setSukMore($goods_id, $data_spec)
+function setSukMore($goods_id=18, $data_spec)
 {   
+    $is_limited = Db::table('goods')->where("FIND_IN_SET(6,goods_attr)")->where('goods_id',$goods_id)->value('goods_id');
+    if($is_limited){
+        $redis = new app\common\util\Redis(config('cache.redis'));
+    }
+
     $all_spec = Db::name('goods_spec')->column('spec_name', 'spec_id');
     foreach ($data_spec as $key => $val) {
         $sku_data = array();
@@ -272,9 +277,15 @@ function setSukMore($goods_id, $data_spec)
         $sku_data['goods_id'] = $goods_id;
         $sku_data['sales'] = 0;
         $sku_data['virtual_sales'] = rand(223, 576);
-        $res2 = Db::table('goods_sku')->insert($sku_data);
-        if (!$res2) {
+        $sku_id = Db::table('goods_sku')->insertGetId($sku_data);
+        if (!$sku_id) {
             return 0;
+        }else{
+            if($is_limited){
+                for($i=0;$i<$sku_data['inventory'];$i++){
+                    $redis->rpush("GOODS_LIMITED_{$sku_id}",1);
+                }
+            }
         }
     }
     return 1;
