@@ -58,10 +58,10 @@ class Groupon extends Common
             $groupon_id =  Db::name('goods_groupon')->insertGetId($data);
             if($groupon_id){
                 //redis
-                $redis = $this->getRedis();
-                for($i=1;$i<=$data['target_number'];$i++){
-                    $redis->rpush("GOODS_GROUP_{$groupon_id}",1);
-                }
+                // $redis = $this->getRedis();
+                // for($i=1;$i<=$data['target_number'];$i++){
+                //     $redis->rpush("GOODS_GROUP_{$groupon_id}",1);
+                // }
 
                 //添加操作日志
                 slog($groupon_id);
