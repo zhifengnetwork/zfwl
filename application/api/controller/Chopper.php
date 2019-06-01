@@ -1,10 +1,23 @@
 <?php
 namespace app\api\controller;
 use app\common\model\GoodsChopper;
+use Overtrue\Wechat\Js;
 use think\Db;
+use think\Config;
 
 class Chopper extends ApiBase
 {
+
+    // public $wxconfig;
+
+    // public function __construct()
+    // {
+    //     // parent::__construct();
+    //     $appId  = Config::get('wx_config.appid');
+    //     $secret = Config::get('wx_config.appsecret');
+    //     $js             = new Js($appId, $secret);
+    //     $this->wxconfig = $js->config(array('scanQRCode', 'onMenuShareTimeline', 'onMenuShareAppMessage'), false, false);
+    // }
     /**
     * 砍一刀商品列表 //判断该用户是否砍过
     */
@@ -104,9 +117,11 @@ class Chopper extends ApiBase
         //砍价用户
         $list = Db::name('user_chopper')->where(['user_id|invite_id' => $user_id,'chopper_id' => $chopper_id])->select();
         // 返回数据
+        $signPackage = (wxJSSDK())->getSignPackage();//微信sdk
         $data = [
-            'info' => $info,
-            'list' => $list,
+            'info'        => $info,
+            'list'        => $list,
+            'signPackage' => $signPackage,
         ];
         $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$data]);
     }
@@ -201,7 +216,7 @@ class Chopper extends ApiBase
           }
           //砍价用户从表数据统计
           if($random){
-                $update_random = [ 
+                $update_random = [
                     'chopper_state' => $random['end_num']?0:1,
                     'already_amount'=> Db::raw('already_amount+'.$amount.''),
                     'already_num'   => Db::raw('already_num+1'),
@@ -225,6 +240,12 @@ class Chopper extends ApiBase
             $this->ajaxReturn(['status' => -2 , 'msg'=>'砍价失败，请重试！','data'=>'']);
         }
 
+    }
+
+
+    public function fenxiang(){
+        $signPackage = (wxJSSDK())->getSignPackage();
+        $this->assign('signPackage',$signPackage);
     }
 
     

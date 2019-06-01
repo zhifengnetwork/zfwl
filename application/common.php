@@ -120,6 +120,24 @@ function xmlToArray($xml){
     $values = json_decode(json_encode(simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
     return $values;
 }
+//判断是否是微信    
+function is_weixin() {
+    if (strpos($_SERVER['HTTP_USER_AGENT'], 'MicroMessenger') !== false) {
+        return true;
+    } return false;
+}
+
+/***
+ * 调用微信sdk
+ */
+function wxJSSDK(){
+    $wx_config     = config('wx_config');
+    $appId         = $wx_config['appid'];
+    $appSecret     = $wx_config['appsecret'];
+    vendor('wxsdk.wxaction');
+    $jssdk = new JSSDK($appId, $appSecret);
+    return $jssdk;
+}
 
 /**
  * 对象转数组操作
