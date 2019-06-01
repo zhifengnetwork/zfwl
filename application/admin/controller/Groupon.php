@@ -57,6 +57,12 @@ class Groupon extends Common
             //添加信息
             $groupon_id =  Db::name('goods_groupon')->insertGetId($data);
             if($groupon_id){
+                //redis
+                $redis = $this->getRedis();
+                for($i=1;$i<=$data['target_number'];$i++){
+                    $redis->rpush("GOODS_GROUP_{$groupon_id}",1);
+                }
+
                 //添加操作日志
                 slog($groupon_id);
                 $this->success('添加团购商品成功',url('Groupon/index'));
@@ -73,12 +79,19 @@ class Groupon extends Common
     //修改团购
     function edit(){
         $groupon_id = input('groupon_id');
+        $info = Db::name('goods_groupon')->where('groupon_id',$groupon_id)->find();
         if(request()->isPost()){
             $data=input('post.');
             $data['start_time'] = strtotime($data['start_time']);
             $data['end_time'] = strtotime($data['end_time']);
             $res = Db::name('goods_groupon')->where('groupon_id',$data['groupon_id'])->update($data);
-            if($res){
+            if($res !== false){
+                /*$redis = $this->getRedis();
+                $num = $data['target_number'] - $redis->llen("GOODS_GROUP_{$data['groupon_id']}");
+                for($i=1;$i<=$num;$i++){
+                    $redis->rpush("GOODS_GROUP_{$groupon_id}",1);
+                }*/
+
                 //添加操作日志
                 slog($groupon_id);
                 $this->success('修改团购商品成功',url('Groupon/index'));
@@ -87,7 +100,7 @@ class Groupon extends Common
             }
         }
 
-        $info = Db::name('goods_groupon')->where('groupon_id',$groupon_id)->find();
+        
 
         return $this->fetch("",[
             'info'=>$info,
