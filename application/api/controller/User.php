@@ -30,7 +30,6 @@ class User extends ApiBase
             //上面获取到code后这里跳转回来
             $code  = input('code');
             $data  = $this->getOpenidFromMp($code);//获取网页授权access_token和用户openid
-            var_dump($data);
             $data2 = $this->GetUserInfo($data['access_token'],$data['openid']);//获取微信用户信息
             $data['nickname']    = empty($data2['nickname']) ? '微信用户' : trim($data2['nickname']);
             $data['sex']         = $data2['sex'];
@@ -68,13 +67,13 @@ class User extends ApiBase
         $data = json_decode($res,true);            
         curl_close($ch);
         //获取用户是否关注了微信公众号， 再来判断是否提示用户 关注
-        //if(!isset($data['unionid'])){
-            $wechat = new WechatUtil($this->weixin_config);
-            $fan = $wechat->getFanInfo($openid);//获取基础支持的access_token
-            if ($fan !== false) {
-                $data['subscribe'] = $fan['subscribe'];
-            }
-        //}
+        // //if(!isset($data['unionid'])){
+        //     $wechat = new WechatUtil($this->weixin_config);
+        //     $fan = $wechat->getFanInfo($openid);//获取基础支持的access_token
+        //     if ($fan !== false) {
+        //         $data['subscribe'] = $fan['subscribe'];
+        //     }
+        // //}
         return $data;
     }
 
