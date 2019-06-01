@@ -9,7 +9,7 @@ use think\Controller;
 use app\common\model\Config;
 use think\Request;
 use think\Session;
-
+use app\common\util\Redis;
 
 class ApiBase extends Controller
 {
@@ -51,11 +51,8 @@ class ApiBase extends Controller
     private  static $redis = null;
     /*获取redis对象*/
     protected function getRedis(){
-        if(!self::$redis instanceof \Redis){
-            self::$redis = new \Redis();
-            self::$redis->connect(Config('cache.redis.host'),Config('cache.redis.port'));
-            self::$redis->auth(Config('cache.redis.auth'));
-            // self::$redis->select(0);
+        if(!self::$redis instanceof Redis){
+            self::$redis = new Redis(Config('cache.redis'));
         }
         return self::$redis;
     }

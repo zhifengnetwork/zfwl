@@ -194,6 +194,13 @@ class Goods extends Common
             $goods_id = Db::table('goods')->strict(false)->insertGetId($data);
             
             if ( $goods_id ) {
+                //限时购redis
+                if(isset($data['stock1'])){
+                    $redis = $this->getRedis();
+                    for($i=1;$i<=$data['stock1'];$i++){
+                        $redis->rpush("GOODS_LIMITED_{$goods_id}",1);
+                    }
+                }
 
                 //添加操作日志
                 slog($goods_id);
@@ -354,7 +361,13 @@ class Goods extends Common
             if( isset( $data['goods_attr'] ) ){
                 if( in_array( 6 , $data['goods_attr']  ) ){
                     if( !in_array( 6 , $info['goods_attr']  ) ){
+                        //限时购redis
                         $data['stock1'] = array_sum($data['goods_td']['num']);
+                        $redis = $this->getRedis();
+                        $redis->del("GOODS_LIMITED_{$goods_id}");
+                        for($i=1;$i<=$data['stock1'];$i++){
+                            $redis->rpush("GOODS_LIMITED_{$goods_id}",1);
+                        }
                     }
                     $data['limited_start'] = strtotime( $data['limited_start'] );
                     $data['limited_end'] = strtotime( $data['limited_end'] );
