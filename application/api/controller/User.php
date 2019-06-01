@@ -22,8 +22,8 @@ class User extends ApiBase
             //触发微信返回code码
             //$baseUrl = urlencode('http://'.$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING']);
             //
-            $baseUrl = urlencode('http://192.168.1.10:8080');
-            $url = $this->__CreateOauthUrlForCode($baseUrl); // 获取 code地址 // 跳转到微信授权页面 需要用户确认登录的页面
+            $baseUrl = urlencode('http://zfshop.zhifengwangluo.com');
+            $url     = $this->__CreateOauthUrlForCode($baseUrl); // 获取 code地址 // 跳转到微信授权页面 需要用户确认登录的页面
             // Header("Location: $url"); // 跳转到微信授权页面 需要用户确认登录的页面
             // exit();
             $this->ajaxReturn(['status' => 1 , 'msg'=>'微信授权登录地址','data' => $url]);
