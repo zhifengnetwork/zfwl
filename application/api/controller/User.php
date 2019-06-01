@@ -19,13 +19,15 @@ class User extends ApiBase
         $code = input('code');
         //通过code获得openid
         if (!isset($code)){
+          
             //触发微信返回code码
             //$baseUrl = urlencode('http://'.$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING']);
             $baseUrl = urlencode($this->get_url());
             $url = $this->__CreateOauthUrlForCode($baseUrl); // 获取 code地址 // 跳转到微信授权页面 需要用户确认登录的页面
+            
             // Header("Location: $url"); // 跳转到微信授权页面 需要用户确认登录的页面
             // exit();
-            $this->ajaxReturn(['status' => 1 , 'msg'=>'微信授权登录地址','data'=>$url]);
+            $this->ajaxReturn(['status' => 1 , 'msg'=>'微信授权登录地址','data' => $url]);
         } else {
             //上面获取到code后这里跳转回来
             $code  = input('code');
