@@ -28,8 +28,9 @@ class User extends ApiBase
             // $this->ajaxReturn(['status' => 1 , 'msg'=>'微信授权登录地址','data'=>$url]);
         } else {
             //上面获取到code后这里跳转回来
-            $code  = $_GET['code'];
+            $code  = input('code');
             $data  = $this->getOpenidFromMp($code);//获取网页授权access_token和用户openid
+            var_dump($data);
             $data2 = $this->GetUserInfo($data['access_token'],$data['openid']);//获取微信用户信息
             $data['nickname']    = empty($data2['nickname']) ? '微信用户' : trim($data2['nickname']);
             $data['sex']         = $data2['sex'];
