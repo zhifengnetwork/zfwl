@@ -23,9 +23,9 @@ class User extends ApiBase
             //$baseUrl = urlencode('http://'.$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING']);
             $baseUrl = urlencode($this->get_url());
             $url = $this->__CreateOauthUrlForCode($baseUrl); // 获取 code地址 // 跳转到微信授权页面 需要用户确认登录的页面
-            Header("Location: $url"); // 跳转到微信授权页面 需要用户确认登录的页面
-            exit();
-            // $this->ajaxReturn(['status' => 1 , 'msg'=>'微信授权登录地址','data'=>$url]);
+            // Header("Location: $url"); // 跳转到微信授权页面 需要用户确认登录的页面
+            // exit();
+            $this->ajaxReturn(['status' => 1 , 'msg'=>'微信授权登录地址','data'=>$url]);
         } else {
             //上面获取到code后这里跳转回来
             $code  = input('code');
@@ -33,9 +33,10 @@ class User extends ApiBase
             // var_dump($data);
             $data2 = $this->GetUserInfo($data['access_token'],$data['openid']);//获取微信用户信息
             $data['nickname']    = empty($data2['nickname']) ? '微信用户' : trim($data2['nickname']);
-            $data['sex']         = $data2['sex'];
+            $data['sex']         = $data2['sex'];    
+            
             $data['head_pic']    = $data2['headimgurl']; 
-            // $data['subscribe']   = $data2['subscribe'];      
+            // $data['subscribe']   = $data2['subscribe']; 
             // $data['oauth_child'] = 'mp';
             // session('openid',$data['openid']);
             $data['oauth']       = 'weixin';
@@ -142,8 +143,6 @@ class User extends ApiBase
         $urlObj["scope"] = "snsapi_userinfo";
         $urlObj["state"] = "STATE"."#wechat_redirect";
         $bizString = $this->ToUrlParams($urlObj);
-        var_dump("https://open.weixin.qq.com/connect/oauth2/authorize?".$bizString);
-        die;
         return "https://open.weixin.qq.com/connect/oauth2/authorize?".$bizString;
     }
 
@@ -250,42 +249,85 @@ class User extends ApiBase
      *  登录接口
      */
     public function login(){
-        if(is_weixin()){
-            $this->GetOpenid();
+        $type = input('type',1);
+        if($type == $type){
+           $user_info = $this->GetOpenid();//微信授权用户信息
+           $wxres = Db::name('user')->where(['openid' => $user_info])->find();
+           if($wxres){
+               if($wxres['is_checked'] == 0){
+                    $data = [
+                        'is_checked' => 0,
+                    ];
+                    $this->ajaxReturn(['status' => 1 , 'msg'=>'授权成功！','data'=>$data]);   
+               }else{
+                   //重写
+                   $data = Db::table("member")->where('id',$wxres['uid'])
+                            ->field('id,mobile')
+                            ->find();
+                   $data['token']    = $this->create_token($data['id']);   
+                   $data = [
+                       'is_checked' => 1,
+                   ];
+                   $this->ajaxReturn(['status' => 1 , 'msg'=>'授权成功！','data'=>$data]);     
+               }
+                                         
+           }else{
+                $insert = [
+                    'openid'         => $user_info['openid'],
+                    'wx_nickname'    => $user_info['nickname'],
+                    'sex'            => $user_info['sex'],
+                    'wx_headimgurl'  => $user_info['head_pic'],
+                    'province'       => $user_info['province'],
+                    'city'           => $user_info['city'],
+                    'create_time'    => time(),
+                ];
+               $wxid  = Db::name('user')->insertGetId($insert);
+               $data = [
+                   'id'         => $wxid,   
+                   'is_checked' => 0,
+               ]; 
+               if($res){
+                    $this->ajaxReturn(['status' => 1 , 'msg'=>'授权成功！','data' => $data]);
+               }
+               $this->ajaxReturn(['status' => -2 , 'msg'=>'授权失败！','data' => $data]);                  
+           }
+
+           
+
         }else{
-
-        }
-        $mobile   = input('mobile');
-        $password = input('password');
-        // $code     = input('code');
+            $mobile   = input('mobile');
+            $password = input('password');
+            // $code     = input('code');
+            
+            // $res = action('PhoneAuth/phoneAuth',[$mobile,$code]);
+            // if( $res === '-1' ){
+            //     $this->ajaxReturn(['status' => -2 , 'msg'=>'验证码已过期！','data'=>'']);
+            // }else if( !$res ){
+            //     $this->ajaxReturn(['status' => -2 , 'msg'=>'验证码错误！','data'=>'']);
+            // }
+    
+            $data = Db::table("member")->where('mobile',$mobile)
+                ->field('id,password,mobile,salt')
+                ->find();
+    
+            if(!$data){
+                $this->ajaxReturn(['status' => -2 , 'msg'=>'手机不存在或错误！']);
+            }
+           
+    
+            $password = md5( $data['salt'] . $password);
+            
+            if ($password != $data['password']) {
+                $this->ajaxReturn(['status' => -2 , 'msg'=>'登录密码错误！']);
+            }
+    
+            unset($data['password'],$data['salt']);
+            //重写
+            $data['token']    = $this->create_token($data['id']);
         
-        // $res = action('PhoneAuth/phoneAuth',[$mobile,$code]);
-        // if( $res === '-1' ){
-        //     $this->ajaxReturn(['status' => -2 , 'msg'=>'验证码已过期！','data'=>'']);
-        // }else if( !$res ){
-        //     $this->ajaxReturn(['status' => -2 , 'msg'=>'验证码错误！','data'=>'']);
-        // }
-
-        $data = Db::table("member")->where('mobile',$mobile)
-            ->field('id,password,mobile,salt')
-            ->find();
-
-        if(!$data){
-            $this->ajaxReturn(['status' => -2 , 'msg'=>'手机不存在或错误！']);
+            $this->ajaxReturn(['status' => 1 , 'msg'=>'登录成功！','data'=>$data]);
         }
        
-
-        $password = md5( $data['salt'] . $password);
-        
-        if ($password != $data['password']) {
-            $this->ajaxReturn(['status' => -2 , 'msg'=>'登录密码错误！']);
-        }
-
-        unset($data['password'],$data['salt']);
-        //重写
-        $data['token']    = $this->create_token($data['id']);
-    
-        $this->ajaxReturn(['status' => 1 , 'msg'=>'登录成功！','data'=>$data]);
     }
 
 
