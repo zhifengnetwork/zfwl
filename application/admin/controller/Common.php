@@ -232,4 +232,16 @@ class Common extends Controller
         return $name.$saveName;
     }
 
+    private  static $redis = null;
+    /*获取redis对象*/
+    protected function getRedis(){
+        if(!self::$redis instanceof \Redis){
+            self::$redis = new \Redis();
+            self::$redis->connect(Config('cache.redis.host'),Config('cache.redis.port'));
+            self::$redis->auth(Config('cache.redis.auth'));
+            // self::$redis->select(0);
+        }
+        return self::$redis;
+    }
+
 }
