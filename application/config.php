@@ -364,7 +364,7 @@ return [
 
     'pay_weixin' => [
         'use_sandbox'       => true,// 是否使用 微信支付仿真测试系统
-        'app_secret'        => '0fc24438be3764387feaa7503b44c036',
+        'app_secret'        => 'aeb753813c5e6d538905daeda4bc4932',
         'app_id'            => 'wxbfd97e7c3331e60b',  // 公众账号ID
         'mch_id'            => 'xxxxx',// 商户id
         'md5_key'           => 'xxxxxxx',// md5 秘钥
