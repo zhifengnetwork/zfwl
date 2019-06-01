@@ -362,12 +362,21 @@ class Goods extends Common
                 if( in_array( 6 , $data['goods_attr']  ) ){
                     if( !in_array( 6 , $info['goods_attr']  ) ){
                         //限时购redis
-                        $data['stock1'] = array_sum($data['goods_td']['num']);
-                        $redis = $this->getRedis();
-                        $redis->del("GOODS_LIMITED_{$goods_id}");
-                        for($i=1;$i<=$data['stock1'];$i++){
-                            $redis->rpush("GOODS_LIMITED_{$goods_id}",1);
+                        foreach($data_spec as $key=>$value){
+                            foreach($value as $k=>$v){
+                                if($k == 'sku_id'){
+                                    $sku_id = $value['sku_id'];
+                                }
+                                if(isset($v['key']) && $v['key'] == '库存' ){
+                                    $redis = $this->getRedis();
+                                    $redis->del("GOODS_LIMITED_{$sku_id}");
+                                    for($i=0;$i<$v['value'];$i++){
+                                        $redis->rpush("GOODS_LIMITED_{$sku_id}",1);
+                                    }
+                                }
+                            }
                         }
+                        $data['stock1'] = array_sum($data['goods_td']['num']);
                     }
                     $data['limited_start'] = strtotime( $data['limited_start'] );
                     $data['limited_end'] = strtotime( $data['limited_end'] );
