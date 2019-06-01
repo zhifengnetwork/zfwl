@@ -43,7 +43,7 @@ class User extends ApiBase
             	$data['unionid'] = $data2['unionid'];
             }
             // session('data',$data);
-            // return $data;
+            return $data;
         }
     }
 
@@ -135,13 +135,15 @@ class User extends ApiBase
      */
     private function __CreateOauthUrlForCode($redirectUrl)
     {
-        $urlObj["appid"] = $this->weixin_config['app_id'];
-        $urlObj["redirect_uri"] = "$redirectUrl";
+        $urlObj["appid"]         = $this->weixin_config['app_id'];
+        $urlObj["redirect_uri"]  = "$redirectUrl";
         $urlObj["response_type"] = "code";
         //$urlObj["scope"] = "snsapi_base";
         $urlObj["scope"] = "snsapi_userinfo";
         $urlObj["state"] = "STATE"."#wechat_redirect";
         $bizString = $this->ToUrlParams($urlObj);
+        var_dump("https://open.weixin.qq.com/connect/oauth2/authorize?".$bizString);
+        die;
         return "https://open.weixin.qq.com/connect/oauth2/authorize?".$bizString;
     }
 
