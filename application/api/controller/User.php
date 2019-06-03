@@ -16,9 +16,6 @@ class User extends ApiBase
     // 网页授权登录获取 OpendId
     public function GetOpenid()
     {
-        $code = input('code');
-        //通过code获得openid
-        if (!isset($code)){
             //触发微信返回code码
             //$baseUrl = urlencode('http://'.$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING']);
             //
@@ -27,14 +24,19 @@ class User extends ApiBase
             // Header("Location: $url"); // 跳转到微信授权页面 需要用户确认登录的页面
             // exit();
             $this->ajaxReturn(['status' => 1 , 'msg'=>'微信授权登录地址','data' => $url]);
-        } else {
+    }
+   
+    /**
+     * 获取code 进行用户信息获取
+     */
+    public function get_code(){
             //上面获取到code后这里跳转回来
             $code  = input('code');
+            if(isset($code)){
+                $this->ajaxReturn(['status' => -2 , 'msg'=>'code不能为空！','data'=>'']);   
+            }
             $data  = $this->getOpenidFromMp($code);//获取网页授权access_token和用户openid
-            // var_dump($data);
             $data2 = $this->GetUserInfo($data['access_token'],$data['openid']);//获取微信用户信息
-            // var_dump($data2);
-            // die;
             $data['city']        = $data2['city'];
             $data['nickname']    = empty($data2['nickname']) ? '微信用户' : trim($data2['nickname']);
             $data['sex']         = $data2['sex'];   
@@ -45,10 +47,114 @@ class User extends ApiBase
             // session('openid',$data['openid']);
             $data['oauth']       = 'weixin';
             if(isset($data2['unionid'])){
-            	$data['unionid'] = $data2['unionid'];
+                $data['unionid'] = $data2['unionid'];
             }
-            // session('data',$data);
-            return $data;
+            $this->wx_user($user_info);
+
+    }
+    /***
+     * 绑定手机号
+     */
+    public function binding_mob(){
+        $id = input('id/d',0);
+        $mobile = input('mobile','');
+        
+        if(!checkMobile($mobile)){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'手机号有问题！','data'=>'']);   
+        }
+
+        if(!$id){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'参数错误！','data'=>'']);   
+        }
+
+        $wxuser = Db::name('user')->where(['id' => $id])->find();
+         
+        if(!$wxuser){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'用户不存在请重新授权！','data'=>'']);    
+        }
+
+        $member = Db::name('member')->where(['openid' => $wxuser['openid']])->find();
+        // 启动事务
+        Db::startTrans();
+        if($member){
+        
+            $res  = Db::name('member')->where(['openid' => $wxuser['openid']])->update(['mobile' => $mobile]);
+            if($res == false){
+                $this->ajaxReturn(['status' => -2 , 'msg'=>'用户不存在请重新授权！','data'=>'']);  
+                Db::rollback();
+            }
+            $res2 = Db::name('user')->where(['openid' => $wxuser['openid']])->update(['uid' => $member['id'],'is_checked' => 1]);
+            if( $res2 == false){
+                $this->ajaxReturn(['status' => -2 , 'msg'=>'用户不存在请重新授权！','data'=>'']);  
+                Db::rollback(); 
+            }
+            $data['token']   = $this->create_token($member['id']);   
+        }else{
+            $insert = [
+                'mobile' => $mobile,
+                'openid' => $wxuser['openid'],
+                'weixin' => $wxuser['wx_nickname'],
+                'createtime' => time(),
+            ];
+           $memberid = Db::name('member')->insertGetId($insert);   
+           if(!$memberid){
+               Db::rollback(); 
+               $this->ajaxReturn(['status' => -2 , 'msg'=>'输入的手机号有误，请重新输入！','data'=>'']);  
+           }
+           $res1 = Db::name('user')->where(['openid' => $wxuser['openid']])->update(['uid' => $memberid,'is_checked' => 1]);
+
+           if($res1 == false){
+              Db::rollback(); 
+              $this->ajaxReturn(['status' => -2 , 'msg'=>'输入的手机号有误，请重新输入！','data'=>'']);  
+           }
+           $data['token']   = $this->create_token($memberid);   
+
+        }
+        // 提交事务
+        Db::commit();
+        $this->ajaxReturn(['status' => 1 , 'msg'=>'授权成功！','data'=>$data]);   
+    }
+   
+    
+    public function wx_user($user_info){
+        $wxres = Db::name('user')->where(['openid' => $user_info['openid']])->find();
+        if($wxres){
+            if($wxres['is_checked'] == 0){
+                 $data = [
+                     'is_checked' => 0,
+                 ];
+                 $this->ajaxReturn(['status' => 1 , 'msg'=>'授权成功！','data'=>$data]);   
+            }else{
+                //重写
+                $data = Db::table("member")->where('id',$wxres['uid'])
+                         ->field('id,mobile')
+                         ->find();
+                $data['token']   = $this->create_token($data['id']);   
+                $data = [
+                    'is_checked' => 1,
+                ];
+                $this->ajaxReturn(['status' => 1 , 'msg'=>'授权成功！','data'=>$data]);     
+            }
+                                      
+        }else{
+             $insert = [
+                 'openid'         => $user_info['openid'],
+                 'wx_nickname'    => $user_info['nickname'],
+                 'sex'            => $user_info['sex'],
+                 'wx_headimgurl'  => $user_info['head_pic'],
+                 'province'       => $user_info['province'],
+                 'city'           => $user_info['city'],
+                 'create_time'    => time(),
+             ];
+            $wxid  = Db::name('user')->insertGetId($insert);
+            $data = [
+                'id'         => $wxid,   
+                'is_checked' => 0,
+            ]; 
+            if($wxid){
+                 $this->ajaxReturn(['status' => 1 , 'msg'=>'授权成功！','data' => $data]);
+            }
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'授权失败！','data' => '']);                  
         }
     }
 
@@ -257,51 +363,6 @@ class User extends ApiBase
         $type = input('type',1);
         if($type == 1){
            $user_info = $this->GetOpenid();//微信授权用户信息
-
-        //    var_dump($user_info);
-        //    die;
-           $wxres = Db::name('user')->where(['openid' => $user_info['openid']])->find();
-           if($wxres){
-               if($wxres['is_checked'] == 0){
-                    $data = [
-                        'is_checked' => 0,
-                    ];
-                    $this->ajaxReturn(['status' => 1 , 'msg'=>'授权成功！','data'=>$data]);   
-               }else{
-                   //重写
-                   $data = Db::table("member")->where('id',$wxres['uid'])
-                            ->field('id,mobile')
-                            ->find();
-                   $data['token']   = $this->create_token($data['id']);   
-                   $data = [
-                       'is_checked' => 1,
-                   ];
-                   $this->ajaxReturn(['status' => 1 , 'msg'=>'授权成功！','data'=>$data]);     
-               }
-                                         
-           }else{
-                $insert = [
-                    'openid'         => $user_info['openid'],
-                    'wx_nickname'    => $user_info['nickname'],
-                    'sex'            => $user_info['sex'],
-                    'wx_headimgurl'  => $user_info['head_pic'],
-                    'province'       => $user_info['province'],
-                    'city'           => $user_info['city'],
-                    'create_time'    => time(),
-                ];
-               $wxid  = Db::name('user')->insertGetId($insert);
-               $data = [
-                   'id'         => $wxid,   
-                   'is_checked' => 0,
-               ]; 
-               if($wxid){
-                    $this->ajaxReturn(['status' => 1 , 'msg'=>'授权成功！','data' => $data]);
-               }
-               $this->ajaxReturn(['status' => -2 , 'msg'=>'授权失败！','data' => $data]);                  
-           }
-
-           
-
         }else{
             $mobile   = input('mobile');
             $password = input('password');
