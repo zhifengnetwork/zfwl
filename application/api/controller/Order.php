@@ -223,13 +223,30 @@ class Order extends ApiBase
                     $this->ajaxReturn(['status' => -2 , 'msg'=>'不能和其他拼团一起下单！','data'=>'']);
                 }
                 $groupon_id = $value['groupon_id'];
+                //redis团购队列
+                $redis = $this->getRedis();
+                if( !$redis->lpop("GROUP_GOODS_{$groupon_id}") ){
+                    Db::table('cart')->where('id',$value['id'])->delete();
+                    Db::table('goods_groupon')->where('groupon_id',$groupon_id)->update(['is_show'=>0,'status'=>1]);
+                    $this->ajaxReturn(['status' => -2 , 'msg'=>'该期拼团已结束，请前往最新一期拼团！','data'=>$value['goods_id']]);
+                }
+
             }
             
             $goods_ids .= $value['goods_id'] . ',';
             $goods_coupon[$value['goods_id']]['subtotal_price'] =  $value['subtotal_price'];
 
             //处理运费
-            $goods_res = Db::table('goods')->field('shipping_setting,shipping_price,delivery_id,less_stock_type')->where('goods_id',$value['goods_id'])->find();
+            $goods_res = Db::table('goods')->field('shipping_setting,shipping_price,delivery_id,less_stock_type,goods_attr')->where('goods_id',$value['goods_id'])->find();
+            if($goods_res['goods_attr']){
+                $goods_attr = explode(',',$goods_res['goods_attr']);
+                if( in_array(6,$goods_attr) ){
+                    $is_limited = 1;
+                else{
+                    $is_limited = 0;
+                }
+            }
+
             if($goods_res['shipping_setting'] == 1){
                 $shipping_price = sprintf("%.2f",$shipping_price + $goods_res['shipping_price']);   //计算该订单的物流费用
             }else if($goods_res['shipping_setting'] == 2){
@@ -261,10 +278,25 @@ class Order extends ApiBase
             $cat_id = Db::table('goods')->where('goods_id',$value['goods_id'])->value('cat_id1');
             foreach($value['spec'] as $k=>$v){
 
-                $sku = Db::table('goods_sku')->where('sku_id',$v['sku_id'])->field('inventory,frozen_stock')->find();
-                $sku_num = $sku['inventory'] - $sku['frozen_stock'];
-                if( $v['goods_num'] > $sku_num ){
-                    $this->ajaxReturn(['status' => -2 , 'msg'=>"商品：{$v['goods_name']}，规格：{$v['spec_key_name']}，数量：剩余{$sku_num}件可购买！",'data'=>'']);
+                if($is_limited)
+                    //限时购redis
+                    $redis = $this->getRedis();
+                    for($i=0;$i<$v['goods_num'];$i++){
+                        if( !$redis->lpop("GOODS_LIMITED_{$v['sku_id']}") ){
+                            for($j=1;$j<=$i;$j++){
+                                $redis->rpush("GOODS_LIMITED_{$v['sku_id']}",1);
+                                continue;
+                            }
+                            $this->ajaxReturn(['status' => -2 , 'msg'=>"商品：{$v['goods_name']}，规格：{$v['spec_key_name']}，数量：剩余{$i}件可购买！",'data'=>'']);
+                            continue;
+                        }
+                    }
+                }else{
+                    $sku = Db::table('goods_sku')->where('sku_id',$v['sku_id'])->field('inventory,frozen_stock')->find();
+                    $sku_num = $sku['inventory'] - $sku['frozen_stock'];
+                    if( $v['goods_num'] > $sku_num ){
+                        $this->ajaxReturn(['status' => -2 , 'msg'=>"商品：{$v['goods_name']}，规格：{$v['spec_key_name']}，数量：剩余{$sku_num}件可购买！",'data'=>'']);
+                    }
                 }
 
                 $order_goods[$i]['goods_id'] = $v['goods_id'];
