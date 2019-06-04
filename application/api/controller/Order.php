@@ -628,7 +628,7 @@ class Order extends ApiBase
             $this->ajaxReturn(['status' => -2 , 'msg'=>'参数错误！','data'=>'']);
         }
 
-        $order = Db::table('order')->where('order_id',$order_id)->where('user_id',$user_id)->field('order_status,pay_status,shipping_status')->find();
+        $order = Db::table('order')->where('order_id',$order_id)->where('user_id',$user_id)->field('order_status,groupon_id,pay_status,shipping_status')->find();
         if(!$order) $this->ajaxReturn(['status' => -2 , 'msg'=>'订单不存在！','data'=>'']);
 
         if( $order['order_status'] == 1 && $order['pay_status'] == 0 && $order['shipping_status'] == 0 ){
@@ -639,20 +639,33 @@ class Order extends ApiBase
 
             $order_goods = Db::table('order_goods')->where('order_id',$order_id)->field('goods_id,sku_id,goods_num')->select();
             foreach($order_goods as $key=>$value){
-                $less_stock_type = Db::table('goods')->where('goods_id',$value['goods_id'])->value('less_stock_type');
-                if($less_stock_type == 1){
+                $goods = Db::table('goods')->where('goods_id',$value['goods_id'])->field('goods_attr,less_stock_type')->find();
+                if($goods['less_stock_type'] == 1){
                     Db::table('goods_sku')->where('sku_id',$value['sku_id'])->setInc('inventory',$value['goods_num']);
                     Db::table('goods')->where('goods_id',$value['goods_id'])->setInc('stock',$value['goods_num']);
-                }else if($less_stock_type == 2){
+                }else if($goods['less_stock_type'] == 2){
                     Db::table('goods_sku')->where('sku_id',$value['sku_id'])->setDec('frozen_stock',$value['goods_num']);
+                }
+                //团购
+                if( $order['groupon_id'] ){
+                    $redis = getRedis();
+                    $redis->rpush("GOODS_GROUP_{$order['groupon_id']}",1);
+                }
+                //限时购
+                if($goods['goods_attr']){
+                    $attr = explode(',',$goods['goods_attr']);
+                    if(in_array(6,$attr)){
+                        $redis = getRedis();
+                        for($i=0;$i<$value['goods_num'];$i++){
+                            $redis->rpush("GOODS_LIMITED_{$value['sku_id']}",1);
+                        }
+                    }
                 }
             }
             if($res){
                 Db::commit();
-
             }else{
                 Db::rollback();
-
             }
         }else if( $order['order_status'] == 1 && $order['pay_status'] == 1 && $order['shipping_status'] == 1 ){
             //确认收货
