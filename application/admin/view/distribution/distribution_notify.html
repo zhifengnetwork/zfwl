@@ -127,7 +127,7 @@
                                 <div class="form-group">
                                     <label class="col-xs-3 col-sm-4 col-md-5 col-lg-4 control-label">任务处理通知</label>
                                     <div class="col-xs-9 col-sm-8 col-md-7 col-lg-8">
-                                        <input type="text" name="tm[templateid]" class="form-control" value="{$info.tm.templateid}">
+                                        <input type="text" name="tm[templateid]" class="form-control" value="{if condition='isset($info.tm.templateid)'}{$info.tm.templateid}{/if}">
                                         <div class="help-block">公众平台模板消息编号: OPENTM200605630 </div>
                                     </div>
                                 </div>
