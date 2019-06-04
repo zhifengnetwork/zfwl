@@ -52,7 +52,7 @@ class User extends ApiBase
                 $data['unionid'] = $data2['unionid'];
             }
 
-            $this->wx_user($user_info);
+            $this->wx_user($data);
     }
     /***
      * 绑定手机号
@@ -121,10 +121,9 @@ class User extends ApiBase
     
     public function wx_user($user_info){
         $wxres = Db::name('user')->where(['openid' => $user_info['openid']])->find();
-        var_dump(111);
+       
         if($wxres){
-            var_dump(2222);
-            die;
+        
             if($wxres['is_checked'] == 0){
                  $data = [
                      'id'          => $wxres['id'],
@@ -146,7 +145,6 @@ class User extends ApiBase
             }
                                       
         }else{
-            var_dump(3333);
          
              $insert = [
                  'openid'         => $user_info['openid'],
@@ -157,8 +155,7 @@ class User extends ApiBase
                  'city'           => $user_info['city'],
                  'create_time'    => time(),
              ];
-             var_dump(4444);
-             die;
+             
             $wxid  = Db::name('user')->insertGetId($insert);
             $data = [
                 'token'      => '',  
