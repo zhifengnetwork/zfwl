@@ -36,7 +36,7 @@ class User extends ApiBase
                 $this->ajaxReturn(['status' => -2 , 'msg'=>'code不能为空！','data'=>'']);   
             }
             $data  = $this->getOpenidFromMp($code);//获取网页授权access_token和用户openid
-          
+
             $data2 = $this->GetUserInfo($data['access_token'],$data['openid']);//获取微信用户信息
             var_dump($data2);
             die;
@@ -173,8 +173,6 @@ class User extends ApiBase
      */
     public function GetUserInfo($access_token,$openid)
     { 
-        var_dump($access_token,$openid); 
-        die;      
         // 获取用户 信息
         $url = $this->__CreateOauthUrlForUserinfo($access_token,$openid);
         $ch = curl_init();//初始化curl        
@@ -184,9 +182,13 @@ class User extends ApiBase
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,FALSE);
         curl_setopt($ch, CURLOPT_HEADER, FALSE);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);         
-        $res  = curl_exec($ch);//运行curl，结果以jason形式返回            
-        $data = json_decode($res,true);            
+        $res  = curl_exec($ch);//运行curl，结果以jason形式返回 
+        $data = json_decode($res,true);   
+        var_dump($res);           
+               
         curl_close($ch);
+        var_dump($data);
+        die; 
         //获取用户是否关注了微信公众号， 再来判断是否提示用户 关注
         // //if(!isset($data['unionid'])){
         //     $wechat = new WechatUtil($this->weixin_config);
