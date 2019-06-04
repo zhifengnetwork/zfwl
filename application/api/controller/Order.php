@@ -278,7 +278,7 @@ class Order extends ApiBase
             $cat_id = Db::table('goods')->where('goods_id',$value['goods_id'])->value('cat_id1');
             foreach($value['spec'] as $k=>$v){
 
-                if($is_limited)
+                if($is_limited){
                     //限时购redis
                     $redis = $this->getRedis();
                     for($i=0;$i<$v['goods_num'];$i++){
