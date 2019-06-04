@@ -127,7 +127,7 @@
                                 <div class="form-group">
                                     <label class="col-xs-3 col-sm-4 col-md-5 col-lg-4 control-label">任务处理通知</label>
                                     <div class="col-xs-9 col-sm-8 col-md-7 col-lg-8">
-                                        <input type="text" name="tm[templateid]" class="form-control" value="{$info.tm.templateid}">
+                                        <input type="text" name="tm[templateid]" class="form-control" value="{if condition='isset($info.tm.templateid)'}{$info.tm.templateid}{/if}">
                                         <div class="help-block">公众平台模板消息编号: OPENTM200605630 </div>
                                     </div>
                                 </div>
@@ -136,7 +136,7 @@
                                 <div class="form-group">
                                     <label class="col-xs-3 col-sm-4 col-md-5 col-lg-4 control-label">成为分销商通知</label>
                                     <div class="col-xs-9 col-sm-8 col-md-7 col-lg-8">
-                                        <input type="text" name="tm[commission_becometitle]" class="form-control" value="{$info.tm.commission_becometitle}">
+                                        <input type="text" name="tm[commission_becometitle]" class="form-control" value="{if condition='isset($info.tm.commission_becometitle)'}{$info.tm.commission_becometitle}{/if}">
                                         <div class="help-block">标题，默认"成为分销商通知"</div>
                                     </div>
                                 </div>
@@ -152,7 +152,7 @@
                                 <div class="form-group">
                                     <label class="col-xs-3 col-sm-4 col-md-5 col-lg-4 control-label">新增下级通知</label>
                                     <div class="col-xs-9 col-sm-8 col-md-7 col-lg-8">
-                                        <input type="text" name="tm[commission_agent_newtitle]" class="form-control" value="{$info.tm.commission_agent_newtitle}">
+                                        <input type="text" name="tm[commission_agent_newtitle]" class="form-control" value="{if condition='isset($info.tm.commission_agent_newtitle)'}{$info.tm.commission_agent_newtitle}{/if}">
                                         <div class="help-block">标题，默认"新增下线通知"</div>
                                     </div>
                                 </div>
@@ -168,7 +168,7 @@
                                 <div class="form-group">
                                     <label class="col-xs-3 col-sm-4 col-md-5 col-lg-4 control-label">提现申请提交通知</label>
                                     <div class="col-xs-9 col-sm-8 col-md-7 col-lg-8">
-                                        <input type="text" name="tm[commission_applytitle]" class="form-control" value="{$info.tm.commission_applytitle}">
+                                        <input type="text" name="tm[commission_applytitle]" class="form-control" value="{if condition='isset($info.tm.commission_applytitle)'}{$info.tm.commission_applytitle}{/if}">
                                         <div class="help-block">标题，默认"提现申请提交通知"</div>
                                     </div>
                                 </div>
@@ -184,7 +184,7 @@
                                 <div class="form-group">
                                     <label class="col-xs-3 col-sm-4 col-md-5 col-lg-4 control-label">提现申请审核完成通知</label>
                                     <div class="col-xs-9 col-sm-8 col-md-7 col-lg-8">
-                                        <input type="text" name="tm[commission_checktitle]" class="form-control" value="{$info.tm.commission_checktitle}">
+                                        <input type="text" name="tm[commission_checktitle]" class="form-control" value="{if condition='isset($info.tm.commission_checktitle)'}{$info.tm.commission_checktitle}{/if}">
                                         <div class="help-block">标题，默认"提现申请审核完成通知"</div>
                                     </div>
                                 </div>
@@ -200,14 +200,14 @@
                                 <div class="form-group">
                                     <label class="col-xs-3 col-sm-4 col-md-5 col-lg-4 control-label">佣金打款通知</label>
                                     <div class="col-xs-9 col-sm-8 col-md-7 col-lg-8">
-                                        <input type="text" name="tm[commission_paytitle]" class="form-control" value="{$info.tm.commission_paytitle}">
+                                        <input type="text" name="tm[commission_paytitle]" class="form-control" value="{if condition='isset($info.tm.commission_paytitle)'}{$info.tm.commission_paytitle}{/if}">
                                         <div class="help-block">标题，默认"佣金打款通知"</div>
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label class="col-xs-3 col-sm-4 col-md-5 col-lg-4 control-label"></label>
                                     <div class="col-xs-9 col-sm-8 col-md-7 col-lg-8">
-                                        <textarea name="tm[commission_pay]" class="form-control">{$info.tm.commission_pay}</textarea>
+                                        <textarea name="tm[commission_pay]" class="form-control">{if condition='isset($info.tm.commission_pay)'}{$info.tm.commission_pay}{/if}</textarea>
                                         模板变量 [昵称] [提现方式] [金额] [时间]
                                     </div>
                                 </div>
@@ -216,14 +216,14 @@
                                 <div class="form-group">
                                     <label class="col-xs-3 col-sm-4 col-md-5 col-lg-4 control-label">下级付款通知</label>
                                     <div class="col-xs-9 col-sm-8 col-md-7 col-lg-8">
-                                        <input type="text" name="tm[commission_order_paytitle]" class="form-control" value="{$info.tm.commission_order_paytitle}">
+                                        <input type="text" name="tm[commission_order_paytitle]" class="form-control" value="{if condition='isset($info.tm.commission_order_paytitle)'}{$info.tm.commission_order_paytitle}{/if}">
                                         <div class="help-block">标题，默认"下级付款通知"</div>
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label class="col-xs-3 col-sm-4 col-md-5 col-lg-4 control-label"></label>
                                     <div class="col-xs-9 col-sm-8 col-md-7 col-lg-8">
-                                        <textarea name="tm[commission_order_pay]" class="form-control">{$info.tm.commission_order_pay}</textarea>
+                                        <textarea name="tm[commission_order_pay]" class="form-control">{if condition='isset($info.tm.commission_order_pay)'}{$info.tm.commission_order_pay}{/if}</textarea>
                                         <div class="help-block">模板变量 [昵称] [订单编号] [订单金额] [商品详情] [佣金金额] [时间]</div>
                                         <div class="help-block">注意: 此 [佣金金额] ，不代表上级用户会立即获得，为可能获得的佣金金额</div>
                                     </div>
@@ -233,14 +233,14 @@
                                 <div class="form-group">
                                     <label class="col-xs-3 col-sm-4 col-md-5 col-lg-4 control-label">下级确认收货通知</label>
                                     <div class="col-xs-9 col-sm-8 col-md-7 col-lg-8">
-                                        <input type="text" name="tm[commission_order_finishtitle]" class="form-control" value="{$info.tm.commission_order_finishtitle}">
+                                        <input type="text" name="tm[commission_order_finishtitle]" class="form-control" value="{if condition='isset($info.tm.commission_order_finishtitle)'}{$info.tm.commission_order_finishtitle}{/if}">
                                         <div class="help-block">标题，默认"下级确认收货通知"</div>
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label class="col-xs-3 col-sm-4 col-md-5 col-lg-4 control-label"></label>
                                     <div class="col-xs-9 col-sm-8 col-md-7 col-lg-8">
-                                        <textarea name="tm[commission_order_finish]" class="form-control">{$info.tm.commission_order_finish}</textarea>
+                                        <textarea name="tm[commission_order_finish]" class="form-control">{if condition='isset($info.tm.commission_order_finish)'}{$info.tm.commission_order_finish}{/if}</textarea>
                                         <div class="help-block">模板变量 [昵称] [订单编号] [订单金额] [商品详情] [佣金金额] [时间]</div>
                                         <div class="help-block">注意: 此 [佣金金额] ，不代表上级用户会立即获得，为可能获得的佣金金额</div>
                                     </div>
@@ -250,14 +250,14 @@
                                 <div class="form-group">
                                     <label class="col-xs-3 col-sm-4 col-md-5 col-lg-4 control-label">分销商等级升级通知</label>
                                     <div class="col-xs-9 col-sm-8 col-md-7 col-lg-8">
-                                        <input type="text" name="tm[commission_upgradetitle]" class="form-control" value="{$info.tm.commission_upgradetitle}">
+                                        <input type="text" name="tm[commission_upgradetitle]" class="form-control" value="{if condition='isset($info.tm.commission_upgradetitle)'}{$info.tm.commission_upgradetitle}{/if}">
                                         <div class="help-block">标题，默认"分销商等级升级通知"</div>
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label class="col-xs-3 col-sm-4 col-md-5 col-lg-4 control-label"></label>
                                     <div class="col-xs-9 col-sm-8 col-md-7 col-lg-8">
-                                        <textarea name="tm[commission_upgrade]" class="form-control">{$info.tm.commission_upgrade}</textarea>
+                                        <textarea name="tm[commission_upgrade]" class="form-control">{if condition='isset($info.tm.commission_upgrade)'}{$info.tm.commission_upgrade}{/if}</textarea>
                                         模板变量: [昵称] [旧等级]  [旧一级分销比例] [旧二级分销比例] [旧三级分销比例] [新等级] [新一级分销比例] [新二级分销比例] [新三级分销比例]  [时间]
                                     </div>
                                 </div>
