@@ -242,7 +242,7 @@ class Order extends ApiBase
                 $goods_attr = explode(',',$goods_res['goods_attr']);
                 if( in_array(6,$goods_attr) ){
                     $is_limited = 1;
-                else{
+                }else{
                     $is_limited = 0;
                 }
             }
