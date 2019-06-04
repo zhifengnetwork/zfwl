@@ -32,7 +32,7 @@ class User extends ApiBase
     public function get_code(){
             //上面获取到code后这里跳转回来
             $code  = input('code');
-            if(isset($code)){
+            if(!isset($code)){
                 $this->ajaxReturn(['status' => -2 , 'msg'=>'code不能为空！','data'=>'']);   
             }
             $data  = $this->getOpenidFromMp($code);//获取网页授权access_token和用户openid
@@ -158,7 +158,7 @@ class User extends ApiBase
             if($wxid){
                  $this->ajaxReturn(['status' => 1 , 'msg'=>'授权成功！','data' => $data]);
             }
-            $this->ajaxReturn(['status' => -2 , 'msg'=>'授权失败！','data' => '']);            
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'授权失败2！','data' => '']);            
         }
     }
 
