@@ -184,11 +184,7 @@ class User extends ApiBase
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);         
         $res  = curl_exec($ch);//运行curl，结果以jason形式返回 
         $data = json_decode($res,true);   
-        var_dump($res);           
-               
         curl_close($ch);
-        var_dump($data);
-        die; 
         //获取用户是否关注了微信公众号， 再来判断是否提示用户 关注
         // //if(!isset($data['unionid'])){
         //     $wechat = new WechatUtil($this->weixin_config);
