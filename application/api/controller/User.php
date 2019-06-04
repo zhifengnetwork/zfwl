@@ -51,8 +51,7 @@ class User extends ApiBase
             if(isset($data2['unionid'])){
                 $data['unionid'] = $data2['unionid'];
             }
-            var_dump($data);
-            die;
+            
             $this->wx_user($user_info);
     }
     /***
