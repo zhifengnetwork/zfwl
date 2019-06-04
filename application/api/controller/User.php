@@ -19,7 +19,7 @@ class User extends ApiBase
             //触发微信返回code码
             //$baseUrl = urlencode('http://'.$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING']);
             //
-            $baseUrl = urlencode('http://zfshop.zhifengwangluo.com');
+            $baseUrl = urlencode('http://zfshop.zhifengwangluo.com'); //做成配置
             $url     = $this->__CreateOauthUrlForCode($baseUrl); // 获取 code地址 // 跳转到微信授权页面 需要用户确认登录的页面
             // Header("Location: $url"); // 跳转到微信授权页面 需要用户确认登录的页面
             // exit();
@@ -50,13 +50,12 @@ class User extends ApiBase
                 $data['unionid'] = $data2['unionid'];
             }
             $this->wx_user($user_info);
-
     }
     /***
      * 绑定手机号
      */
     public function binding_mob(){
-        $id = input('id/d',0);
+        $id     = input('id/d',0);
         $mobile = input('mobile','');
         
         if(!checkMobile($mobile)){
@@ -96,7 +95,7 @@ class User extends ApiBase
                 'weixin' => $wxuser['wx_nickname'],
                 'createtime' => time(),
             ];
-           $memberid = Db::name('member')->insertGetId($insert);   
+           $memberid = Db::name('member')->insertGetId($insert);
            if(!$memberid){
                Db::rollback(); 
                $this->ajaxReturn(['status' => -2 , 'msg'=>'输入的手机号有误，请重新输入！','data'=>'']);  
@@ -107,12 +106,13 @@ class User extends ApiBase
               Db::rollback(); 
               $this->ajaxReturn(['status' => -2 , 'msg'=>'输入的手机号有误，请重新输入！','data'=>'']);  
            }
+
            $data['token']   = $this->create_token($memberid);   
 
         }
         // 提交事务
         Db::commit();
-        $this->ajaxReturn(['status' => 1 , 'msg'=>'授权成功！','data'=>$data]);   
+        $this->ajaxReturn(['status' => 1 , 'msg'=>'绑定成功！','data'=>$data]);   
     }
    
     
@@ -121,7 +121,9 @@ class User extends ApiBase
         if($wxres){
             if($wxres['is_checked'] == 0){
                  $data = [
-                     'is_checked' => 0,
+                     'id'          => $wxres['id'],
+                     'token'       => '', 
+                     'is_checked'  => 0,
                  ];
                  $this->ajaxReturn(['status' => 1 , 'msg'=>'授权成功！','data'=>$data]);   
             }else{
@@ -129,8 +131,9 @@ class User extends ApiBase
                 $data = Db::table("member")->where('id',$wxres['uid'])
                          ->field('id,mobile')
                          ->find();
-                $data['token']   = $this->create_token($data['id']);   
                 $data = [
+                    'token'      => $this->create_token($data['id']),
+                    'id'         => 0, 
                     'is_checked' => 1,
                 ];
                 $this->ajaxReturn(['status' => 1 , 'msg'=>'授权成功！','data'=>$data]);     
@@ -148,13 +151,14 @@ class User extends ApiBase
              ];
             $wxid  = Db::name('user')->insertGetId($insert);
             $data = [
+                'token'      => '',  
                 'id'         => $wxid,   
                 'is_checked' => 0,
             ]; 
             if($wxid){
                  $this->ajaxReturn(['status' => 1 , 'msg'=>'授权成功！','data' => $data]);
             }
-            $this->ajaxReturn(['status' => -2 , 'msg'=>'授权失败！','data' => '']);                  
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'授权失败！','data' => '']);            
         }
     }
 

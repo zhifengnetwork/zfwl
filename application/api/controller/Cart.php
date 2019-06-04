@@ -56,9 +56,11 @@ class Cart extends ApiBase
             $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
         }
 
-        $sku_id = Request::instance()->param("sku_id", 0, 'intval');
-        $groupon_id = Request::instance()->param("groupon_id", 0, 'intval');
-        $cart_number = Request::instance()->param("cart_number", 1, 'intval');
+        // input('sku_id/d',0)
+
+        $sku_id       = Request::instance()->param("sku_id", 0, 'intval');
+        $groupon_id   = Request::instance()->param("groupon_id", 0, 'intval');
+        $cart_number  = Request::instance()->param("cart_number", 1, 'intval');
         $act = input('act');
 
         if( !$sku_id || !$cart_number ){
