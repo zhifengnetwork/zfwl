@@ -37,6 +37,10 @@ class User extends ApiBase
             }
             $data  = $this->getOpenidFromMp($code);//获取网页授权access_token和用户openid
 
+            if(!isset($data['access_token'])){
+                $this->ajaxReturn(['status' => -2 , 'msg'=>'code必须要刷新！','data'=>'']);   
+            }
+
             $data2 = $this->GetUserInfo($data['access_token'],$data['openid']);//获取微信用户信息
 
             $data['city']        = $data2['city'];
@@ -81,12 +85,12 @@ class User extends ApiBase
         if($member){
         
             $res  = Db::name('member')->where(['openid' => $wxuser['openid']])->update(['mobile' => $mobile]);
-            if($res == false){
+            if($res === false){
                 $this->ajaxReturn(['status' => -2 , 'msg'=>'用户不存在请重新授权！','data'=>'']);  
                 Db::rollback();
             }
             $res2 = Db::name('user')->where(['openid' => $wxuser['openid']])->update(['uid' => $member['id'],'is_checked' => 1]);
-            if( $res2 == false){
+            if($res2 === false){
                 $this->ajaxReturn(['status' => -2 , 'msg'=>'用户不存在请重新授权！','data'=>'']);  
                 Db::rollback(); 
             }
@@ -105,13 +109,11 @@ class User extends ApiBase
            }
            $res1 = Db::name('user')->where(['openid' => $wxuser['openid']])->update(['uid' => $memberid,'is_checked' => 1]);
 
-           if($res1 == false){
-              Db::rollback(); 
-              $this->ajaxReturn(['status' => -2 , 'msg'=>'输入的手机号有误，请重新输入！','data'=>'']);  
+           if($res1 === false){
+                Db::rollback(); 
+                $this->ajaxReturn(['status' => -2 , 'msg'=>'输入的手机号有误，请重新输入！','data'=>'']);
            }
-
            $data['token']   = $this->create_token($memberid);   
-
         }
         // 提交事务
         Db::commit();
@@ -137,6 +139,7 @@ class User extends ApiBase
                          ->field('id,mobile')
                          ->find();
                 $data = [
+
                     'token'      => $this->create_token($member['id']),
                     'id'         => 0, 
                     'is_checked' => 1,
