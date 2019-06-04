@@ -38,8 +38,7 @@ class User extends ApiBase
             $data  = $this->getOpenidFromMp($code);//获取网页授权access_token和用户openid
 
             $data2 = $this->GetUserInfo($data['access_token'],$data['openid']);//获取微信用户信息
-            var_dump($data2);
-            die;
+
             $data['city']        = $data2['city'];
             $data['nickname']    = empty($data2['nickname']) ? '微信用户' : trim($data2['nickname']);
             $data['sex']         = $data2['sex'];   
@@ -52,6 +51,8 @@ class User extends ApiBase
             if(isset($data2['unionid'])){
                 $data['unionid'] = $data2['unionid'];
             }
+            var_dump($data);
+            die;
             $this->wx_user($user_info);
     }
     /***
