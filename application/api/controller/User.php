@@ -133,11 +133,11 @@ class User extends ApiBase
                  $this->ajaxReturn(['status' => 1 , 'msg'=>'授权成功！','data'=>$data]);   
             }else{
                 //重写
-                $data = Db::table("member")->where('id',$wxres['uid'])
+                $member = Db::table("member")->where('id',$wxres['uid'])
                          ->field('id,mobile')
                          ->find();
                 $data = [
-                    'token'      => $this->create_token($data['id']),
+                    'token'      => $this->create_token($member['id']),
                     'id'         => 0, 
                     'is_checked' => 1,
                 ];
