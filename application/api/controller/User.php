@@ -172,7 +172,9 @@ class User extends ApiBase
      * @return openid
      */
     public function GetUserInfo($access_token,$openid)
-    {         
+    { 
+        var_dump($access_token,$openid); 
+        die;      
         // 获取用户 信息
         $url = $this->__CreateOauthUrlForUserinfo($access_token,$openid);
         $ch = curl_init();//初始化curl        
