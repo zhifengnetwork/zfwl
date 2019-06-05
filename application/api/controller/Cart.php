@@ -61,7 +61,7 @@ class Cart extends ApiBase
         $sku_id       = Request::instance()->param("sku_id", 0, 'intval');
         $groupon_id   = Request::instance()->param("groupon_id", 0, 'intval');
         $cart_number  = Request::instance()->param("cart_number", 1, 'intval');
-        $act = input('act');
+        $act = Request::instance()->param('act');
 
         if( !$sku_id || !$cart_number ){
             $this->ajaxReturn(['status' => -2 , 'msg'=>'该商品不存在！','data'=>'']);
