@@ -668,7 +668,23 @@ class User extends ApiBase
     public function add_address()
     {
             $user_id   = $this->get_user_id();
-            $post_data = input('post.');
+            if(!$user_id){
+                $this->ajaxReturn(['status' => -2, 'msg'=>'用户不存在','data'=>'']);
+            }
+            $consignee = input('consignee');
+            $longitude = input('lng');
+            $latitude = input('lat');
+            $address_district = input('address_district');
+            $address_twon = input('address_twon');
+            $address = input('address');
+            $mobile = input('mobile');
+            $is_default = input('is_default');
+
+            $address = $address_twon . $address;
+
+            
+
+
             $addressM  = Model('UserAddr');
             $return    = $addressM->add_address($user_id, 0, $post_data);
             $this->ajaxReturn($return);
