@@ -182,6 +182,7 @@ class Cart extends ApiBase
             $goods_res = Db::name('goods')->where('goods_id',$sku_res['goods_id'])->field('goods_name,price,original_price')->find();
             $cartData['groupon_id'] = $groupon_id;
             $cartData['goods_id'] = $sku_res['goods_id'];
+            $cartData['selected'] = 0;
             $cartData['goods_name'] = $goods_res['goods_name'];
             $cartData['sku_id'] = $sku_id;
             $cartData['user_id'] = $user_id;
