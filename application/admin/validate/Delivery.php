@@ -12,11 +12,11 @@ class Delivery extends Validate
     ];
 
     protected $message = [
-        'name.require '              => '配送方式名称必须填写',
-        'firstweight.require '       => '首重或首件必须填写',
-        'firstprice.require '        => '首费必须填写',
-        'secondweight.require '      => '续重或续件必须填写',
-        'secondprice.require '       => '续费必须填写',
+        'name.require'              => '配送方式名称必须填写',
+        'firstweight.require'       => '首重或首件必须填写',
+        'firstprice.require'        => '首费必须填写',
+        'secondweight.require'      => '续重或续件必须填写',
+        'secondprice.require'       => '续费必须填写',
     ];
 
     protected $scene = [

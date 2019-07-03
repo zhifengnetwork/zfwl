@@ -61,7 +61,44 @@ class Member extends Model
         $dephp_7 = self::getMember($dephp_0);
         return $dephp_7['groupid'];
     }
- 
 
+    /**
+     *  判断是否是puls会员
+     */
+    public function is_puls ($id = 0) {
+        $sql = "select is_puls from member where id=$id";
+        $is_puls = Db::query($sql);
+        if ($is_puls['is_puls'] == 1){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    /**
+     *  成为puls会员
+     * $type    渠道 1：订单渠道，2：直接支付渠道
+     */
+    public function create_puls ($id = 0,$order_id = 0,$type = 2) {
+        if ($id && $type ==1 && $order_id){
+            $get_order_goods_goodsid = Db::table('order_goods')->where('order_id',$order_id)->column('goods_id');
+            $get_goods_ispuls_sum = Db::table('goods')->where(['id',['in',$get_order_goods_goodsid]])->sum('is_puls');
+            if ($get_goods_ispuls_sum == 0){
+                //订单没有商品开启升级puls会员选项
+                return true;
+            }
+        }elseif ($id && $type == 2){
+
+        }else{
+            return false;
+        }
+        $update_sql = "update member set is_puls=1 where id=$id";
+        $update = Db::query($update_sql);
+        if ($update){
+            return true;
+        }else{
+            return false;
+        }
+    }
 
 }

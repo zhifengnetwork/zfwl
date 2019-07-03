@@ -41,7 +41,9 @@ class Shop extends Common
                 return json(['code'=>0,'msg'=>'请填写页面名称']);
             }
             if (!empty($data)){
+
                 $res = model('DiyEweiShop')->edit($data,$this->admin_id,$page_name,$id);
+
                 if ($res){
                     return json(['code'=>1,'msg'=>'保存成功','data'=>['id'=>$res]]);
                 }else{

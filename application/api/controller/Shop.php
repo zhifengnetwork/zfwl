@@ -7,7 +7,7 @@
  */
 
 namespace app\api\controller;
-
+use app\common\model\Goods;
 use think\Db;
 
 class Shop extends ApiBase
@@ -29,7 +29,9 @@ class Shop extends ApiBase
     public function gooodsList () {
         $keyword = request()->param('keyword','');
         $cat_id = request()->param('cat_id',0,'intval');
-        $list = model('Goods')->getGoodsList($keyword,$cat_id);
+        $page = request()->param('page',0,'intval');
+        $goods = new Goods();
+        $list = $goods->getGoodsList($keyword,$cat_id,$page);
         if (!empty($list)){
             return json(['code'=>1,'msg'=>'','data'=>$list]);
         }else{

@@ -346,7 +346,5 @@ class Order extends Model
 			return array('status'=>1,'did'=>$did,'printhtml'=>$printhtml);
 		}
 		/*code_21快递鸟电子面单*/
-	}
-
-
+    }
 }

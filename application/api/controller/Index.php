@@ -15,6 +15,25 @@ class Index extends ApiBase
     */
     public function index()
     {
+        // $redis = $this->getRedis();
+        // for($i=1;$i<=10;$i++){
+        //     $redis->rpush('ss',1);
+        // }
+
+        // $n = 12;
+        // for($i=0;$i<$n;$i++){
+        //     if( $redis->lpop('ss') <= 0 ){
+        //         for($j=1;$j<=$i;$j++){
+        //             $redis->rpush('ss',1);
+        //             continue;
+        //         }
+        //         echo "还有{$i}件可购买";die;
+        //         continue;
+        //     }
+        // }
+
+
+        // die;
         echo 1111;
         exit;
         $user_id = $this->get_user_id();

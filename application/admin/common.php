@@ -232,15 +232,20 @@ function getTree($array, $pid =0, $level = 0){
     return $list;
 }
 
-function setSukMore($goods_id, $data_spec)
+function setSukMore($goods_id=18, $data_spec)
 {   
+    $is_limited = Db::table('goods')->where("FIND_IN_SET(6,goods_attr)")->where('goods_id',$goods_id)->value('goods_id');
+    if($is_limited){
+        $redis = new app\common\util\Redis(config('cache.redis'));
+    }
+
     $all_spec = Db::name('goods_spec')->column('spec_name', 'spec_id');
     foreach ($data_spec as $key => $val) {
         $sku_data = array();
         $sku_attr = '';
         $map = [];
         foreach ($val as $k => $v) {
-            if ($v['key'] != '库存' && $v['key'] != 'pri' && $v['key'] != 'tiered_pri' && $v['key'] != 'img') {
+            if ($v['key'] != '库存' && $v['key'] != 'pri' && $v['key'] != 'group_pri' && $v['key'] != 'img') {
                 $goods_spec_data = array();
                 $spec_id = array_keys($all_spec, $v['key'])[0];
                 $goods_spec_data['spec_id'] = $spec_id;
@@ -260,6 +265,8 @@ function setSukMore($goods_id, $data_spec)
                 $sku_data['inventory'] = $v['value'];
             } else if ($v['key'] == 'pri') {
                 $sku_data['price'] = $v['value'];
+            } else if ($v['key'] == 'group_pri') {
+                $sku_data['groupon_price'] = $v['value'];
             } else if ($v['key'] == 'img') {
                 $sku_data['img'] = $v['value'];
             }
@@ -270,9 +277,15 @@ function setSukMore($goods_id, $data_spec)
         $sku_data['goods_id'] = $goods_id;
         $sku_data['sales'] = 0;
         $sku_data['virtual_sales'] = rand(223, 576);
-        $res2 = Db::table('goods_sku')->insert($sku_data);
-        if (!$res2) {
+        $sku_id = Db::table('goods_sku')->insertGetId($sku_data);
+        if (!$sku_id) {
             return 0;
+        }else{
+            if($is_limited){
+                for($i=0;$i<$sku_data['inventory'];$i++){
+                    $redis->rpush("GOODS_LIMITED_{$sku_id}",1);
+                }
+            }
         }
     }
     return 1;
@@ -289,7 +302,7 @@ function setSukMore2($goods_id, $data_spec)
         $map = [];
         foreach ($val as $k => $v) {
             if ($k !== 'sku_id') {
-                if ($v['key'] != '库存' && $v['key'] != 'pri' && $v['key'] != 'img') {
+                if ($v['key'] != '库存' && $v['key'] != 'pri' && $v['key'] != 'group_pri' && $v['key'] != 'img') {
                     $goods_spec_data = array();
                     $spec_id = array_keys($all_spec, $v['key'])[0];
                     $goods_spec_data['spec_id'] = $spec_id;
@@ -310,6 +323,8 @@ function setSukMore2($goods_id, $data_spec)
                     $sku_data['inventory'] = $v['value'];
                 } else if ($v['key'] == 'pri') {
                     $sku_data['price'] = $v['value'];
+                }else if ($v['key'] == 'group_pri') {
+                    $sku_data['groupon_price'] = $v['value'];
                 } else if ($v['key'] == 'img') {
                     $sku_data['img'] = $v['value'];
                 }

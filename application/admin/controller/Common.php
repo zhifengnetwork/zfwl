@@ -6,6 +6,7 @@ use think\Db;
 use think\Request;
 use think\Session;
 use think\View;
+use app\common\util\Redis;
 
 /*
  * 公共控制器
@@ -230,6 +231,15 @@ class Common extends Controller
             @unlink( ROOT_PATH .Config('c_pub.img') . $info );
         }
         return $name.$saveName;
+    }
+
+    private  static $redis = null;
+    /*获取redis对象*/
+    protected function getRedis(){
+        if(!self::$redis instanceof Redis){
+            self::$redis = new Redis(Config('cache.redis'));
+        }
+        return self::$redis;
     }
 
 }

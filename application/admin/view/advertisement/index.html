@@ -12,7 +12,7 @@
         <div class="col-lg-12">
             <h3  class="col-lg-4" >{$meta_title}</h3>
             <div class="pull-right">
-                <a class="btn btn-info" href="{:url('advertisement/edit')}"><i class="fa fa-plus"></i> 新增广告图</a>
+                <a class="btn btn-info" href="{:url('advertisement/page_edit')}"><i class="fa fa-plus"></i> 添加页面</a>
             </div>
         </div>
     </div>
@@ -22,32 +22,37 @@
         <table class="table  table-bordered table-hover text-center">
             <thead>
                 <tr>
-                    <th>图片编号</th>
-                    <th>图片</th>
-                    <th>标题</th>
-                    <th>排序</th>
-                    <th>是否显示</th>
-                    <th class="col-lg-2">修改时间</th>
+                    <th>页面编号</th>
+                    <th>页面名称</th>
+                    <th>页面唯一标识</th>
+                    <th>状态</th>
                     <th>操作</th>
                 </tr>
             </thead>
             <tbody>
-                {notempty name="list"}
-                {volist name="list" id="vo"}
-                <tr>
-                    <td>{$vo.id}</td>
-                    <td><img src="{$vo.picture}" alt="" width="120px"></td>
-                    <td>{$vo.title}</td>
-                    <td>{$vo.sort}</td>
-                    <td>{eq name="vo['state']" value="1"}显示{else /}隐藏{/eq}</td>
-                    <td>{$vo.create_time}</td>
-                    <td>
-                        <a class="btn btn-default" href="{:url('advertisement/edit',['id'=>$vo.id])}"><i class="fa fa-edit"></i> 编辑</a>
-                        <span class="btn btn-default delete" id="{$vo['id']}" href="{:url('advertisement/set_status',array('id'=>$vo['id']))}">删除 <i class="fa fa-trash-o"></i></span>
-                    </td>
-                </tr>
-                {/volist}
-                {/notempty}
+            {notempty name="list"}
+            {volist name="list" id="vo"}
+            <tr>
+                <td>{$vo.id}</td>
+                <td>{$vo.page_name}</td>
+                <td>{$vo.only_logo}</td>
+                <td>{eq name="vo['status']" value="1"}启用{else /}关闭{/eq}</td>
+                <td>
+                    <a class="btn btn-default" onclick="update(this,{$vo.id},{$vo['status'] == 1?0:1})" href="javascript:;">
+                        <i class="fa fa-edit"></i>
+                        {$vo['status'] == 1?'关闭':'启用'}
+                    </a>
+                    <a class="btn btn-default" href="{:url('advertisement/page_edit',['id'=>$vo.id])}"><i class="fa fa-edit"></i> 编辑</a>
+                    <a class="btn btn-default" href="{:url('advertisement/list',['page_id'=>$vo.id])}"><i class="fa fa-edit"></i> 查看</a>
+                    <a class="btn btn-default" href="{:url('advertisement/edit',['page_id'=>$vo.id])}"><i class="fa fa-edit"></i> 添加</a>
+                    <a class="btn btn-default" onclick="del(this,{$vo.id},-1)" href="javascript:;">
+                        <i class="fa fa-trash-o"></i>
+                        删除
+                    </a>
+                </td>
+            </tr>
+            {/volist}
+            {/notempty}
             </tbody>
         </table>
     </div>
@@ -55,15 +60,29 @@
 {/block}
 {block name="script"}
 <script>
-$(function() {
-    $('.delete').click(function(e) {
-        var _this = this;
-        layer.confirm('是否确定删除', { icon: 3, title: '提示' }, function(index) {
-            location.href = "{:url('advertisement/set_status')}?id=" + _this.id;
-            layer.close(index);
-        });
-    });
+function update(obj,id,status){
+    console.log(status,id);
+    if(window.confirm('确认修改该页面状态吗？')){
+        $.post("{:url('Advertisement/page_status')}",{'id':id,'status':status},function(data){
+            console.log(data)
+            alert(data.msg);
+            if(data.code==1){
+                window.location.reload();
+            }
+        },'json');
+    }
+}
 
-});
+function del(obj,id,status){
+    if(window.confirm('确认删除该页面吗？')){
+        $.post("{:url('Advertisement/page_status')}",{'id':id,'status':status},function(data){
+            console.log(data)
+            alert(data.msg);
+            if(data.code==1){
+                $(obj).parents('tr').remove();
+            }
+        },'json');
+    }
+}
 </script>
 {/block}

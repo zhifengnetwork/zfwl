@@ -13,12 +13,12 @@ class Coupon extends Validate
     ];
 
     protected $message = [
-        'goods_id.require '  => '商品名称必须选择',
-        'title.require '       => '优惠券标题必须填写',
-        'price.require '       => '优惠金额必须填写',
-        'number.require '      => '优惠数量必须填写',
-        'start_time.require '  => '开始时间必须填写',
-        'end_time.require '    => '结束时间必须填写',
+        'goods_id.require'  => '商品名称必须选择',
+        'title.require'       => '优惠券标题必须填写',
+        'price.require'       => '优惠金额必须填写',
+        'number.require'      => '优惠数量必须填写',
+        'start_time.require'  => '开始时间必须填写',
+        'end_time.require'    => '结束时间必须填写',
     ];
 
     protected $scene = [

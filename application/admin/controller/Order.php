@@ -3,6 +3,7 @@ namespace app\admin\controller;
 
 use app\common\model\Order as OrderModel;
 use app\common\model\OrderGoods as OrdeGoodsModel;
+use app\common\model\OrderRefund;
 use Overtrue\Wechat\Payment\Business;
 use Overtrue\Wechat\Payment\QueryRefund;
 use Overtrue\Wechat\Payment\Refund;
@@ -202,6 +203,13 @@ class Order extends Common
                 'handle_remark'   => $handle_remark,
                 'refund_status'   => $refund_status,
             ]; 
+            if($refund_status == 2){
+                //todo::调用退款程序 
+               $relut = OrderRefund::refund_obj($info);
+               
+
+
+            }
             $res = Db::name('order_refund')->where(['id' => $id])->update($update);
 
             if($res !== false){

@@ -34,14 +34,14 @@ class Pay extends ApiBase
      * 支付
      */
     public function payment(){
-        $order_id     = input('order_id',1413);
-        $pay_type     = input('pay_type',3);//支付方式
+        $order_id     = input('order_id');
+        $pay_type     = input('pay_type');//支付方式
         $user_id      = $this->get_user_id();
         if(!$user_id){
             $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
         }
 
-        $order_info   = Db::name('order')->where(['order_id' => $order_id])->field('order_id,order_sn,order_amount,pay_type,pay_status,user_id')->find();//订单信息
+        $order_info   = Db::name('order')->where(['order_id' => $order_id])->field('order_id,groupon_id,order_sn,order_amount,pay_type,pay_status,user_id')->find();//订单信息
         if($order_info){
             //从订单列表立即付款进来
             $pay_type     = $order_info['pay_type'];//支付方式
@@ -57,18 +57,34 @@ class Pay extends ApiBase
 
     	if($order_info['pay_status'] == 1){
 			$this->ajaxReturn(['status' => -4 , 'msg'=>'此订单，已完成支付!','data'=>'']);
-    	}
+        }
+        
+        //团购
+        if($order_info['groupon_id']){
+            $groupon = Db::table('goods_groupon')->where('groupon_id',$order_info['groupon_id'])->where('is_show',1)->where('is_delete',0)->where('status',2)->find();
+            if(!$groupon){
+                Db::table('order')->where('order_id',$order_info['order_id'])->delete();
+                Db::table('order_goods')->where('order_id',$order_info['order_id'])->delete();
+                $this->ajaxReturn(['status' => -2 , 'msg'=>'该期拼团已结束，请前往最新一期拼团！','data'=>'']);
+            }
+            if(($groupon['target_number'] - $groupon['sold_number']) <= 0){
+                Db::table('order')->where('order_id',$order_info['order_id'])->delete();
+                Db::table('order_goods')->where('order_id',$order_info['order_id'])->delete();
+                $this->ajaxReturn(['status' => -2 , 'msg'=>'该期拼团已结束，请前往最新一期拼团！','data'=>$groupon['goods_id']]);
+            }
+        }
+
         // $sysset       = Db::name('sysset')->find();
         // $config       = unserialize($sysset['sets']);
         $amount       = $order_info['order_amount'];
         $client_ip    = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '127.0.0.1';
         $payData['order_no']        = $order_info['order_sn'];
-        $payData['body']            = '支付宝支付';
+        $payData['body']            = '';
         $payData['timeout_express'] = time() + 600;
         $payData['amount']          = $amount;
         if($pay_type == 3){
               $payData['subject']      = '支付宝支付';
-              $payData['goods_type']   = 1;
+              $payData['goods_type']   = 1;//虚拟还是实物
               $payData['return_param'] = '';
               $payData['store_id']     = '';
               $payData['quit_url']     = '';
@@ -124,13 +140,6 @@ class Pay extends ApiBase
             $jifen = 0;
             foreach($goods_res as $key=>$value){
 
-                $sku = Db::table('goods_sku')->where('sku_id',$value['sku_id'])->field('inventory,frozen_stock')->find();
-                $sku_num = $sku['inventory'] - $sku['frozen_stock'];
-                if( $value['goods_num'] > $sku_num ){
-                    Db::rollback();
-                    $this->ajaxReturn(['status' => -2 , 'msg'=>"商品：{$value['goods_name']}，规格：{$value['spec_key_name']}，数量：剩余{$sku_num}件可购买！",'data'=>'']);
-                }
-
                 $goods = Db::table('goods')->where('goods_id',$value['goods_id'])->field('less_stock_type,gift_points')->find();
                 //付款减库存
                 if($goods['less_stock_type']==2){
@@ -149,11 +158,21 @@ class Pay extends ApiBase
                     $jifen = sprintf("%.2f",$jifen + ($value['goods_num'] * $goods['gift_points']));
                 }
             }
-            
+            //团购
+            Db::table('goods_groupon')->where('groupon_id',$order_info['groupon_id'])->setInc('sold_number',1);
+           
             $res = Db::table('member')->update(['id'=>$user_id,'gouwujifen'=>$jifen]);
 
+            //判断用户是否是puls会员
+            $is_puls = model('Member')->is_puls($user_id);
+            if (empty($is_puls)){
+                //不是puls会员
+                $update_ispuls = model('Member')->create_puls($user_id,$order_id,1);
+            }else{
+                $update_ispuls = 1;
+            }
 
-            if($reult){
+            if($reult && $update_ispuls){
                 // 提交事务
                 Db::commit();
                 $this->ajaxReturn(['status' => 1 , 'msg'=>'余额支付成功!','data'=>['order_id' =>$order_info['order_id'],'order_amount' =>$order_info['order_amount'],'goods_name' => getPayBody($order_info['order_id']),'order_sn' => $order_info['order_sn'] ]]);
@@ -176,7 +195,128 @@ class Pay extends ApiBase
             $this->ajaxReturn(['status' => 0 , 'msg'=>$e->errorMessage(),'data'=>'']);
             exit;
         }
-    } 
+    }
+    /**
+     * 打卡微信支付接口
+     */
+    public function clock_wx_pay(){
+
+        $order_id     = 13;
+        $pay_type     = input('pay_type');//支付方式
+        $user_id      = 9;
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+        }
+        $order_info   = Db::name('clock_balance_log')->where(['order_id' => $order_id])->field('order_id,order_sn,title,pay_money,pay_status,uid,punch_time')->find();//订单信息
+        $member       = MemberModel::get($user_id);
+        //验证是否本人的
+        if(empty($order_info)){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'订单不存在','data'=>'']);
+        }
+        if($order_info['uid'] != $user_id){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'非本人订单','data'=>'']);
+        }
+
+        if($order_info['pay_status'] == 1){
+            $this->ajaxReturn(['status' => -4 , 'msg'=>'此订单，已完成支付!','data'=>'']);
+        }
+
+        $rechData['order_no']        = $order_info['order_sn'];
+        $rechData['body']            = '每日打卡支付';
+        $rechData['timeout_express'] = time() + 600;
+        $rechData['amount']          = $order_info['pay_money'];
+        $rechData['subject']         = '每日打卡';
+        $rechData['openid']       = $member['openid'];
+        $pay_config = Config::get('pay_config');
+        $wxConfig = Config::get('wx_config');
+        $url      = Charge::run(Config::WX_CHANNEL_WAP, $wxConfig, $rechData);
+
+    }
+
+
+    /**
+     * 打卡余额支付接口
+     */
+    public function clock_balance_pay(){
+
+        $order_id     = input('order_id');
+        $user_id      = $this->get_user_id();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+        }
+        $order_info   = Db::name('clock_balance_log')->where(['order_id' => $order_id])->field('order_id,order_sn,title,pay_money,pay_status,uid,punch_time')->find();//订单信息
+        $member       = MemberModel::get($user_id);
+        //验证是否本人的
+        if(empty($order_info)){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'订单不存在','data'=>'']);
+        }
+        if($order_info['uid'] != $user_id){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'非本人订单','data'=>'']);
+        }
+
+        if($order_info['pay_status'] == 1){
+            $this->ajaxReturn(['status' => -4 , 'msg'=>'此订单，已完成支付!','data'=>'']);
+        }
+
+        $amount       = $order_info['pay_money'];
+        $client_ip    = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '127.0.0.1';
+        $payData['order_no']        = $order_info['order_sn'];
+        $payData['body']            = $order_info['title'];
+        $payData['timeout_express'] = time() + 600;
+        $payData['amount']          = $amount;
+        $balance_info  = get_balance($user_id,0);
+            if($balance_info['balance'] < $order_info['pay_money']){
+                $this->ajaxReturn(['status' => 0 , 'msg'=>'余额不足','data'=>'']);
+            }
+            // 启动事务
+            Db::startTrans();
+
+            //扣除用户余额
+            $balance = [
+                'balance'            =>  Db::raw('balance-'.$amount.''),
+            ];
+            $res =  Db::table('member_balance')->where(['user_id' => $user_id,'balance_type' => 0])->update($balance);
+            if(!$res){
+                Db::rollback();
+            }
+            //余额记录
+            $balance_log = [
+                'user_id'      => $user_id,
+                'balance'      => $balance_info['balance'] - $order_info['pay_money'],
+                'balance_type' => $balance_info['balance_type'],
+                'source_type'  => 0,
+                'log_type'     => 0,
+                'source_id'    => $order_info['order_sn'],
+                'note'         => '打卡消费',
+                'create_time'  => time(),
+                'old_balance'  => $balance_info['balance']
+            ];
+            $res2 = Db::table('menber_balance_log')->insert($balance_log);
+            if(!$res2){
+                Db::rollback();
+            }
+            $dayInfo=["uid"=>$user_id,"punch_time"=>$order_info["punch_time"],"status"=>0];
+            $day_id = Db::table("clock_day")->insertGetId($dayInfo);
+            //修改订单状态
+            $update = [
+                'pay_status'   => 1,
+                'pay_type'     => 1,
+                'day_id'   => $day_id,
+                'pay_time'     => time(),
+            ];
+            $reult = Db::name("clock_balance_log")->where(['order_id' => $order_id])->update($update);
+
+            if($reult){
+                // 提交事务
+                Db::commit();
+                $this->ajaxReturn(['status' => 1 , 'msg'=>'余额支付成功!','data'=>['order_id' =>$order_info['order_id'],'order_amount' =>$order_info['pay_money'],'goods_name' =>$order_info['title'],'order_sn' => $order_info['order_sn'] ]]);
+            }else{
+                Db::rollback();
+                $this->ajaxReturn(['status' => -2 , 'msg'=>'余额支付失败','data'=>'']);
+            }
+
+    }
+
 
     /***
      * 支付宝回调
