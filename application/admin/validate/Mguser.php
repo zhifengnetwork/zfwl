@@ -28,9 +28,9 @@ class Mguser extends Validate
     ];
 
     protected $message = [
-        'name.require '                   => '昵称不能为空',
+        'name.require'                   => '昵称不能为空',
         'name.checkHasValue:name'         => '昵称已存在',
-        'username.require '               => '用户名不能为空',
+        'username.require'               => '用户名不能为空',
         'username.checkHasValue:username' => '用户名已存在',
         'username.alphaNum'               => '用户名必须是字母、数字',
         'mobile.checkHasValue:mobile'     => '该手机号已存在',

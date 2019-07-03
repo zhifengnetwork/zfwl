@@ -35,6 +35,15 @@ if (preg_match("/(.*)\.(.*)\.c3w\.cc/i", HTTP_HOST, $matches)) {
         'sapi.zfwl.local' => 'sapi',
         'api.zfwl.local' => 'api',
         'admin.zfwl.local' => 'admin',
+//         '127.0.0.1:10059' => 'agent',
+//         '127.0.0.1:10058' => 'home',
+//         '127.0.0.1:10057' => 'sapi',
+//         '127.0.0.1:10056' => 'api',
+//         '127.0.0.1:12588' => 'admin',
+//         '127.0.0.1:12580' => 'api',
+//        'demo.zfwl.top' => 'admin',
+//        'test.com' => 'admin',
+//        // '127.0.0.1:12580' => 'api',
     ];
     if (!empty($terrace[HTTP_HOST])) {
         $module = $terrace[HTTP_HOST];

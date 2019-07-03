@@ -175,7 +175,7 @@ function goods(obj){
     }
 
     var option = '';
-    $.post("{:url('coupon/goods')}",{'goods_name':goods_name},function(data){
+    $.post("{:url('Ajax/get_goods')}",{'goods_name':goods_name},function(data){
         $(data.data).each(function(k,v){
             option += '<option value="'+v.goods_id+'">'+v.goods_name+'</option>';
         })

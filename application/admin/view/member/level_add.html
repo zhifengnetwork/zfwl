@@ -20,7 +20,7 @@
                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                             <label class="col-xs-12 col-sm-3 col-md-3 control-label"><span style='color:red'>*</span> 等级名称</label>
                             <div class="col-sm-9 col-xs-12">
-                                <input type="text" name="levelname" class="form-control" value="" />
+                                <input type="text" name="name" class="form-control" value="" />
                             </div>
                         </div>
                     </div>
@@ -30,26 +30,23 @@
                             <div class="col-sm-9 col-xs-12">
                         
                                 <div class='input-group'>
-                                        {if empty($shopset['leveltype'])}
-                                        <span class='input-group-addon'>完成订单金额满</span>
-                                        <input type="text" name="ordermoney" class="form-control" value="" />
-                                        <span class='input-group-addon'>元</span>
-                                        {/if}
-                                        {if $shopset['leveltype']==1} 
-                                        <span class='input-group-addon'>完成订单数量满</span>
-                                        <input type="text" name="ordercount" class="form-control" value="" />
-                                        <span class='input-group-addon'>个</span>
-                                        {/if}
+                                        <span class='input-group-addon'>直推puls会员</span>
+                                        <input type="text" name="children_num" class="form-control" value="" />
+                                        <span class='input-group-addon'>人</span>
+                                        <span class='input-group-addon'>团队满足</span>
+                                        <input type="text" name="team_num" class="form-control" value="" />
+                                        <span class='input-group-addon'>人</span>
                                 </div>
-                                  <span class='help-block'>会员升级条件，不填写默认为不自动升级, 设置<a href="{:url('member/set')}">【会员升级依据】</a> </span>
                             </div>
                         </div>
                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                            <label class="col-xs-12 col-sm-3 col-md-3 control-label">折扣</label>
+                            <label class="col-xs-12 col-sm-3 col-md-3 control-label">升级奖励</label>
                             <div class="col-sm-9 col-xs-12">
-                               
-                                <input type="text" name="discount" class="form-control" value="" />
-                                <span class='help-block'>请输入0.1~10之间的数字,值为空代表不设置折扣</span>
+
+                                <div class='input-group'>
+                                    <input type="text" name="reward" class="form-control" value="" />
+                                    <span class='input-group-addon'>元</span>
+                                </div>
                             </div>
                         </div>
                     </div>

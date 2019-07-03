@@ -14,8 +14,7 @@ use think\Db;
 class Index extends Common
 {
     public function index()
-    { 
-       
+    {
         $where= [];
         $where['status'] = ['>=',0];
         $list       = Db::table('diy_ewei_shop')

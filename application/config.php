@@ -192,24 +192,52 @@ return [
     //     // 缓存保存目录
     //     'path'     => CACHE_PATH,
     //     // 缓存前缀
-    //     'prefix'   => 'zjtest',
+    //     'prefix'   => '',
     //     // 缓存有效期 0表示永久缓存
     //     'expire'   => 0,
-    //     'port'     => 6100,
-    //     'password' => 'sVbV#M8YAbe8',
-    //     'select'   => 1,
-    //     'host'     => '127.0.0.1',
     // ],
+    
     // 文件缓存 (本地使用这个)
     'cache'                  => [
         // 驱动方式
-        'type'   => 'File',
-        // 缓存保存目录
-        'path'   => CACHE_PATH,
-        // 缓存前缀
-        'prefix' => '',
-        // 缓存有效期 0表示永久缓存
-        'expire' => 0,
+        // 'type'   => 'File',
+        // // 缓存保存目录
+        // 'path'   => CACHE_PATH,
+        // // 缓存前缀
+        // 'prefix' => '',
+        // // 缓存有效期 0表示永久缓存
+        // 'expire' => 0,
+
+        // 使用复合缓存类型
+        'type'  =>  'complex',
+
+        // 默认使用的缓存
+        'default'   =>  [
+            // 驱动方式
+            'type'   => 'file',
+            // 缓存保存目录
+            'path'   => CACHE_PATH,
+            // 缓存有效期 0表示永久缓存
+            'expire' => 0,
+            //缓存前缀
+            'prefix' => 'File_'
+        ],
+        
+        // redis缓存
+        'redis'   =>  [
+            // 驱动方式
+            'type'   => 'redis',
+            // 服务器地址
+            'host'      => '47.107.185.253',
+            //端口号
+            'port'      => 6379,
+            // 全局缓存有效期（0为永久有效）
+            'expire'    => 0,
+            // 缓存前缀
+            'prefix'    => '',
+            //安全认证
+            'password'      => 'zfwl',
+        ],
     ],
     // +----------------------------------------------------------------------
     // | 会话设置
@@ -332,6 +360,28 @@ return [
         'notify_url'                => 'http://api.zhifengwangluo.c3w.cc/pay/alipay_notify/',
         'return_url'                => 'http://zf_shop.zhifengwangluo.com/',
         'return_raw'                =>  false,// 在处理回调时，是否直接返回原始数据，默认为 true
+    ],
+
+    'pay_weixin' => [
+        'use_sandbox'       => true,// 是否使用 微信支付仿真测试系统
+        'app_secret'        => 'aeb753813c5e6d538905daeda4bc4932',
+        'app_id'            => 'wxbfd97e7c3331e60b',  // 公众账号ID
+        'mch_id'            => 'xxxxx',// 商户id
+        'md5_key'           => 'xxxxxxx',// md5 秘钥
+        'app_cert_pem'      => dirname(__FILE__) . DIRECTORY_SEPARATOR . 'wx' . DIRECTORY_SEPARATOR .  'pem' . DIRECTORY_SEPARATOR . 'weixin_app_cert.pem',
+        'app_key_pem'       => dirname(__FILE__) . DIRECTORY_SEPARATOR . 'wx' . DIRECTORY_SEPARATOR .  'pem' . DIRECTORY_SEPARATOR . 'weixin_app_key.pem',
+        'sign_type'         => 'MD5',// MD5  HMAC-SHA256
+        'limit_pay'         => [
+            //'no_credit',
+        ],// 指定不能使用信用卡支付   不传入，则均可使用
+        'fee_type'          => 'CNY',// 货币类型  当前仅支持该字段
+    
+        'notify_url'        => 'https://helei112g.github.io/v1/notify/wx',
+    
+        'redirect_url'      => 'https://helei112g.github.io/',// 如果是h5支付，可以设置该值，返回到指定页面
+    
+        'return_raw'        => false,// 在处理回调时，是否直接返回原始数据，默认为true
+
     ]
 
 ];

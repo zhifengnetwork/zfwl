@@ -10,7 +10,21 @@ function pred($data){
     echo '<pre>';
     print_r($data);die;
 }
-
+function request_curl( $url , $data = null ){
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    if( !empty($data) )
+    {
+        @curl_setopt($ch, CURLOPT_POST, 1); 
+        @curl_setopt($ch, CURLOPT_POSTFIELDS, $data);   
+    }
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    $str  = curl_exec($ch);
+    curl_close($ch);
+    return $str;
+}
 /**
  * 只保留字符串首尾字符，隐藏中间用*代替（两个字符时只显示第一个）
  * @param string $user_name 姓名
@@ -21,6 +35,34 @@ function substr_cut($user_name){
     $firstStr     = mb_substr($user_name, 0, 1, 'utf-8');
     $lastStr     = mb_substr($user_name, -1, 1, 'utf-8');
     return $strlen == 2 ? $firstStr . str_repeat('*', mb_strlen($user_name, 'utf-8') - 1) : $firstStr . str_repeat("*", $strlen - 2) . $lastStr;
+}
+
+function get_randMoney($money_total = 20 , $personal_num = 10){
+    $min_money    = $money_total/$personal_num - $money_total/$personal_num*0.1;
+    $money_right  = $money_total;
+    $randMoney=[];
+    for($i=1;$i<=$personal_num;$i++){
+        if($i== $personal_num){
+            $money=$money_right;
+        }else{
+            $max=$money_right*100 - ($personal_num - $i ) * $min_money *100;
+            $money= rand($min_money*100,$max) /100;
+            $money=sprintf("%.2f",$money);
+            }
+            $randMoney[]=$money;
+            $money_right=$money_right - $money;
+            $money_right=sprintf("%.2f",$money_right);
+    }
+    shuffle($randMoney);
+    return  $randMoney;
+}
+//获取区间刀
+function get_qujian($chopper_id){
+    $section = Db::name('goods_chopper')->where(['chopper_id' =>$chopper_id])->value('section');
+    $section = unserialize($section);
+    $qe_amount = ($section['end'] - $section['start'] + 1) * $section['amount'];
+    $res     = '第'.$section['start'].'刀到第'.$section['end'].'刀每刀砍价'.$section['amount'].'元一共'.$qe_amount.'元';
+    return $res;
 }
 
 //树结构
@@ -91,6 +133,24 @@ function xmlToArray($xml){
     libxml_disable_entity_loader(true);
     $values = json_decode(json_encode(simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
     return $values;
+}
+//判断是否是微信    
+function is_weixin() {
+    if (strpos($_SERVER['HTTP_USER_AGENT'], 'MicroMessenger') !== false) {
+        return true;
+    } return false;
+}
+
+/***
+ * 调用微信sdk
+ */
+function wxJSSDK(){
+    $wx_config     = config('wx_config');
+    $appId         = $wx_config['appid'];
+    $appSecret     = $wx_config['appsecret'];
+    vendor('wxsdk.wxaction');
+    $jssdk = new JSSDK($appId, $appSecret);
+    return $jssdk;
 }
 
 /**
