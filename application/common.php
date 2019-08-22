@@ -10,7 +10,21 @@ function pred($data){
     echo '<pre>';
     print_r($data);die;
 }
-
+function request_curl( $url , $data = null ){
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    if( !empty($data) )
+    {
+        @curl_setopt($ch, CURLOPT_POST, 1); 
+        @curl_setopt($ch, CURLOPT_POSTFIELDS, $data);   
+    }
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    $str  = curl_exec($ch);
+    curl_close($ch);
+    return $str;
+}
 /**
  * 只保留字符串首尾字符，隐藏中间用*代替（两个字符时只显示第一个）
  * @param string $user_name 姓名

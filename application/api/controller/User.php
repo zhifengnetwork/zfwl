@@ -667,7 +667,45 @@ class User extends ApiBase
     public function add_address()
     {
             $user_id   = $this->get_user_id();
-            $post_data = input('post.');
+            if(!$user_id){
+                $this->ajaxReturn(['status' => -2, 'msg'=>'用户不存在','data'=>'']);
+            }
+
+            $consignee = input('consignee');
+            $longitude = input('lng');
+            $latitude = input('lat');
+            $address_district = input('address_district');
+            $address_twon = input('address_twon');
+            $address = input('address');
+            $mobile = input('mobile');
+            $is_default = input('is_default');
+
+            $address = $address_twon . $address;
+
+            $post_data['consignee'] = $consignee;
+            $post_data['longitude'] = $longitude;
+            $post_data['latitude'] = $latitude;
+            $post_data['mobile'] = $mobile;
+            $post_data['is_default'] = $is_default;
+            
+            if($latitude && $longitude){
+                $url = "http://api.map.baidu.com/geocoder/v2/?ak=gOuAqF169G6cDdxGnMmB7kBgYGLj3G1j&callback=renderReverse&location={$latitude},{$longitude}&output=json";
+                $res = request_curl($url);
+                if($res){
+                    $res = explode('Reverse(',$res)[1];
+                    $res = substr($res,0,strlen($res)-1);
+                    $res = json_decode($res,true)['result']['addressComponent'];
+
+                    $post_data['province'] = Db::table('region')->where('area_name',$res['province'])->value('area_id');
+                    $post_data['city'] = Db::table('region')->where('area_name',$res['city'])->value('area_id');
+                    $post_data['district'] = Db::table('region')->where('area_name',$res['district'])->value('area_id');
+                    if($res['town']){
+                        $post_data['town'] = Db::table('region')->where('area_name',$res['town'])->value('area_id');
+                    }
+                }
+            }
+            $post_data['address'] = $address;
+            
             $addressM  = Model('UserAddr');
             $return    = $addressM->add_address($user_id, 0, $post_data);
             $this->ajaxReturn($return);
@@ -688,7 +726,45 @@ class User extends ApiBase
         if(!$address){
             $this->ajaxReturn(['status' => -2 , 'msg'=>'地址id不存在！','data'=>'']);
         }
-        $post_data = input('post.');
+        
+        $consignee = input('consignee');
+        $longitude = input('lng');
+        $latitude = input('lat');
+        $address_district = input('address_district');
+        $address_twon = input('address_twon');
+        $address = input('address');
+        $mobile = input('mobile');
+        $is_default = input('is_default');
+
+        $address = $address_twon . $address;
+
+        $post_data['consignee'] = $consignee;
+        $post_data['longitude'] = $longitude;
+        $post_data['latitude'] = $latitude;
+        $post_data['mobile'] = $mobile;
+        $post_data['is_default'] = $is_default;
+        
+        if($latitude && $longitude){
+            $url = "http://api.map.baidu.com/geocoder/v2/?ak=gOuAqF169G6cDdxGnMmB7kBgYGLj3G1j&callback=renderReverse&location={$latitude},{$longitude}&output=json";
+            $res = request_curl($url);
+            if($res){
+                $res = explode('Reverse(',$res)[1];
+                $res = substr($res,0,strlen($res)-1);
+                $res = json_decode($res,true)['result']['addressComponent'];
+
+                $post_data['province'] = Db::table('region')->where('area_name',$res['province'])->value('area_id');
+                $post_data['city'] = Db::table('region')->where('area_name',$res['city'])->value('area_id');
+                $post_data['district'] = Db::table('region')->where('area_name',$res['district'])->value('area_id');
+                if($res['town']){
+                    $post_data['town'] = Db::table('region')->where('area_name',$res['town'])->value('area_id');
+                }
+            }
+        }
+
+        $post_data['address'] = $address;
+
+
+
         $addressM  = Model('UserAddr');
         $return    = $addressM->add_address($user_id, $id, $post_data);
         $this->ajaxReturn($return);
