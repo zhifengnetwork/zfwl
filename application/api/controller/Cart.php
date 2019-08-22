@@ -61,7 +61,7 @@ class Cart extends ApiBase
         $sku_id       = Request::instance()->param("sku_id", 0, 'intval');
         $groupon_id   = Request::instance()->param("groupon_id", 0, 'intval');
         $cart_number  = Request::instance()->param("cart_number", 1, 'intval');
-        $act = input('act');
+        $act = Request::instance()->param('act');
 
         if( !$sku_id || !$cart_number ){
             $this->ajaxReturn(['status' => -2 , 'msg'=>'该商品不存在！','data'=>'']);
@@ -182,6 +182,7 @@ class Cart extends ApiBase
             $goods_res = Db::name('goods')->where('goods_id',$sku_res['goods_id'])->field('goods_name,price,original_price')->find();
             $cartData['groupon_id'] = $groupon_id;
             $cartData['goods_id'] = $sku_res['goods_id'];
+            $cartData['selected'] = 0;
             $cartData['goods_name'] = $goods_res['goods_name'];
             $cartData['sku_id'] = $sku_id;
             $cartData['user_id'] = $user_id;

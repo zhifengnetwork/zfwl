@@ -34,6 +34,10 @@ class Login extends \think\Controller
             $where['status']   = 1;
 
             $user_info = Db::table('mg_user')->where($where)->find();
+//            $password='admin888';
+////            $this->error('密码错误！'.$user_info['password']);
+//            $this->error('密码错误！'.minishop_md5($password, $user_info['salt']));
+//            exit;
             if ($user_info && $user_info['password'] === minishop_md5($password, $user_info['salt'])) {
                 $session['mgid']     = $user_info['mgid'];
                 $session['username'] = $user_info['username'];

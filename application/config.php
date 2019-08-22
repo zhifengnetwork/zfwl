@@ -382,6 +382,17 @@ return [
     
         'return_raw'        => false,// 在处理回调时，是否直接返回原始数据，默认为true
 
-    ]
+    ],
+
+    //验证码
+    'captcha' => [    // 验证码字符集合3.
+        'codeSet' => '2345678abcdefhijkmnpqrstuvwxyzABCDEFGHJKLMNPQRTUVWXY',     // 验证码字体大小(px)5.
+        'fontSize' => 28,     // 是否画混淆曲线7.
+        'useCurve' => false,     // 验证码图片高度9.
+        'imageH'  => 50,    // 验证码图片宽度11.
+        'imageW'  => 200,     // 验证码位数13.
+        'length'  => 4,     // 验证成功后是否重置    15.
+        'reset'  => true
+    ],
 
 ];

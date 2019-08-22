@@ -34,7 +34,7 @@ class Index extends ApiBase
 
 
         // die;
-        echo 1111;
+        echo '这里真的是api模块的首页';
         exit;
         $user_id = $this->get_user_id();
         if(!$user_id){

@@ -79,6 +79,12 @@ class Groupon extends ApiBase
             $groupon_data['surplus'] = $groupon_data['target_number'];
             $groupon_data['surplus_percentage'] = 1;
             $groupon_data['groupon_id'] = $groupon_id;
+
+            $redis = $this->getRedis();
+            for($i=0;$i<$groupon_data['target_number'];$i++){
+                $redis->rpush("GOODS_GROUP_{$groupon_id}",1);
+            }
+
             return $groupon_data;
         }else{
             return false;
