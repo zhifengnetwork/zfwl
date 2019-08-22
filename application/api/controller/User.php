@@ -94,7 +94,7 @@ class User extends ApiBase
                 $this->ajaxReturn(['status' => -2 , 'msg'=>'用户不存在请重新授权！','data'=>'']);  
                 Db::rollback(); 
             }
-            $data['token']   = $this->create_token($member['id']);   
+            $data['token']   = $this->create_token($member['id']); 
         }else{
             $insert = [
                 'mobile' => $mobile,
@@ -283,7 +283,7 @@ class User extends ApiBase
         //通过code获取网页授权access_token 和 openid 。网页授权access_token是一次性的，而基础支持的access_token的是有时间限制的：7200s。
     	//1、微信网页授权是通过OAuth2.0机制实现的，在用户授权给公众号后，公众号可以获取到一个网页授权特有的接口调用凭证（网页授权access_token），通过网页授权access_token可以进行授权后接口调用，如获取用户基本信息；
     	//2、其他微信接口，需要通过基础支持中的“获取access_token”接口来获取到的普通access_token调用。
-        $url = $this->__CreateOauthUrlForOpenid($code);       
+        $url = $this->__CreateOauthUrlForOpenid($code); 
         $ch = curl_init();//初始化curl        
         curl_setopt($ch, CURLOPT_TIMEOUT, 300);//设置超时
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -412,7 +412,6 @@ class User extends ApiBase
         }
        
     }
-
 
     /*
      *  找回密码接口

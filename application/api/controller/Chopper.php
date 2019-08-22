@@ -117,11 +117,11 @@ class Chopper extends ApiBase
         //砍价用户
         $list = Db::name('user_chopper')->where(['user_id|invite_id' => $user_id,'chopper_id' => $chopper_id])->select();
         // 返回数据
-        $signPackage = (wxJSSDK())->getSignPackage();//微信sdk
+        // $signPackage = (wxJSSDK())->getSignPackage();//微信sdk
         $data = [
             'info'        => $info,
             'list'        => $list,
-            'signPackage' => $signPackage,
+            // 'signPackage' => $signPackage,
         ];
         $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$data]);
     }
@@ -132,8 +132,8 @@ class Chopper extends ApiBase
      */
 
     public function chopper(){
-        $user_id = 100;
-        $invite_id  = input('invite_id',0);//被邀请人ID
+        $user_id    = 100;
+        $agent_id   = input('agent_id',0);//代理ID
         // if(!$user_id){
         //     $this->ajaxReturn(['status' => -2 , 'msg'=>'用户不存在','data'=>'']);
         // }
@@ -152,11 +152,12 @@ class Chopper extends ApiBase
 
         $random  = Db::name('chopper_random')->where(['user_id' => $user_id,'chopper_id' => $chopper_id])->find();
         if(!$random){
-            $amount      = $chopper['first_amount'];//第一刀
+            $first_amount   = unserialize($chopper['first_amount']);
+            $amount         = mt_rand($first_amount['amount_start'],$first_amount['amount_end']) + (mt_rand(0,9)/10);//第一刀
             $random_ins = [
                 'user_id'       => $user_id,
                 'chopper_id'    => $chopper_id,
-                'amount'        => serialize(get_randMoney($chopper['end_price'],$chopper['end_num'])),
+                // 'amount'        => serialize(get_randMoney($chopper['end_price'],$chopper['end_num'])),
                 'end_num'       => $chopper['end_num'],
                 'chopper_state' => 0,
                 'already_amount'=> $amount,
@@ -173,11 +174,13 @@ class Chopper extends ApiBase
             $section     = unserialize($chopper['section']);
             $already_num =  $random['already_num']+1;
             if($already_num  == 2){
-               $amount   = $chopper['second_amount']; //第二刀
+                $second_amount  = unserialize($chopper['second_amount']);
+                $amount         =  mt_rand($second_amount['amount_start'],$second_amount['amount_end']) + (mt_rand(0,9)/10);; //第二刀
             }elseif($already_num == 3){
-               $amount   =  $chopper['third_amount']; //第三刀
+                $third_amount   = unserialize($chopper['third_amount']);
+                $amount         =  mt_rand($third_amount['amount_start'],$third_amount['amount_end']) + (mt_rand(0,9)/10);; //第二刀
             }elseif($already_num >= $section['start'] && $already_num <= $section['end']){
-               $amount   =  $section['amount'];//区间刀
+                $amount         =  mt_rand($section['amount_start'],$section['amount_end']) + (mt_rand(0,9)/10);; //第二刀
             }else{
                if($random['end_num'] == 0){
                    $amount = 0.01;//刀满

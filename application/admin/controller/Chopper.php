@@ -40,71 +40,86 @@ class Chopper extends Common
     //添加砍一刀
     function add(){
         if(request()->isPost() ){
-            $chopper_name   = input('chopper_name','');//砍一刀
-            $surplus_amount = input('surplus_amount/f',0);//底价
-            $first_amount   = input('first_amount/f',0);//第一刀
-            $second_amount  = input('second_amount/f',0);//第二刀
-            $third_amount   = input('third_amount/f',0);//第三刀
-            $section        = input('section/a');//区间刀
-            $end_num        = input('end_num/d');//区间刀
-            $start_time     = input('start_time');//开始时间
-            $end_time       = input('end_time');//结束时间
-            $goods_id       = input('goods_id/d');
+            $chopper_name     = input('chopper_name','');//砍一刀
+            $surplus_amount   = input('surplus_amount/f',0);//底价
+            $first_amount     = input('first_amount/a',0);//第一刀 波动价格
+            $second_amount    = input('second_amount/a',0);//第二刀 波动价格
+            $third_amount     = input('third_amount/a',0);//第三刀 波动价格
+            $section          = input('section/a');//区间刀 波动价格
+            $end_num          = input('end_num/d');//区间刀 n刀 
+            $start_time       = input('start_time');//开始时间
+            $end_time         = input('end_time');//结束时间
+            $goods_id         = input('goods_id/d');
             $goods_cost_price = input('cost_price/f');
             $goods_price      = input('price/f');
 
-            if($section['start'] > $section['end']){
-                $this->error('区间刀填写错误!');
+            // if($section['start'] > $section['end']){
+            //     $this->error('区间刀填写错误!');
+            // }
+
+            if($first_amount['amount_start'] <= 0 || $first_amount['amount_end'] <=0){
+                 $this->error('第一刀金额输入有误!');
             }
-            if($section['amount'] < 0){
-                $this->error('区间刀价格不正确!');
+
+            if($second_amount['amount_start'] <= 0 || $second_amount['amount_end'] <=0){
+                 $this->error('第二刀金额输入有误!');
             }
+
+            if($third_amount['amount_start'] <= 0 || $third_amount['amount_end'] <=0){
+                $this->error('第三刀金额输入有误!');
+            }
+            
+            if($section['amount_start'] <= 0 || $section['amount_end'] <=0){
+                $this->error('区间刀金额输入有误!');
+            }
+
             if($end_num < 0){
                 $this->error('剩余砍价次数不能小于0!');
             }
+
             if($goods_id <= 0){
                 $this->error('请选择商品!');    
             }
+
             $good = Goods::get($goods_id);
             //判断砍价最低价不能小于成本价
             if($surplus_amount < $good['cost_price']){
                 $this->error('最低价不能小于成本价!');
             }
 
-            //区间刀总金额
+            //区间刀最大金额
 
-            $qe_amount = ($section['end'] - $section['start'] + 1) * $section['amount'];
+            $qe_amount = ($section['end'] - $section['start'] + 1) * $section['amount_end'];
 
-            //判断砍价总金额不能超过可砍金额
-            $total_amount     = $first_amount + $second_amount + $third_amount + $qe_amount;
-         
-            $end_price        = $good['price'] - $surplus_amount - $total_amount;//随机砍的金额
-            //用户需要砍的总金额
-            $tamount = $total_amount + $end_price;
-           
+            //前N刀最大金额
+            $total_amount     =  $first_amount['amount_end'] + $second_amount['amount_end'] + $third_amount['amount_end'] + $qe_amount;
+            
             //可砍金额
-            $kekan_amount  = $good['price'] - $surplus_amount;
+            $kekan_amount     = $good['price'] - $surplus_amount;
+           
 
 
-            if($tamount  > $kekan_amount){
+            if($total_amount  > $kekan_amount){
                 $this->error('设置的砍价金额超过商品可砍金额!');
             }
 
 
-            $section      = serialize($section);
+            $section           = serialize($section);
+            $first_amount      = serialize($first_amount);
+            $second_amount     = serialize($second_amount);
+            $third_amount      = serialize($third_amount);
             $data = [
-                'section'        => $section,
-                'chopper_price'  => $tamount,
-                'surplus_amount' => $surplus_amount,
-                'chopper_name'   => $chopper_name,
-                'first_amount'   => $first_amount,
-                'second_amount'  => $second_amount,
-                'third_amount'   => $third_amount,
-                'end_num'        => $end_num,
-                'end_price'      => $end_price,
-                'start_time'     => strtotime($start_time),
-                'end_time'       => strtotime($end_time),
-                'goods_id'       => $goods_id,
+                'section'          => $section,
+                'chopper_price'    => $kekan_amount,
+                'surplus_amount'   => $surplus_amount,
+                'chopper_name'     => $chopper_name,
+                'first_amount'     => $first_amount,
+                'second_amount'    => $second_amount,
+                'third_amount'     => $third_amount,
+                'end_num'          => $end_num,
+                'start_time'       => strtotime($start_time),
+                'end_time'         => strtotime($end_time),
+                'goods_id'         => $goods_id,
                 'goods_cost_price' => $goods_cost_price,
                 'goods_price'      => $goods_price,
             ]; 
@@ -164,7 +179,7 @@ class Chopper extends Common
 
             $section = serialize($section);
             $data = [
-                'section'      => $section,
+                'section'        => $section,
                 'surplus_amount' => $surplus_amount,
                 'chopper_name' => $chopper_name,
                 'first_amount' => $first_amount,
@@ -188,7 +203,7 @@ class Chopper extends Common
             }
         }
 
-        $info   = Db::name('goods_chopper')->where('chopper_id',$chopper_id)->find();
+        $info    = Db::name('goods_chopper')->where('chopper_id',$chopper_id)->find();
         $section = unserialize($info['section']);
         return $this->fetch("",[
             'section'       =>  $section,

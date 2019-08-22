@@ -53,7 +53,6 @@
                                 <th>区间刀</th>  
                                 <th>砍价底价</th>
                                 <th>随机砍价次数</th>
-                                <th>随机砍价金额</th>
                                 <th>可砍金额</th>
                                 <th>开始时间</th>
                                 <th>结束时间</th>
@@ -68,13 +67,12 @@
                                 <td><input type="checkbox" class="i-checks ch_item" name="chopper_id[]"   value="{$vo.chopper_id}">{$vo.chopper_id}</td>
                                 <td>{$vo.chopper_name}</td>
                                 <td>{$vo.sort}</td>
-                                <td>{$vo.first_amount}</td>
-                                <td>{$vo.second_amount}</td>
-                                <td>{$vo.third_amount}</td>
+                                <td>{:get_qiandao($vo.chopper_id,1)}</td>
+                                <td>{:get_qiandao($vo.chopper_id,2)}</td>
+                                <td>{:get_qiandao($vo.chopper_id,3)}</td>
                                 <td>{:get_qujian($vo.chopper_id)}</td>
                                 <td>{$vo.surplus_amount}</td>
                                 <td>{$vo.end_num}</td>
-                                <td>{$vo.end_price}</td>
                                 <td>{$vo.chopper_price}</td>
                                 <td>{$vo.start_time|date="Y-m-d H:i:s",###}</td>
                                 <td>{$vo.end_time|date="Y-m-d H:i:s",###}</td>

@@ -138,7 +138,6 @@ class ApiBase extends Controller
     
             if(!$res){
                 $this->ajaxReturn(['status' => -1 , 'msg'=>'token已过期','data'=>null]);
-    
             }
     
             if(!isset($res['iat']) || !isset($res['exp']) || !isset($res['user_id']) ){

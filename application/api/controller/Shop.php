@@ -17,21 +17,21 @@ class Shop extends ApiBase
     }
 
     public function getShopData () {
-
         $res = model('DiyEweiShop')->getShopData();
         if (!empty($res)){
             return json(['code'=>1,'msg'=>'','data'=>$res]);
         }else{
             return json(['code'=>0,'msg'=>'没有数据，请添加','data'=>'']);
         }
+        
     }
 
     public function gooodsList () {
-        $keyword = request()->param('keyword','');
-        $cat_id = request()->param('cat_id',0,'intval');
-        $page = request()->param('page',0,'intval');
-        $goods = new Goods();
-        $list = $goods->getGoodsList($keyword,$cat_id,$page);
+        $keyword  = request()->param('keyword','');
+        $cat_id   = request()->param('cat_id',0,'intval');
+        $page     = request()->param('page',0,'intval');
+        $goods    = new Goods();
+        $list     = $goods->getGoodsList($keyword,$cat_id,$page);
         if (!empty($list)){
             return json(['code'=>1,'msg'=>'','data'=>$list]);
         }else{

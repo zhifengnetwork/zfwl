@@ -1794,15 +1794,19 @@
                         keyword: that.search_data['key_word'],
                     })
                     .then(function(response) {
-                        console.log(response['data']);
                         if(response['data']['code'] == 1) {
+                           
                         	var re_data = response['data']['data'];
+                            console.log(re_data['data']);
                             /*成功之后=>清除-本地数据,在更新*/
                             that.comm_data = [];
                             /*循环赋值*/
                             for(var g = 0; g < re_data['data'].length; g++) {
                                 /*(深克隆)赋值给页面渲染的data*/
+                                console.log(re_data['data'][g]);
+                                
                                 that.comm_data.push(clones(re_data['data'][g]));
+                                exit;
                             }
                             /*暂无该商品*/
 							if(that.comm_data.length == 0){

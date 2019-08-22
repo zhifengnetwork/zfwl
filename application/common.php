@@ -46,10 +46,26 @@ function get_randMoney($money_total = 20 , $personal_num = 10){
 function get_qujian($chopper_id){
     $section = Db::name('goods_chopper')->where(['chopper_id' =>$chopper_id])->value('section');
     $section = unserialize($section);
-    $qe_amount = ($section['end'] - $section['start'] + 1) * $section['amount'];
-    $res     = '第'.$section['start'].'刀到第'.$section['end'].'刀每刀砍价'.$section['amount'].'元一共'.$qe_amount.'元';
+    $res     = '第'.$section['start'].'刀到第'.$section['end'].'刀波动砍价'.$section['amount_start'].'到'.$section['amount_end'].'元';
     return $res;
 }
+
+//获取前三刀
+function get_qiandao($chopper_id,$num){
+    $section = Db::name('goods_chopper')->where(['chopper_id' => $chopper_id])->find();
+    if($num == 1){
+        $data = unserialize($section['first_amount']);
+    }elseif($num == 2){
+        $data = unserialize($section['second_amount']);
+    }else{
+        $data = unserialize($section['third_amount']);
+    }
+    $res = $data['amount_start'].'--'.$data['amount_end'].'元';
+  
+    return $res;
+}
+
+
 
 //树结构
 function getTree1($items,$pid ="pid") {

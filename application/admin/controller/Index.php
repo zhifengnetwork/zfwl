@@ -15,6 +15,13 @@ class Index extends Common
 {
     public function index()
     {
+
+        $str = '1.1231';
+        $arr = explode('.', $str)[1];
+        $num = substr($arr,0,2);
+        var_dump($num);
+        die;
+
         $where= [];
         $where['status'] = ['>=',0];
         $list       = Db::table('diy_ewei_shop')
