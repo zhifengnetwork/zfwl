@@ -18,9 +18,6 @@ class Common extends Controller
      */
     public function _initialize()
     {
-//        $session['mgid']     = 26;
-//        $session['username'] = 'xiaozhi222';
-//        Session::set('admin_user_auth',$session);
         config((new Config)->getConfig());
         if (session('admin_user_auth')) {
             if (!defined('UID')) {
@@ -43,7 +40,6 @@ class Common extends Controller
         $this->auth();
         $this->view->mginfo     = $this->mginfo    = session('admin_user_auth');
         $leftmenu =  self::get_leftmenu();
-    
         $this->view->lefts_menu  = self::lefts_menu($leftmenu);
         $this->view->left_menu   = $leftmenu;
         // var_dump(self::lefts_menu($leftmenu)[0]['_child']);
@@ -87,8 +83,11 @@ class Common extends Controller
             }
         }
         $menu_tree = list_to_tree($list);
+        
         Session::set('ALL_MENU_LIST', $menu_tree);
         $left_menu = self::menu($menu_tree);
+        
+        
         return $left_menu;
     }
 
@@ -100,19 +99,28 @@ class Common extends Controller
         static $url;
         //!$url && $url = strtolower(request()->controller() . '/' . request()->action());
         !$url && $url = request()->path();
-        if($url == '/'){
-           $url = 'index/index';
+       
+        $url = str_replace('admin/', '', $url);
+
+        if ($url == '/') {
+            $url = strtolower(request()->controller() . "/" . request()->action());
         }
-        // $url = str_replace('admin/', '', $url);
+
+        if($url == 'admin'){
+              $url = 'index/index';
+        } 
+
+
+
         $array = array();
         foreach ($left_menu as $key => &$val) {
-            if($url == $val['url']){
+            if($url == $val['url']||stripos($url,$val['url'])){
                 $val['left'] = 1;
             }
             if (!empty($val['_child'])) {
                 $val['_child'] = self::menu($val['_child']);
-                
-                if ($url == $val['url']) {
+
+                if ($url == $val['url']||stripos($url,$val['url'])) {
                     $val['class']  = 'active';
                     $val['class2'] = 'select';
                     $val['left']  =  1;
@@ -177,9 +185,16 @@ class Common extends Controller
         //当前url
 
         $url = $request->path();
+       
+        $url = str_replace('admin/', '', $url);
+        if($url == 'admin'){
+            $url = 'index/index';
+        }        
+      
         if ($url == '/') {
             $url = strtolower($request->controller() . "/" . $request->action());
         }
+
         //超级管理员，直接返回
         if (UID === IS_ROOT) {
             return true;
@@ -208,9 +223,9 @@ class Common extends Controller
         //去除重复值
         $rules_array = array_unique($rules_array);
         // //权限判断
-        // if (!in_array($rule_id, $rules_array)) {
-        //     return $this->error("没有权限");
-        // }
+        if (!in_array($rule_id, $rules_array)) {
+            // return $this->error("没有权限");
+        }
 
     }
 
